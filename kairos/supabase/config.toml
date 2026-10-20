@@ -1,0 +1,7 @@
+# Supabase project config for the Kairos relay.
+# The relay authenticates every call with a per-mailbox bearer token (see
+# functions/relay/handler.ts), not with Supabase Auth, so JWT verification is off.
+project_id = "kairos"
+
+[functions.relay]
+verify_jwt = false
