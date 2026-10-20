@@ -1,0 +1,152 @@
+{
+  "expo": {
+    "name": "Kairos",
+    "slug": "kairos",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "kairos",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#0D0A0C",
+    "ios": {
+      "bundleIdentifier": "love.kairos.app",
+      "supportsTablet": true,
+      "associatedDomains": [
+        "applinks:kairos.love"
+      ],
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "privacyManifests": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyCollectedDataTypes": []
+      }
+    },
+    "android": {
+      "package": "love.kairos.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0D0A0C",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "android.permission.health.READ_MENSTRUATION",
+        "android.permission.health.READ_OVULATION_TEST",
+        "android.permission.health.READ_CERVICAL_MUCUS",
+        "android.permission.health.READ_BASAL_BODY_TEMPERATURE"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "kairos.love",
+              "pathPrefix": "/pair"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
+      "predictiveBackGestureEnabled": true
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png",
+      "name": "Kairos",
+      "shortName": "Kairos",
+      "themeColor": "#0D0A0C",
+      "backgroundColor": "#0D0A0C",
+      "description": "Her rhythm. Your moment. A private, cycle-aware companion for couples."
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "asyncRoutes": {
+            "web": false
+          }
+        }
+      ],
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0D0A0C",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 120
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#FFAA6B"
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "Kairos adds a private “Seasons” calendar with all-day, free events. It never reads your other events."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Kairos uses the camera only to scan your partner’s pairing code.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "Kairos reads your cycle data (periods, ovulation tests, temperature) to forecast your seasons on this iPhone. It never leaves your phone unencrypted.",
+          "NSHealthUpdateUsageDescription": false,
+          "background": false
+        }
+      ],
+      "react-native-health-connect",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26
+          }
+        }
+      ],
+      [
+        "expo-widgets",
+        {
+          "widgets": [
+            {
+              "name": "SeasonWidget",
+              "displayName": "Season",
+              "description": "Her season at a glance, discreetly.",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryCircular",
+                  "accessoryRectangular",
+                  "accessoryInline"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

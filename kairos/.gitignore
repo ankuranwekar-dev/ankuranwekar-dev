@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.expo/
+web-build/
+ios/
+android/
+*.tsbuildinfo
+.DS_Store
+coverage/
+.env*.local
+apps/app/dist/
+apps/app/dist-dev/
+apps/app/expo-env.d.ts
