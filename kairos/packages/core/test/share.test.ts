@@ -34,7 +34,10 @@ describe('snapshot', () => {
   });
 
   it('pauses on a positive pregnancy test: he never hears it from an app', () => {
-    const pf = forecast({ ...data, pregnancyTests: [{ date: '2026-09-20', positive: true }] }, { asOf: '2026-09-20', seed: 's' });
+    const pf = forecast(
+      { ...data, pregnancyTests: [{ date: '2026-09-20', positive: true }] },
+      { asOf: '2026-09-20', seed: 's' },
+    );
     const s = buildSnapshot(pf, { intent: 'trying', share: 'fertility', playbook: PLAYBOOK });
     expect(s.status).toBe('paused');
     expect(s.days).toEqual([]);
@@ -67,8 +70,12 @@ describe('signals', () => {
   });
 
   it('a craving uses her words, or her favorite treat', () => {
-    expect(respondToSignal({ id: 'craving', at: '2026-10-20T15:00:00Z', note: 'fries' }, PLAYBOOK).title).toBe('She’s craving fries');
-    expect(respondToSignal({ id: 'craving', at: '2026-10-20T15:00:00Z' }, PLAYBOOK).title).toBe('She’s craving salted dark chocolate');
+    expect(respondToSignal({ id: 'craving', at: '2026-10-20T15:00:00Z', note: 'fries' }, PLAYBOOK).title).toBe(
+      'She’s craving fries',
+    );
+    expect(respondToSignal({ id: 'craving', at: '2026-10-20T15:00:00Z' }, PLAYBOOK).title).toBe(
+      'She’s craving salted dark chocolate',
+    );
   });
 
   it('"need space" quiets other nudges', () => {

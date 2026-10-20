@@ -88,11 +88,7 @@ export const PHASE_COPY: Record<Phase, SeasonCopy> = {
     name: 'Summer',
     glyph: '☀︎',
     read: 'She’s at her most radiant. Connection comes easily.',
-    helps: [
-      'A real date: dress up a little',
-      'Specific compliments, not generic ones',
-      'Closeness, with no agenda',
-    ],
+    helps: ['A real date: dress up a little', 'Specific compliments, not generic ones', 'Closeness, with no agenda'],
     avoid: ['Making it about one thing', 'Scrolling through dinner'],
     herRead: 'Your brightest days. Say yes to what sounds fun.',
     codename: 'Summer',

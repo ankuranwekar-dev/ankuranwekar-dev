@@ -81,7 +81,10 @@ export const SIGNALS: readonly SignalDef[] = [
     quietHours: 12,
     action: {
       type: 'message',
-      drafts: ['Heard today was rough. Dinner’s handled. Want to vent or be distracted?', 'I’m on my way. Anything you need?'],
+      drafts: [
+        'Heard today was rough. Dinner’s handled. Want to vent or be distracted?',
+        'I’m on my way. Anything you need?',
+      ],
     },
   },
   {

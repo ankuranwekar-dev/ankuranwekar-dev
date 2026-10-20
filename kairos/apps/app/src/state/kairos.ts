@@ -119,7 +119,9 @@ function useKairosCompute(): Kairos {
     const upcoming = plan.items.filter((i) => i.date > today).slice(0, 6);
 
     const now = Date.now();
-    const latest = [...(snapshot?.signals ?? [])].reverse().find((e) => now - Date.parse(e.at) < SIGNAL_TTL_HOURS * 3_600_000);
+    const latest = [...(snapshot?.signals ?? [])]
+      .reverse()
+      .find((e) => now - Date.parse(e.at) < SIGNAL_TTL_HOURS * 3_600_000);
     const activeSignal =
       latest && !s.acknowledged.includes(latest.at)
         ? { event: latest, response: respondToSignal(latest, snapshot!.playbook) }

@@ -65,14 +65,23 @@ export default function PlaybookEditor() {
       </T>
 
       <SectionLabel>Your name</SectionLabel>
-      <Field value={pb.name} placeholder="What he calls you" onChange={(name) => update({ name } as Partial<Playbook>)} />
+      <Field
+        value={pb.name}
+        placeholder="What he calls you"
+        onChange={(name) => update({ name } as Partial<Playbook>)}
+      />
 
       <SectionLabel>What makes you feel loved</SectionLabel>
       <Glass radius={Radius.l} style={{ paddingVertical: Space.s }}>
         {LOVE_DIMENSIONS.map((d, i) => {
           const v = pb.loves?.[d] ?? 0.5;
           return (
-            <View key={d} style={[styles.loveRow, i > 0 ? { borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.hairline } : null]}>
+            <View
+              key={d}
+              style={[
+                styles.loveRow,
+                i > 0 ? { borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.hairline } : null,
+              ]}>
               <View style={{ flex: 1 }}>
                 <T variant="callout" style={{ fontWeight: '500' }}>
                   {LOVES[d].title}
@@ -83,11 +92,18 @@ export default function PlaybookEditor() {
               </View>
               <View style={styles.dots}>
                 {[0.2, 0.45, 0.7, 0.95].map((level) => (
-                  <Press key={level} onPress={() => setLove(d, level)} accessibilityLabel={`${LOVES[d].title}: ${level}`} style={styles.dotHit}>
+                  <Press
+                    key={level}
+                    onPress={() => setLove(d, level)}
+                    accessibilityLabel={`${LOVES[d].title}: ${level}`}
+                    style={styles.dotHit}>
                     <View
                       style={[
                         styles.dot,
-                        { backgroundColor: v >= level - 0.01 ? pal.glow : alpha(colors.text, 0.12), transform: [{ scale: 0.7 + level * 0.4 }] },
+                        {
+                          backgroundColor: v >= level - 0.01 ? pal.glow : alpha(colors.text, 0.12),
+                          transform: [{ scale: 0.7 + level * 0.4 }],
+                        },
                       ]}
                     />
                   </Press>
@@ -101,7 +117,12 @@ export default function PlaybookEditor() {
       <SectionLabel>Your favorites</SectionLabel>
       <Glass radius={Radius.l} style={{ paddingVertical: Space.xs }}>
         {FIELDS.map((f, i) => (
-          <View key={f.key} style={[styles.fieldRow, i > 0 ? { borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.hairline } : null]}>
+          <View
+            key={f.key}
+            style={[
+              styles.fieldRow,
+              i > 0 ? { borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.hairline } : null,
+            ]}>
             <T variant="footnote" tone="secondary" style={{ width: 118 }}>
               {f.label}
             </T>
@@ -119,7 +140,13 @@ export default function PlaybookEditor() {
       <SectionLabel>Please don’t</SectionLabel>
       <View style={styles.chips}>
         {NEVER.map((n) => (
-          <Chip key={n.tag} label={n.label} selected={(pb.never ?? []).includes(n.tag)} accent={colors.danger} onPress={() => toggleNever(n.tag)} />
+          <Chip
+            key={n.tag}
+            label={n.label}
+            selected={(pb.never ?? []).includes(n.tag)}
+            accent={colors.danger}
+            onPress={() => toggleNever(n.tag)}
+          />
         ))}
       </View>
 
@@ -130,7 +157,9 @@ export default function PlaybookEditor() {
             <T variant="callout" style={{ flex: 1 }}>
               {n}
             </T>
-            <Press onPress={() => update({ notes: (pb.notes ?? []).filter((x) => x !== n) })} accessibilityLabel="Remove note">
+            <Press
+              onPress={() => update({ notes: (pb.notes ?? []).filter((x) => x !== n) })}
+              accessibilityLabel="Remove note">
               <Icon name="close" size={14} color={colors.textTertiary} />
             </Press>
           </View>
@@ -152,7 +181,15 @@ export default function PlaybookEditor() {
   );
 }
 
-function Field({ value, placeholder, onChange }: { value: string; placeholder: string; onChange: (t: string) => void }) {
+function Field({
+  value,
+  placeholder,
+  onChange,
+}: {
+  value: string;
+  placeholder: string;
+  onChange: (t: string) => void;
+}) {
   const { colors } = useTheme();
   return (
     <Glass radius={Radius.l} style={{ paddingHorizontal: Space.l }}>
@@ -168,7 +205,13 @@ function Field({ value, placeholder, onChange }: { value: string; placeholder: s
 }
 
 const styles = StyleSheet.create({
-  loveRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Space.l, paddingVertical: Space.m, gap: Space.m },
+  loveRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Space.l,
+    paddingVertical: Space.m,
+    gap: Space.m,
+  },
   dots: { flexDirection: 'row', alignItems: 'center' },
   dotHit: { width: 30, height: 34, alignItems: 'center', justifyContent: 'center' },
   dot: { width: 14, height: 14, borderRadius: 7 },

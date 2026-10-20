@@ -14,7 +14,13 @@
 import { addDays, diffDays, toDayNumber, fromDayNumber, type ISODate } from '../dates';
 import { gaussian, sampleIndex, seededRandom } from '../random';
 import { estimateStats, normalisePeriods } from './history';
-import { bestWindowEnd, credibleInterval, ovulationPosterior, type Evidence, type OvulationPosterior } from './ovulation';
+import {
+  bestWindowEnd,
+  credibleInterval,
+  ovulationPosterior,
+  type Evidence,
+  type OvulationPosterior,
+} from './ovulation';
 import { CONCEPTION_BY_OFFSET, clamp } from './population';
 import { seasonOf, type Phase, type Season } from './seasons';
 import type { CycleData, CycleStats } from './types';
@@ -76,10 +82,7 @@ export interface ForecastOptions {
 
 const PREMENSTRUAL_DAYS = 5;
 
-function phaseFor(
-  day: number,
-  t: { start: number; bleedEnd: number; ovulation: number; nextStart: number },
-): Phase {
+function phaseFor(day: number, t: { start: number; bleedEnd: number; ovulation: number; nextStart: number }): Phase {
   if (day >= t.start && day <= t.bleedEnd) return 'menstrual';
   if (day >= t.ovulation - 5 && day <= t.ovulation + 1) return 'ovulatory';
   if (day > t.ovulation + 1) return day >= t.nextStart - PREMENSTRUAL_DAYS ? 'premenstrual' : 'luteal';
@@ -185,7 +188,12 @@ export function forecast(data: CycleData, opts: ForecastOptions): Forecast {
         const len = clamp(Math.round(stats.cycleMean + stats.cycleSd * gaussian(rand)), 18, 50);
         const l = sampleLuteal(-Infinity);
         const bleedLen = clamp(periodLen + Math.round(gaussian(rand) * 0.7), 2, 9);
-        cycles.push({ start, bleedEnd: start + bleedLen - 1, ovulation: start + Math.max(6, len - l), nextStart: start + len });
+        cycles.push({
+          start,
+          bleedEnd: start + bleedLen - 1,
+          ovulation: start + Math.max(6, len - l),
+          nextStart: start + len,
+        });
       }
     }
     for (const c of cycles) {

@@ -47,10 +47,17 @@ function TabButton({ spec, isFocused, ...props }: TabTriggerSlotProps & { spec: 
   const { season } = useKairos();
   const accent = seasonColors(season).glow;
   return (
-    <Pressable {...(props as PressableProps)} accessibilityRole="tab" accessibilityLabel={spec.label} style={styles.tab}>
+    <Pressable
+      {...(props as PressableProps)}
+      accessibilityRole="tab"
+      accessibilityLabel={spec.label}
+      style={styles.tab}>
       <View style={[styles.pill, isFocused ? { backgroundColor: alpha(accent, 0.18) } : null]}>
         <Icon name={spec.icon} size={20} color={isFocused ? accent : colors.textSecondary} />
-        <T variant="caption" style={{ letterSpacing: 0.2, textTransform: 'none', fontSize: 10.5 }} color={isFocused ? colors.text : colors.textSecondary}>
+        <T
+          variant="caption"
+          style={{ letterSpacing: 0.2, textTransform: 'none', fontSize: 10.5 }}
+          color={isFocused ? colors.text : colors.textSecondary}>
           {spec.label}
         </T>
       </View>
@@ -63,5 +70,13 @@ const styles = StyleSheet.create({
   bar: { minWidth: 280 },
   row: { flexDirection: 'row', padding: 5, gap: 2 },
   tab: { flex: 1 },
-  pill: { minWidth: 84, height: 54, borderRadius: 27, alignItems: 'center', justifyContent: 'center', gap: 3, paddingHorizontal: 12 },
+  pill: {
+    minWidth: 84,
+    height: 54,
+    borderRadius: 27,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+    paddingHorizontal: 12,
+  },
 });

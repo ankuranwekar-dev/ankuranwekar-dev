@@ -90,7 +90,10 @@ export interface IcsOptions extends CodenameOptions {
 }
 
 export function toIcs(days: SharedDay[], opts: IcsOptions = {}): string {
-  const now = (opts.now ?? new Date()).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const now = (opts.now ?? new Date())
+    .toISOString()
+    .replace(/[-:]/g, '')
+    .replace(/\.\d{3}/, '');
   const salt = opts.uidSalt ?? 'kairos';
   const lines = [
     'BEGIN:VCALENDAR',

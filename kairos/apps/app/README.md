@@ -1,56 +1,48 @@
-# Welcome to your Expo app 👋
+# Kairos app
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo SDK 58 · Expo Router · React Native 0.88 · one codebase for iOS, Android and the web.
 
-## Get started
+![Onboarding](../../docs/screenshots/onboarding.jpg)
 
-1. Install dependencies
+## Structure
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+src/
+  app/                 routes (Expo Router)
+    welcome.tsx        first screen: choose her side or his, or explore the demo
+    onboarding/        her.tsx (5 steps) and him.tsx (3 steps)
+    him/               Today · Rhythm · her playbook (as he sees it)
+    her/               Today (signals, log) · Playbook · Sharing
+    nudge.tsx          an idea in full (sheet)
+    settings.tsx       his cadence, budget, weekend, lock-screen detail; her pregnancy-test flow
+  state/
+    store.ts           persisted state (zustand + AsyncStorage, never throws)
+    kairos.ts          forecast → snapshot → plan, computed once for the tree
+    effects.ts         notifications, widget, encrypted sync
+    demo.ts            the simulated couple
+  platform/            native integrations, split by platform file
+    health.ios.ts      HealthKit (read-only)
+    health.android.ts  Health Connect (read-only)
+    notifications.ts   local scheduling, actionable categories
+    calendar.ts        local "Seasons" calendar (.web: .ics file)
+    relay.ts           encrypted pairing and messaging client
+  ui/                  design system: theme, text, glass, orb, ring, controls, tabs, showcase
+  widgets/             iOS WidgetKit widget via expo-widgets
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+## Commands
 
-### Other setup steps
+```bash
+pnpm start                          # dev server
+pnpm web                            # browser
+pnpm typecheck
+npx expo export --platform web      # static site in dist/
+node scripts/build-showcase.mjs     # dist/ packed into one self-contained HTML file
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Notes
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- `NativeTabs` gives the system tab bar on iOS (Liquid Glass on iOS 26) and Material bottom navigation on Android; the web uses a floating glass capsule (`ui/tabs.web.tsx`).
+- `ui/glass.tsx` uses real Liquid Glass where available, a frosted blur on older iOS and the web, and tonal surfaces on Android.
+- On screens 980 px and wider, `ui/showcase.web.tsx` turns the web app into the website: pitch on the left, the live app in a phone frame on the right.
+- Configure the relay with `EXPO_PUBLIC_RELAY_URL` and `EXPO_PUBLIC_RELAY_ANON_KEY`. Without them, real pairing is off and the demo is the way in.

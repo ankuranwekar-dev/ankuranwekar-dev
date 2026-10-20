@@ -927,7 +927,8 @@ export const LIBRARY: readonly NudgeTemplate[] = [
     id: 'prep.not-this-month',
     kind: 'prep',
     title: 'If her period comes today, be gentle',
-    detail: 'When you are trying, a period can feel like a small loss. Hold her, take the day’s load, and don’t say "next month".',
+    detail:
+      'When you are trying, a period can feel like a small loss. Hold her, take the day’s load, and don’t say "next month".',
     phases: { menstrual: 1 },
     intents: ['trying'],
     minShare: 'fertility',

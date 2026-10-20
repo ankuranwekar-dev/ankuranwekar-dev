@@ -41,7 +41,11 @@ describe('library', () => {
   it('renders every template without leftover tokens, with or without a playbook', () => {
     for (const t of LIBRARY) {
       for (const pb of [PLAYBOOK, { name: 'Maya' }]) {
-        const s = fillTokens(`${t.title} ${t.detail}`, pb, { id: 'm', text: 'her sister’s interview', date: '2026-09-01' });
+        const s = fillTokens(`${t.title} ${t.detail}`, pb, {
+          id: 'm',
+          text: 'her sister’s interview',
+          date: '2026-09-01',
+        });
         expect(s, t.id).not.toMatch(/\{\w+\}/);
       }
     }
@@ -88,7 +92,10 @@ describe('planner', () => {
           const gifts = plan.items.filter((i) => i.kind === 'gift' && i.targetDate >= start && i.targetDate <= runEnd);
           expect(gifts.length).toBeLessThanOrEqual(1);
         }
-        expect(plan.items.some((i) => i.big && i.phase !== 'ovulatory'), `${seed}/${intent}`).toBe(true);
+        expect(
+          plan.items.some((i) => i.big && i.phase !== 'ovulatory'),
+          `${seed}/${intent}`,
+        ).toBe(true);
         expect(summerShareOfBigGestures(plan.items)).toBeLessThanOrEqual(0.5);
       }
     }
@@ -119,7 +126,9 @@ describe('planner', () => {
     for (const a of plan.items) {
       for (const b of plan.items) {
         if (a === b || a.templateId !== b.templateId) continue;
-        expect(Math.abs(diffDays(a.targetDate, b.targetDate))).toBeGreaterThanOrEqual(byId.get(a.templateId)!.cooldown ?? 21);
+        expect(Math.abs(diffDays(a.targetDate, b.targetDate))).toBeGreaterThanOrEqual(
+          byId.get(a.templateId)!.cooldown ?? 21,
+        );
       }
     }
     const sorted = [...plan.items].sort((a, b) => (a.targetDate < b.targetDate ? -1 : 1));
@@ -136,7 +145,7 @@ describe('planner', () => {
     const byId = new Map(LIBRARY.map((t) => [t.id, t]));
     for (const i of plan.items) {
       const t = byId.get(i.templateId)!;
-      const expected = t.when === 'morning' ? Math.max(t.leadDays ?? 0, 1) : t.leadDays ?? 0;
+      const expected = t.when === 'morning' ? Math.max(t.leadDays ?? 0, 1) : (t.leadDays ?? 0);
       expect(diffDays(i.date, i.targetDate)).toBe(expected);
       expect(i.date >= asOf).toBe(true);
       if (t.when === 'morning') expect(i.notifyAt).toBe('20:30');
@@ -147,7 +156,8 @@ describe('planner', () => {
   it('uses the Gulf weekend when asked', () => {
     const plan = planNudges(input({ prefs: { ...PREFS, weekendDays: [5, 6] } }));
     const byId = new Map(LIBRARY.map((t) => [t.id, t]));
-    for (const i of plan.items) if (byId.get(i.templateId)!.weekendOnly) expect([5, 6]).toContain(weekday(i.targetDate));
+    for (const i of plan.items)
+      if (byId.get(i.templateId)!.weekendOnly) expect([5, 6]).toContain(weekday(i.targetDate));
   });
 
   it('adds his trying-to-conceive prep only when she shares fertility and they are trying', () => {
@@ -186,7 +196,9 @@ describe('planner', () => {
   });
 
   it('follows up on things she mentioned', () => {
-    const plan = planNudges(input({ mentions: [{ id: 'm1', text: 'her sister’s job interview', date: '2026-09-18' }] }));
+    const plan = planNudges(
+      input({ mentions: [{ id: 'm1', text: 'her sister’s job interview', date: '2026-09-18' }] }),
+    );
     const f = plan.items.find((i) => i.mentionId === 'm1');
     expect(f?.detail).toContain('her sister’s job interview');
   });
@@ -208,7 +220,8 @@ describe('planner', () => {
     const plan = planNudges(input());
     for (const i of plan.items) {
       const text = `${i.lockScreen.title} ${i.lockScreen.body}`.toLowerCase();
-      for (const word of ['period', 'fertile', 'ovulat', 'cycle', 'pms', 'maya', 'peonies']) expect(text).not.toContain(word);
+      for (const word of ['period', 'fertile', 'ovulat', 'cycle', 'pms', 'maya', 'peonies'])
+        expect(text).not.toContain(word);
     }
     const detailed = planNudges(input({ prefs: { ...PREFS, detailedNotifications: true } }));
     expect(detailed.items[0]!.lockScreen.title).toBe(detailed.items[0]!.title);

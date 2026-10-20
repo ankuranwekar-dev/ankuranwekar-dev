@@ -21,7 +21,10 @@ export const PREFS: PartnerPrefs = { cadence: 'steady', budget: 3, notifyAt: '08
 
 export function regularData(start: string, n: number, len: number): CycleData {
   return {
-    periods: Array.from({ length: n }, (_, i) => ({ start: addDays(start, i * len), end: addDays(start, i * len + 4) })),
+    periods: Array.from({ length: n }, (_, i) => ({
+      start: addDays(start, i * len),
+      end: addDays(start, i * len + 4),
+    })),
   };
 }
 

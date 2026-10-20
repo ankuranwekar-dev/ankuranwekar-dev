@@ -204,7 +204,10 @@ const TEMPER = 0.6;
 
 export function robustNoiseSd(values: number[]): number {
   if (values.length < 3) return 0.15;
-  const diffs = values.slice(1).map((v, i) => Math.abs(v - values[i]!)).sort((a, b) => a - b);
+  const diffs = values
+    .slice(1)
+    .map((v, i) => Math.abs(v - values[i]!))
+    .sort((a, b) => a - b);
   const mad = diffs[Math.floor(diffs.length / 2)]!;
   return Math.max(0.05, (1.4826 * mad) / Math.SQRT2);
 }
@@ -236,7 +239,7 @@ export function temperatureLogLikelihoods(
     }
     const A = Srr / sigma2 + 1 / tau2;
     const B = Str / sigma2 + m / tau2;
-    out[k] = TEMPER * (B * B / (2 * A) - Stt / (2 * sigma2) - (m * m) / (2 * tau2) - 0.5 * Math.log(A * tau2));
+    out[k] = TEMPER * ((B * B) / (2 * A) - Stt / (2 * sigma2) - (m * m) / (2 * tau2) - 0.5 * Math.log(A * tau2));
   }
   return out;
 }
@@ -271,10 +274,7 @@ export function ovulationPosterior(opts: PosteriorOptions): OvulationPosterior {
   const obs = opts.observations ?? {};
   const asOfOffset = diffDays(cycleStart, asOf);
   const nextOffset = nextStart ? diffDays(cycleStart, nextStart) : undefined;
-  const maxOffset = Math.min(
-    MAX_CYCLE_LENGTH - MIN_LUTEAL,
-    (nextOffset ?? MAX_CYCLE_LENGTH) - MIN_LUTEAL + 2,
-  );
+  const maxOffset = Math.min(MAX_CYCLE_LENGTH - MIN_LUTEAL, (nextOffset ?? MAX_CYCLE_LENGTH) - MIN_LUTEAL + 2);
   const n = Math.max(MIN_OVULATION_OFFSET + 1, maxOffset + 1);
   const sd = Math.max(opts.priorSd, 1.0);
 

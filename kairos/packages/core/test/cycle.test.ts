@@ -13,7 +13,11 @@ const regular = (start: string, n: number, len: number): CycleData => ({
 
 describe('history', () => {
   it('merges period logs that are really one bleed', () => {
-    const p = normalisePeriods([{ start: '2026-01-01' }, { start: '2026-01-04', end: '2026-01-06' }, { start: '2026-01-29' }]);
+    const p = normalisePeriods([
+      { start: '2026-01-01' },
+      { start: '2026-01-04', end: '2026-01-06' },
+      { start: '2026-01-29' },
+    ]);
     expect(p).toEqual([{ start: '2026-01-01', end: '2026-01-06' }, { start: '2026-01-29' }]);
   });
 
@@ -85,19 +89,27 @@ describe('ovulation posterior', () => {
     const after = ovulationPosterior({
       ...base,
       asOf: '2026-10-15',
-      observations: { lhTests: Array.from({ length: 7 }, (_, i) => ({ date: addDays('2026-10-09', i), result: 'negative' as const })) },
+      observations: {
+        lhTests: Array.from({ length: 7 }, (_, i) => ({ date: addDays('2026-10-09', i), result: 'negative' as const })),
+      },
     });
     expect(after.mean).toBeGreaterThan(before.mean + 1);
   });
 
   it('detects a classic three-over-six temperature shift', () => {
-    const temps = [36.4, 36.35, 36.45, 36.4, 36.3, 36.42, 36.38, 36.62, 36.7, 36.72, 36.75].map((c, i) => ({ offset: 8 + i, celsius: c }));
+    const temps = [36.4, 36.35, 36.45, 36.4, 36.3, 36.42, 36.38, 36.62, 36.7, 36.72, 36.75].map((c, i) => ({
+      offset: 8 + i,
+      celsius: c,
+    }));
     const shift = detectThermalShift(temps, 0.2);
     expect(shift?.offset).toBe(15);
   });
 
   it('does not call a single feverish morning a shift', () => {
-    const temps = [36.4, 36.35, 36.45, 36.4, 36.3, 36.42, 36.9, 36.4, 36.38, 36.41].map((c, i) => ({ offset: 8 + i, celsius: c }));
+    const temps = [36.4, 36.35, 36.45, 36.4, 36.3, 36.42, 36.9, 36.4, 36.38, 36.41].map((c, i) => ({
+      offset: 8 + i,
+      celsius: c,
+    }));
     expect(detectThermalShift(temps, 0.2)).toBeUndefined();
   });
 

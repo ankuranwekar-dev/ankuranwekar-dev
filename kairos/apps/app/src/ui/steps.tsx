@@ -31,7 +31,11 @@ export function StepFrame({
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   return (
-    <View style={[styles.root, { backgroundColor: colors.bg, paddingTop: insets.top + Space.m, paddingBottom: insets.bottom + Space.l }]}>
+    <View
+      style={[
+        styles.root,
+        { backgroundColor: colors.bg, paddingTop: insets.top + Space.m, paddingBottom: insets.bottom + Space.l },
+      ]}>
       <View style={styles.column}>
         <View style={styles.top}>
           {onBack ? (
@@ -45,13 +49,20 @@ export function StepFrame({
             {Array.from({ length: total }, (_, i) => (
               <View
                 key={i}
-                style={[styles.dot, { backgroundColor: i <= step ? colors.text : colors.hairline, width: i === step ? 20 : 6 }]}
+                style={[
+                  styles.dot,
+                  { backgroundColor: i <= step ? colors.text : colors.hairline, width: i === step ? 20 : 6 },
+                ]}
               />
             ))}
           </View>
           <View style={styles.back} />
         </View>
-        <Animated.View key={step} entering={FadeInRight.duration(320)} exiting={FadeOutLeft.duration(160)} style={styles.body}>
+        <Animated.View
+          key={step}
+          entering={FadeInRight.duration(320)}
+          exiting={FadeOutLeft.duration(160)}
+          style={styles.body}>
           {eyebrow ? (
             <T variant="caption" tone="tertiary">
               {eyebrow}

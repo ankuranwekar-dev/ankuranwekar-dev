@@ -73,7 +73,10 @@ describe('pairing', () => {
     const forgedInvite = { ...invite, secret: new Uint8Array(32) };
     const req = createJoinRequest(mallory, forgedInvite);
     expect(() => verifyJoinRequest(req, invite)).toThrow();
-    const tampered = { ...createJoinRequest(generateKeyPair(), invite), partnerPublicKey: toBase64Url(mallory.publicKey) };
+    const tampered = {
+      ...createJoinRequest(generateKeyPair(), invite),
+      partnerPublicKey: toBase64Url(mallory.publicKey),
+    };
     expect(() => verifyJoinRequest(tampered, invite)).toThrow();
   });
 

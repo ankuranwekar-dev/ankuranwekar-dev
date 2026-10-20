@@ -11,7 +11,10 @@ export function RoleTabs({ tabs }: { tabs: TabSpec[] }) {
   const { season } = useKairos();
   const accent = seasonColors(season).glow;
   return (
-    <NativeTabs tintColor={accent} iconColor={{ default: colors.textSecondary, selected: accent }} minimizeBehavior="onScrollDown">
+    <NativeTabs
+      tintColor={accent}
+      iconColor={{ default: colors.textSecondary, selected: accent }}
+      minimizeBehavior="onScrollDown">
       {tabs.map((t) => (
         <NativeTabs.Trigger key={t.name} name={t.name}>
           <NativeTabs.Trigger.Label>{t.label}</NativeTabs.Trigger.Label>

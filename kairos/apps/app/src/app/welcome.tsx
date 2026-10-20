@@ -27,7 +27,11 @@ export default function Welcome() {
   }, []);
 
   return (
-    <View style={[styles.root, { backgroundColor: colors.bg, paddingTop: insets.top + Space.xxl, paddingBottom: insets.bottom + Space.xl }]}>
+    <View
+      style={[
+        styles.root,
+        { backgroundColor: colors.bg, paddingTop: insets.top + Space.xxl, paddingBottom: insets.bottom + Space.xl },
+      ]}>
       <View style={styles.column}>
         <Animated.View entering={FadeIn.duration(1200)} style={styles.hero}>
           <Orb season={CYCLE[i]} size={210} />

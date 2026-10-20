@@ -35,7 +35,11 @@ export async function importFromHealth(): Promise<HealthImport> {
   });
   const filter = { date: { startDate: yearAgo(), endDate: new Date() } };
 
-  const flow = await queryCategorySamples('HKCategoryTypeIdentifierMenstrualFlow', { filter, limit: 0, ascending: true });
+  const flow = await queryCategorySamples('HKCategoryTypeIdentifierMenstrualFlow', {
+    filter,
+    limit: 0,
+    ascending: true,
+  });
   const periods = periodsFromFlowDays(
     flow
       .filter((s) => Number(s.value) !== FLOW_NONE)
@@ -45,7 +49,10 @@ export async function importFromHealth(): Promise<HealthImport> {
   const ovulation = await queryCategorySamples('HKCategoryTypeIdentifierOvulationTestResult', { filter, limit: 0 });
   const lhTests: LHTest[] = ovulation
     .filter((s) => Number(s.value) === OVULATION_POSITIVE || Number(s.value) === OVULATION_NEGATIVE)
-    .map((s) => ({ date: dayOf(s.startDate), result: Number(s.value) === OVULATION_POSITIVE ? 'positive' : 'negative' }));
+    .map((s) => ({
+      date: dayOf(s.startDate),
+      result: Number(s.value) === OVULATION_POSITIVE ? 'positive' : 'negative',
+    }));
 
   const mucusSamples = await queryCategorySamples('HKCategoryTypeIdentifierCervicalMucusQuality', { filter, limit: 0 });
   const mucus: MucusObservation[] = mucusSamples.flatMap((s) => {
@@ -53,7 +60,11 @@ export async function importFromHealth(): Promise<HealthImport> {
     return type ? [{ date: dayOf(s.startDate), type }] : [];
   });
 
-  const bbt = await queryQuantitySamples('HKQuantityTypeIdentifierBasalBodyTemperature', { filter, limit: 0, unit: 'degC' });
+  const bbt = await queryQuantitySamples('HKQuantityTypeIdentifierBasalBodyTemperature', {
+    filter,
+    limit: 0,
+    unit: 'degC',
+  });
   const wrist = await queryQuantitySamples('HKQuantityTypeIdentifierAppleSleepingWristTemperature', {
     filter,
     limit: 0,

@@ -39,7 +39,11 @@ export default function HerToday() {
         </T>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Space.s, marginTop: Space.l }}>
           {[0, 1, 2, 3, 5, 7, 10, 14].map((d) => (
-            <Chip key={d} label={d === 0 ? 'Today' : d === 1 ? 'Yesterday' : `${d} days ago`} onPress={() => s.logPeriodStart(addDays(k.today, -d))} />
+            <Chip
+              key={d}
+              label={d === 0 ? 'Today' : d === 1 ? 'Yesterday' : `${d} days ago`}
+              onPress={() => s.logPeriodStart(addDays(k.today, -d))}
+            />
           ))}
         </View>
       </Screen>
@@ -53,7 +57,8 @@ export default function HerToday() {
     if (k.summerIn !== undefined) chips.push(`Fertile ${k.summerIn === 1 ? 'tomorrow' : `in ${k.summerIn} days`}`);
     else if (best.length) chips.push(`Best: ${best.map(shortDay).join(' & ')}`);
   }
-  if (f.ovulation?.confirmed && f.ovulation.date < k.today && k.phase !== 'menstrual') chips.push('Ovulation confirmed');
+  if (f.ovulation?.confirmed && f.ovulation.date < k.today && k.phase !== 'menstrual')
+    chips.push('Ovulation confirmed');
 
   return (
     <Screen season={k.season}>
@@ -72,7 +77,10 @@ export default function HerToday() {
 
       <View style={styles.titleBlock}>
         <T variant="display" center>
-          Your <T variant="display" italic color={ink(pal.glow, dark)}>{k.copy?.name.toLowerCase()}</T>
+          Your{' '}
+          <T variant="display" italic color={ink(pal.glow, dark)}>
+            {k.copy?.name.toLowerCase()}
+          </T>
         </T>
         <T variant="callout" tone="secondary" center style={{ maxWidth: 360 }}>
           {k.copy?.herRead}
@@ -89,7 +97,10 @@ export default function HerToday() {
       </View>
 
       {s.pairing.status !== 'paired' ? (
-        <Press onPress={() => router.push('/her/sharing')} accessibilityLabel="Invite him" style={{ marginTop: Space.xl }}>
+        <Press
+          onPress={() => router.push('/her/sharing')}
+          accessibilityLabel="Invite him"
+          style={{ marginTop: Space.xl }}>
           <Glass radius={Radius.l} tint={pal.glow} style={styles.invite}>
             <Icon name="qr" size={20} color={ink(pal.glow, dark)} />
             <View style={{ flex: 1 }}>
@@ -116,7 +127,9 @@ export default function HerToday() {
             <Icon name="sparkles" size={17} color={ink(pal.glow, dark)} />
           </View>
           <View style={{ flex: 1 }}>
-            <T variant="headline">{k.todayNudge ? `${his || 'He'} has a small idea for today` : `A quiet day for ${his || 'him'}`}</T>
+            <T variant="headline">
+              {k.todayNudge ? `${his || 'He'} has a small idea for today` : `A quiet day for ${his || 'him'}`}
+            </T>
             <T variant="footnote" tone="secondary">
               Surprise mode is on. You’ll see it when it happens.
             </T>
@@ -126,8 +139,10 @@ export default function HerToday() {
       </Glass>
 
       <T variant="footnote" tone="tertiary" center style={{ marginTop: Space.xl }}>
-        {s.healthSource === 'manual' ? 'Logged by you' : `Synced from ${s.healthSource === 'apple-health' ? 'Apple Health' : 'Health Connect'}`} · Only your season and forecast reach {his || 'him'}, end-to-end
-        encrypted.
+        {s.healthSource === 'manual'
+          ? 'Logged by you'
+          : `Synced from ${s.healthSource === 'apple-health' ? 'Apple Health' : 'Health Connect'}`}{' '}
+        · Only your season and forecast reach {his || 'him'}, end-to-end encrypted.
       </T>
     </Screen>
   );
@@ -167,7 +182,10 @@ function Signals({ his }: { his: string }) {
               accessibilityLabel={`Send: ${sig.label}`}
               onPress={() => (sig.takesNote ? setCraving((c) => !c) : fire(sig.id))}
               style={styles.signalCell}>
-              <Glass radius={Radius.l} tint={on ? pal.glow : undefined} style={[styles.signal, on ? { borderColor: pal.glow, borderWidth: 1 } : null]}>
+              <Glass
+                radius={Radius.l}
+                tint={on ? pal.glow : undefined}
+                style={[styles.signal, on ? { borderColor: pal.glow, borderWidth: 1 } : null]}>
                 {on ? (
                   <Animated.View entering={ZoomIn.springify().damping(12)} style={{ alignItems: 'center', gap: 4 }}>
                     <Icon name="check" size={20} color={ink(pal.glow, dark)} />
@@ -229,10 +247,22 @@ function QuickLog() {
         {bleeding ? (
           <Chip label="Period ended" icon="drop" onPress={() => (s.logPeriodEnd(k.today), done('Period end logged'))} />
         ) : (
-          <Chip label="Period started" icon="drop" onPress={() => (s.logPeriodStart(k.today), done('Period start logged'))} />
+          <Chip
+            label="Period started"
+            icon="drop"
+            onPress={() => (s.logPeriodStart(k.today), done('Period start logged'))}
+          />
         )}
-        <Chip label="LH positive" icon="test" onPress={() => (s.logLH(k.today, 'positive'), done('Positive LH test logged'))} />
-        <Chip label="LH negative" icon="test" onPress={() => (s.logLH(k.today, 'negative'), done('Negative LH test logged'))} />
+        <Chip
+          label="LH positive"
+          icon="test"
+          onPress={() => (s.logLH(k.today, 'positive'), done('Positive LH test logged'))}
+        />
+        <Chip
+          label="LH negative"
+          icon="test"
+          onPress={() => (s.logLH(k.today, 'negative'), done('Negative LH test logged'))}
+        />
         {s.intent === 'trying' ? (
           <Chip label="Pregnancy test" icon="sparkles" onPress={() => router.push('/settings?section=pregnancy')} />
         ) : null}
@@ -277,5 +307,12 @@ const styles = StyleSheet.create({
   cravingInput: { flex: 1, fontSize: 16, height: 44 },
   round: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   invite: { flexDirection: 'row', alignItems: 'center', gap: Space.m, padding: Space.l },
-  heartButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Space.s, height: 46, borderRadius: Radius.pill },
+  heartButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Space.s,
+    height: 46,
+    borderRadius: Radius.pill,
+  },
 });

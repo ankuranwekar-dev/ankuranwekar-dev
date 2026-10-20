@@ -73,7 +73,9 @@ export function Glass({ children, style, radius = Radius.l, tint, interactive, s
         colors={[dark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.7)', 'rgba(255,255,255,0)']}
         style={[StyleSheet.absoluteFill, { height: 60 }]}
       />
-      {tint ? <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: tint, opacity: 0.12 }]} /> : null}
+      {tint ? (
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: tint, opacity: 0.12 }]} />
+      ) : null}
       {children}
     </BlurView>
   );

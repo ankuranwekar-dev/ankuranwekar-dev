@@ -14,48 +14,54 @@ import type { SeasonWidgetProps } from './season-props';
  * Privacy: it only ever shows a codename ("Spring") and, if he opted into
  * detailed notifications, today's idea. Never a phase name, never a date.
  */
-export const SeasonWidget = createWidget<SeasonWidgetProps>(
-  'SeasonWidget',
-  function SeasonWidgetLayout(props, env) {
-    'widget';
-    if (env.widgetFamily === 'accessoryInline') {
-      return <Text>{`${props.glyph} ${props.title}`}</Text>;
-    }
-    if (env.widgetFamily === 'accessoryCircular') {
-      return (
-        <VStack spacing={0}>
-          <Text modifiers={[font({ size: 18 })]}>{props.glyph}</Text>
-          <Text modifiers={[font({ size: 11, weight: 'semibold' })]}>{props.short}</Text>
-        </VStack>
-      );
-    }
-    if (env.widgetFamily === 'accessoryRectangular') {
-      return (
-        <VStack alignment="leading" spacing={1}>
-          <Text modifiers={[font({ size: 15, weight: 'semibold' })]}>{`${props.glyph} ${props.title}`}</Text>
-          <Text modifiers={[font({ size: 12 })]}>{props.idea ?? props.line}</Text>
-        </VStack>
-      );
-    }
+export const SeasonWidget = createWidget<SeasonWidgetProps>('SeasonWidget', function SeasonWidgetLayout(props, env) {
+  'widget';
+  if (env.widgetFamily === 'accessoryInline') {
+    return <Text>{`${props.glyph} ${props.title}`}</Text>;
+  }
+  if (env.widgetFamily === 'accessoryCircular') {
     return (
-      <VStack
-        alignment="leading"
-        spacing={4}
-        modifiers={[
-          padding({ all: 2 }),
-          containerBackground(
-            { type: 'linearGradient', colors: [props.from, props.to], startPoint: { x: 0.2, y: 0 }, endPoint: { x: 0.9, y: 1 } },
-            'widget',
-          ),
-        ]}>
-        <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundStyle(props.ink), opacity(0.75)]}>{props.meta}</Text>
-        <Spacer />
-        <Text modifiers={[font({ size: 26, design: 'serif' }), foregroundStyle(props.ink)]}>{props.title}</Text>
-        <Text modifiers={[font({ size: 12 }), foregroundStyle(props.ink), opacity(0.85)]}>{props.idea ?? props.line}</Text>
+      <VStack spacing={0}>
+        <Text modifiers={[font({ size: 18 })]}>{props.glyph}</Text>
+        <Text modifiers={[font({ size: 11, weight: 'semibold' })]}>{props.short}</Text>
       </VStack>
     );
-  },
-);
+  }
+  if (env.widgetFamily === 'accessoryRectangular') {
+    return (
+      <VStack alignment="leading" spacing={1}>
+        <Text modifiers={[font({ size: 15, weight: 'semibold' })]}>{`${props.glyph} ${props.title}`}</Text>
+        <Text modifiers={[font({ size: 12 })]}>{props.idea ?? props.line}</Text>
+      </VStack>
+    );
+  }
+  return (
+    <VStack
+      alignment="leading"
+      spacing={4}
+      modifiers={[
+        padding({ all: 2 }),
+        containerBackground(
+          {
+            type: 'linearGradient',
+            colors: [props.from, props.to],
+            startPoint: { x: 0.2, y: 0 },
+            endPoint: { x: 0.9, y: 1 },
+          },
+          'widget',
+        ),
+      ]}>
+      <Text modifiers={[font({ size: 11, weight: 'semibold' }), foregroundStyle(props.ink), opacity(0.75)]}>
+        {props.meta}
+      </Text>
+      <Spacer />
+      <Text modifiers={[font({ size: 26, design: 'serif' }), foregroundStyle(props.ink)]}>{props.title}</Text>
+      <Text modifiers={[font({ size: 12 }), foregroundStyle(props.ink), opacity(0.85)]}>
+        {props.idea ?? props.line}
+      </Text>
+    </VStack>
+  );
+});
 
 export function updateSeasonWidget(props: SeasonWidgetProps): void {
   try {

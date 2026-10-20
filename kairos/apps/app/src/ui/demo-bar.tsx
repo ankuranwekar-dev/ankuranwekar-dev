@@ -5,6 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useStore } from '@/state/store';
 
+import { useInShowcase } from './frame';
+
 import { Press } from './controls';
 import { Glass } from './glass';
 import { Icon } from './icon';
@@ -28,8 +30,9 @@ export function DemoBar() {
   const insets = useSafeAreaInsets();
   const path = usePathname();
   const { colors } = useTheme();
+  const inShowcase = useInShowcase();
   const hidden = ['/welcome', '/onboarding', '/nudge', '/settings'].some((p) => path.startsWith(p));
-  if (!demo || hidden) return null;
+  if (!demo || hidden || inShowcase) return null;
 
   const date = addDays(localToday(), offset);
   const label = offset === 0 ? 'Today' : `${weekdayName(date).slice(0, 3)} · ${offset > 0 ? '+' : ''}${offset}d`;
@@ -51,7 +54,10 @@ export function DemoBar() {
                 onPress={() => switchTo(r)}
                 accessibilityLabel={r === 'him' ? 'View his phone' : 'View her phone'}
                 style={[styles.role, role === r ? { backgroundColor: colors.text } : null]}>
-                <T variant="label" color={role === r ? colors.inverse : colors.textSecondary} style={{ fontSize: 12.5 }}>
+                <T
+                  variant="label"
+                  color={role === r ? colors.inverse : colors.textSecondary}
+                  style={{ fontSize: 12.5 }}>
                   {r === 'him' ? 'His phone' : 'Her phone'}
                 </T>
               </Press>

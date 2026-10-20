@@ -23,18 +23,16 @@ export const SHARE_ORDER: Record<ShareLevel, number> = { period: 0, seasons: 1, 
 /** The six ingredients of feeling loved, used to weight what he is nudged toward. */
 export type LoveDimension = 'presence' | 'words' | 'service' | 'gifts' | 'touch' | 'adventure';
 
-export const LOVE_DIMENSIONS: readonly LoveDimension[] = ['presence', 'words', 'service', 'gifts', 'touch', 'adventure'];
+export const LOVE_DIMENSIONS: readonly LoveDimension[] = [
+  'presence',
+  'words',
+  'service',
+  'gifts',
+  'touch',
+  'adventure',
+];
 
-export type NudgeKind =
-  | 'presence'
-  | 'words'
-  | 'service'
-  | 'gift'
-  | 'touch'
-  | 'adventure'
-  | 'romance'
-  | 'care'
-  | 'prep';
+export type NudgeKind = 'presence' | 'words' | 'service' | 'gift' | 'touch' | 'adventure' | 'romance' | 'care' | 'prep';
 
 /** Her playbook: what she loves, written by her, read by his phone. */
 export interface Playbook {

@@ -1,6 +1,7 @@
 import '@/global.css';
 
 import { SEASON_PALETTE, type Phase, type Season } from '@kairos/core';
+import { useSyncExternalStore } from 'react';
 import { Platform, useColorScheme } from 'react-native';
 
 /**
@@ -52,9 +53,23 @@ export const Space = { xxs: 2, xs: 4, s: 8, m: 12, l: 16, xl: 20, xxl: 28, xxxl:
 export const Radius = { s: 10, m: 16, l: 22, xl: 28, pill: 999 } as const;
 export const MaxWidth = 560;
 
+// On the web a host page may force a theme with <html data-theme="dark|light">; honour it over the OS setting.
+function subscribeDocTheme(onChange: () => void): () => void {
+  if (Platform.OS !== 'web' || typeof MutationObserver === 'undefined') return () => {};
+  const mo = new MutationObserver(onChange);
+  mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  return () => mo.disconnect();
+}
+function docTheme(): string | null {
+  return Platform.OS === 'web' && typeof document !== 'undefined'
+    ? document.documentElement.getAttribute('data-theme')
+    : null;
+}
+
 export function useTheme() {
   const scheme = useColorScheme();
-  const dark = scheme !== 'light';
+  const forced = useSyncExternalStore(subscribeDocTheme, docTheme, () => null);
+  const dark = forced === 'dark' ? true : forced === 'light' ? false : scheme !== 'light';
   return { dark, colors: dark ? dusk : dawn };
 }
 
@@ -83,6 +98,14 @@ export function ink(hex: string, dark: boolean): string {
 /** Mix a hex color with alpha, e.g. alpha('#FFAA6B', 0.4). */
 export function alpha(hex: string, a: number): string {
   const h = hex.replace('#', '');
-  const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+  const n = parseInt(
+    h.length === 3
+      ? h
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : h,
+    16,
+  );
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 }

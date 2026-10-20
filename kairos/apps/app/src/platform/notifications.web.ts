@@ -10,7 +10,14 @@ export async function scheduleNudges(_items: PlannedNudge[]): Promise<number> {
   return 0;
 }
 export async function presentSignal(_r: SignalResponse): Promise<void> {}
-export type NudgeResponse = { action: 'done' | 'later' | 'open'; key: string; date: string; kind: string; templateId: string; title: string };
+export type NudgeResponse = {
+  action: 'done' | 'later' | 'open';
+  key: string;
+  date: string;
+  kind: string;
+  templateId: string;
+  title: string;
+};
 export function onNudgeResponse(_handler: (r: NudgeResponse) => void): () => void {
   return () => {};
 }

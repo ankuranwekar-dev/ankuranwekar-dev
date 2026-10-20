@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useStore } from '@/state/store';
 
+import { useInShowcase } from './frame';
 import { DEMO_BAR_HEIGHT } from './demo-bar';
 import { alpha, MaxWidth, seasonColors, Space, useTheme } from './theme';
 
@@ -27,13 +28,17 @@ export function Screen({
 }) {
   const { colors, dark } = useTheme();
   const insets = useSafeAreaInsets();
-  const demo = useStore((s) => s.demo);
+  const inShowcase = useInShowcase();
+  const demo = useStore((s) => s.demo) && !inShowcase;
   const glow = season ? seasonColors(season).glow : '#B79BEB';
   const content = (
     <View
       style={[
         styles.content,
-        { paddingTop: padTop ? insets.top + Space.l + (demo ? DEMO_BAR_HEIGHT : 0) : 0, paddingBottom: (tabs ? TAB_CLEARANCE : Space.xxl) + insets.bottom },
+        {
+          paddingTop: padTop ? insets.top + Space.l + (demo ? DEMO_BAR_HEIGHT : 0) : 0,
+          paddingBottom: (tabs ? TAB_CLEARANCE : Space.xxl) + insets.bottom,
+        },
       ]}>
       {children}
     </View>

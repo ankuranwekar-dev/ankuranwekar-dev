@@ -1,5 +1,11 @@
 import type { CycleData, LHTest, MucusObservation, TemperatureReading } from '@kairos/core';
-import { getSdkStatus, initialize, readRecords, requestPermission, SdkAvailabilityStatus } from 'react-native-health-connect';
+import {
+  getSdkStatus,
+  initialize,
+  readRecords,
+  requestPermission,
+  SdkAvailabilityStatus,
+} from 'react-native-health-connect';
 
 import { dayOf, MUCUS_BY_INDEX, periodsFromFlowDays, summarise, yearAgo, type HealthImport } from './health-shared';
 
@@ -21,7 +27,11 @@ export async function importFromHealth(): Promise<HealthImport> {
     { accessType: 'read', recordType: 'CervicalMucus' },
     { accessType: 'read', recordType: 'BasalBodyTemperature' },
   ]);
-  const timeRangeFilter = { operator: 'between' as const, startTime: yearAgo().toISOString(), endTime: new Date().toISOString() };
+  const timeRangeFilter = {
+    operator: 'between' as const,
+    startTime: yearAgo().toISOString(),
+    endTime: new Date().toISOString(),
+  };
 
   const flow = await readRecords('MenstruationFlow', { timeRangeFilter });
   // MenstruationFlow.flow: 0 unknown, 1 light, 2 medium, 3 heavy. Any recorded flow counts.

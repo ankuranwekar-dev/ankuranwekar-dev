@@ -80,7 +80,9 @@ export default function HerOnboarding() {
                 <Icon name="health" size={22} color="#FF6B8A" />
               </View>
               <View style={{ flex: 1 }}>
-                <T variant="headline">{imported ? `Connected to ${healthSourceName}` : `Connect ${healthSourceName}`}</T>
+                <T variant="headline">
+                  {imported ? `Connected to ${healthSourceName}` : `Connect ${healthSourceName}`}
+                </T>
                 <T variant="footnote" tone="secondary">
                   {imported ?? (busy ? 'Reading…' : 'Periods, LH tests and temperature. Read-only. Zero typing.')}
                 </T>
@@ -108,13 +110,19 @@ export default function HerOnboarding() {
                 Your cycles usually run about
               </T>
               <View style={styles.stepper}>
-                <Press onPress={() => setLength((l) => Math.max(21, l - 1))} style={styles.stepButton} accessibilityLabel="Shorter">
+                <Press
+                  onPress={() => setLength((l) => Math.max(21, l - 1))}
+                  style={styles.stepButton}
+                  accessibilityLabel="Shorter">
                   <T variant="title2">−</T>
                 </Press>
                 <T variant="title" style={{ minWidth: 120, textAlign: 'center' }}>
                   {length} days
                 </T>
-                <Press onPress={() => setLength((l) => Math.min(40, l + 1))} style={styles.stepButton} accessibilityLabel="Longer">
+                <Press
+                  onPress={() => setLength((l) => Math.min(40, l + 1))}
+                  style={styles.stepButton}
+                  accessibilityLabel="Longer">
                   <T variant="title2">+</T>
                 </Press>
               </View>
@@ -141,15 +149,35 @@ export default function HerOnboarding() {
 
   if (step === 1) {
     const options: { v: Intent; title: string; body: string }[] = [
-      { v: 'trying', title: 'Trying for a baby', body: 'He’ll know your best days, do his part, and be steady through the wait.' },
+      {
+        v: 'trying',
+        title: 'Trying for a baby',
+        body: 'He’ll know your best days, do his part, and be steady through the wait.',
+      },
       { v: 'closer', title: 'Growing closer', body: 'Your seasons shape his care and romance. No pregnancy goal.' },
-      { v: 'basics', title: 'Just the basics', body: 'A heads-up around your period, and the support that comes with it.' },
+      {
+        v: 'basics',
+        title: 'Just the basics',
+        body: 'A heads-up around your period, and the support that comes with it.',
+      },
     ];
     return (
-      <StepFrame step={1} total={TOTAL} onBack={back} eyebrow="Why you’re here" title="What would help most?" footer={<Button label="Continue" onPress={next} />}>
+      <StepFrame
+        step={1}
+        total={TOTAL}
+        onBack={back}
+        eyebrow="Why you’re here"
+        title="What would help most?"
+        footer={<Button label="Continue" onPress={next} />}>
         <View style={{ gap: Space.s }}>
           {options.map((o) => (
-            <Choice key={o.v} title={o.title} body={o.body} selected={s.intent === o.v} onPress={() => s.setIntent(o.v)} />
+            <Choice
+              key={o.v}
+              title={o.title}
+              body={o.body}
+              selected={s.intent === o.v}
+              onPress={() => s.setIntent(o.v)}
+            />
           ))}
         </View>
       </StepFrame>
@@ -173,7 +201,13 @@ export default function HerOnboarding() {
         footer={<Button label="Continue" onPress={next} />}>
         <View style={{ gap: Space.s }}>
           {options.map((o) => (
-            <Choice key={o.v} title={o.title} body={o.body} selected={s.share === o.v} onPress={() => s.setShare(o.v)} />
+            <Choice
+              key={o.v}
+              title={o.title}
+              body={o.body}
+              selected={s.share === o.v}
+              onPress={() => s.setShare(o.v)}
+            />
           ))}
         </View>
       </StepFrame>
@@ -190,12 +224,38 @@ export default function HerOnboarding() {
         eyebrow="Your playbook"
         title="Three things he should know."
         subtitle="Optional, and you can add more later. His ideas get specific when you do."
-        footer={<Button label={pb.flowers || pb.treat || pb.drink ? 'Continue' : 'Skip for now'} onPress={next} kind={pb.flowers || pb.treat ? 'primary' : 'secondary'} />}>
+        footer={
+          <Button
+            label={pb.flowers || pb.treat || pb.drink ? 'Continue' : 'Skip for now'}
+            onPress={next}
+            kind={pb.flowers || pb.treat ? 'primary' : 'secondary'}
+          />
+        }>
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: Space.m }}>
-          <Labeled label="Your name" value={pb.name} placeholder="What he calls you" onChange={(name) => s.updatePlaybook({ name })} />
-          <Labeled label="Favorite flowers" value={pb.flowers ?? ''} placeholder="Peonies" onChange={(flowers) => s.updatePlaybook({ flowers })} />
-          <Labeled label="Go-to treat" value={pb.treat ?? ''} placeholder="Salted dark chocolate" onChange={(treat) => s.updatePlaybook({ treat })} />
-          <Labeled label="Coffee order" value={pb.drink ?? ''} placeholder="Oat flat white" onChange={(drink) => s.updatePlaybook({ drink })} />
+          <Labeled
+            label="Your name"
+            value={pb.name}
+            placeholder="What he calls you"
+            onChange={(name) => s.updatePlaybook({ name })}
+          />
+          <Labeled
+            label="Favorite flowers"
+            value={pb.flowers ?? ''}
+            placeholder="Peonies"
+            onChange={(flowers) => s.updatePlaybook({ flowers })}
+          />
+          <Labeled
+            label="Go-to treat"
+            value={pb.treat ?? ''}
+            placeholder="Salted dark chocolate"
+            onChange={(treat) => s.updatePlaybook({ treat })}
+          />
+          <Labeled
+            label="Coffee order"
+            value={pb.drink ?? ''}
+            placeholder="Oat flat white"
+            onChange={(drink) => s.updatePlaybook({ drink })}
+          />
         </ScrollView>
       </StepFrame>
     );
@@ -223,11 +283,23 @@ export default function HerOnboarding() {
   );
 }
 
-function Choice({ title, body, selected, onPress }: { title: string; body: string; selected: boolean; onPress: () => void }) {
+function Choice({
+  title,
+  body,
+  selected,
+  onPress,
+}: {
+  title: string;
+  body: string;
+  selected: boolean;
+  onPress: () => void;
+}) {
   const { colors } = useTheme();
   return (
     <Press onPress={onPress} accessibilityLabel={title}>
-      <Glass radius={Radius.l} style={[styles.choice, selected ? { borderColor: alpha(accent, 0.75), borderWidth: 1 } : null]}>
+      <Glass
+        radius={Radius.l}
+        style={[styles.choice, selected ? { borderColor: alpha(accent, 0.75), borderWidth: 1 } : null]}>
         <View style={[styles.radio, { borderColor: selected ? accent : colors.textTertiary }]}>
           {selected ? <View style={[styles.radioDot, { backgroundColor: accent }]} /> : null}
         </View>
@@ -242,7 +314,17 @@ function Choice({ title, body, selected, onPress }: { title: string; body: strin
   );
 }
 
-function Labeled({ label, value, placeholder, onChange }: { label: string; value: string; placeholder: string; onChange: (v: string) => void }) {
+function Labeled({
+  label,
+  value,
+  placeholder,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  placeholder: string;
+  onChange: (v: string) => void;
+}) {
   const { colors } = useTheme();
   return (
     <Glass radius={Radius.l} style={{ paddingHorizontal: Space.l, paddingTop: Space.m }}>
@@ -265,7 +347,14 @@ const styles = StyleSheet.create({
   optionIcon: { width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Space.s },
   stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Space.l },
-  stepButton: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(127,127,127,0.12)' },
+  stepButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(127,127,127,0.12)',
+  },
   choice: { flexDirection: 'row', alignItems: 'center', gap: Space.m, padding: Space.l },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   radioDot: { width: 10, height: 10, borderRadius: 5 },

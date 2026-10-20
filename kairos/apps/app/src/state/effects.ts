@@ -59,9 +59,23 @@ export function useBackgroundWork(ready: boolean) {
     return onNudgeResponse((r) => {
       const s = useStore.getState();
       if (r.action === 'done') {
-        s.log({ key: r.key, nudgeId: r.templateId, kind: r.kind as never, date: localToday(), outcome: 'done', title: r.title });
+        s.log({
+          key: r.key,
+          nudgeId: r.templateId,
+          kind: r.kind as never,
+          date: localToday(),
+          outcome: 'done',
+          title: r.title,
+        });
       } else if (r.action === 'later') {
-        s.log({ key: r.key, nudgeId: r.templateId, kind: r.kind as never, date: localToday(), outcome: 'snoozed', title: r.title });
+        s.log({
+          key: r.key,
+          nudgeId: r.templateId,
+          kind: r.kind as never,
+          date: localToday(),
+          outcome: 'snoozed',
+          title: r.title,
+        });
       }
     });
   }, [native]);

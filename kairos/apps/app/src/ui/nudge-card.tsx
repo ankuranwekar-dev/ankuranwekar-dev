@@ -71,7 +71,9 @@ export function NudgeCard({
       <Animated.View entering={FadeIn.duration(400)} layout={LinearTransition}>
         <Glass radius={Radius.xl} tint={pal.glow} style={styles.card}>
           <View style={styles.doneRow}>
-            <Animated.View entering={ZoomIn.springify().damping(12)} style={[styles.doneBadge, { backgroundColor: pal.glow }]}>
+            <Animated.View
+              entering={ZoomIn.springify().damping(12)}
+              style={[styles.doneBadge, { backgroundColor: pal.glow }]}>
               <Icon name="check" size={22} color="#1A1214" />
             </Animated.View>
             <View style={{ flex: 1, gap: 3 }}>
@@ -119,9 +121,16 @@ export function NudgeCard({
   }
 
   return (
-    <Animated.View key={nudge.key} entering={FadeIn.duration(450)} exiting={FadeOut.duration(150)} layout={LinearTransition}>
+    <Animated.View
+      key={nudge.key}
+      entering={FadeIn.duration(450)}
+      exiting={FadeOut.duration(150)}
+      layout={LinearTransition}>
       <Glass radius={Radius.xl} strong style={styles.card}>
-        <Press haptics={false} onPress={() => router.push({ pathname: '/nudge', params: { key: nudge.key } })} accessibilityLabel={`Open ${nudge.title}`}>
+        <Press
+          haptics={false}
+          onPress={() => router.push({ pathname: '/nudge', params: { key: nudge.key } })}
+          accessibilityLabel={`Open ${nudge.title}`}>
           <View style={styles.meta}>
             <View style={[styles.kind, { backgroundColor: alpha(pal.glow, 0.16) }]}>
               <Icon name={KIND_ICON[nudge.kind]} size={12} color={ink(pal.glow, dark)} />
@@ -144,7 +153,8 @@ export function NudgeCard({
           </T>
           {nudge.targetDate !== nudge.date ? (
             <T variant="footnote" color={ink(pal.glow, dark)} style={{ marginTop: Space.s }}>
-              Set it up today so it lands on {new Date(`${nudge.targetDate}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long' })}.
+              Set it up today so it lands on{' '}
+              {new Date(`${nudge.targetDate}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long' })}.
             </T>
           ) : null}
           <View style={[styles.why, { borderColor: colors.hairline }]}>

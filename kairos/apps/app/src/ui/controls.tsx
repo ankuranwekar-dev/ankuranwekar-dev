@@ -68,7 +68,13 @@ export function Button({
 }) {
   const { colors, dark } = useTheme();
   const bg =
-    kind === 'primary' ? (accent ?? colors.text) : kind === 'secondary' ? (dark ? 'rgba(255,255,255,0.09)' : 'rgba(30,21,25,0.06)') : 'transparent';
+    kind === 'primary'
+      ? (accent ?? colors.text)
+      : kind === 'secondary'
+        ? dark
+          ? 'rgba(255,255,255,0.09)'
+          : 'rgba(30,21,25,0.06)'
+        : 'transparent';
   const fg = kind === 'primary' ? (accent ? '#1A1214' : colors.inverse) : colors.text;
   return (
     <Press
@@ -112,7 +118,11 @@ export function Chip({
       style={[
         styles.chip,
         {
-          backgroundColor: selected ? alpha(on.startsWith('#') ? on : '#FFFFFF', dark ? 0.18 : 0.14) : dark ? 'rgba(255,255,255,0.06)' : 'rgba(30,21,25,0.05)',
+          backgroundColor: selected
+            ? alpha(on.startsWith('#') ? on : '#FFFFFF', dark ? 0.18 : 0.14)
+            : dark
+              ? 'rgba(255,255,255,0.06)'
+              : 'rgba(30,21,25,0.05)',
           borderColor: selected ? alpha(on.startsWith('#') ? on : '#FFFFFF', 0.6) : 'transparent',
         },
       ]}>
@@ -148,7 +158,12 @@ export function Segmented<V extends string>({
             accessibilityLabel={o.label}
             style={[
               styles.segment,
-              on ? { backgroundColor: dark ? 'rgba(255,255,255,0.16)' : '#FFFFFF', borderColor: accent ? alpha(accent, 0.5) : 'transparent' } : null,
+              on
+                ? {
+                    backgroundColor: dark ? 'rgba(255,255,255,0.16)' : '#FFFFFF',
+                    borderColor: accent ? alpha(accent, 0.5) : 'transparent',
+                  }
+                : null,
             ]}>
             <T variant="label" color={on ? colors.text : colors.textSecondary}>
               {o.label}

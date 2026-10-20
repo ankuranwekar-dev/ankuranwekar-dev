@@ -103,15 +103,28 @@ export async function presentSignal(r: SignalResponse): Promise<void> {
   });
 }
 
-export type NudgeResponse = { action: 'done' | 'later' | 'open'; key: string; date: string; kind: string; templateId: string; title: string };
+export type NudgeResponse = {
+  action: 'done' | 'later' | 'open';
+  key: string;
+  date: string;
+  kind: string;
+  templateId: string;
+  title: string;
+};
 
 export function onNudgeResponse(handler: (r: NudgeResponse) => void): () => void {
   const sub = Notifications.addNotificationResponseReceivedListener((res) => {
     const data = res.notification.request.content.data as Partial<NudgeResponse> | undefined;
     if (!data?.key) return;
-    const action =
-      res.actionIdentifier === 'done' ? 'done' : res.actionIdentifier === 'later' ? 'later' : 'open';
-    handler({ action, key: data.key, date: data.date!, kind: data.kind!, templateId: data.templateId!, title: data.title! });
+    const action = res.actionIdentifier === 'done' ? 'done' : res.actionIdentifier === 'later' ? 'later' : 'open';
+    handler({
+      action,
+      key: data.key,
+      date: data.date!,
+      kind: data.kind!,
+      templateId: data.templateId!,
+      title: data.title!,
+    });
   });
   return () => sub.remove();
 }

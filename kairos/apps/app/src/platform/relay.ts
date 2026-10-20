@@ -73,7 +73,10 @@ async function call<T>(path: string, body: unknown): Promise<T> {
   return (await res.json()) as T;
 }
 
-const keyPairOf = (p: StoredPairing): KeyPair => ({ publicKey: fromBase64Url(p.me.pk), secretKey: fromBase64Url(p.me.sk) });
+const keyPairOf = (p: StoredPairing): KeyPair => ({
+  publicKey: fromBase64Url(p.me.pk),
+  secretKey: fromBase64Url(p.me.sk),
+});
 
 function session(p: StoredPairing): SessionKeys | null {
   if (!p.partnerPk) return null;
@@ -91,7 +94,13 @@ export async function startInvite(): Promise<{ link: string; pairId: string }> {
   const link = encodeInvite(invite);
   const { pairId, token } = mailbox(invite);
   await call('mailbox', { pairId, tokenHash: tokenHash(token) });
-  await save({ role: 'her', invite: link, me: { pk: toBase64Url(kp.publicKey), sk: toBase64Url(kp.secretKey) }, cursor: 0, seq: {} });
+  await save({
+    role: 'her',
+    invite: link,
+    me: { pk: toBase64Url(kp.publicKey), sk: toBase64Url(kp.secretKey) },
+    cursor: 0,
+    seq: {},
+  });
   return { link, pairId };
 }
 

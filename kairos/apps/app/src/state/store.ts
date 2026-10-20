@@ -195,7 +195,9 @@ export const useStore = create<Store>()(
       travel: (days) => set({ dayOffset: days }),
 
       logPeriodStart: (date) =>
-        set((s) => ({ cycle: { ...s.cycle, periods: [...s.cycle.periods.filter((p) => p.start !== date), { start: date }] } })),
+        set((s) => ({
+          cycle: { ...s.cycle, periods: [...s.cycle.periods.filter((p) => p.start !== date), { start: date }] },
+        })),
       logPeriodEnd: (date) =>
         set((s) => {
           const periods = [...s.cycle.periods].sort((a, b) => (a.start < b.start ? -1 : 1));
@@ -223,13 +225,24 @@ export const useStore = create<Store>()(
           },
         })),
       setIntent: (intent) =>
-        set({ intent, share: intent === 'trying' ? 'fertility' : intent === 'basics' ? 'period' : get().share === 'period' ? 'seasons' : get().share }),
+        set({
+          intent,
+          share:
+            intent === 'trying'
+              ? 'fertility'
+              : intent === 'basics'
+                ? 'period'
+                : get().share === 'period'
+                  ? 'seasons'
+                  : get().share,
+        }),
       setShare: (share) => set({ share }),
       setPaused: (paused) => set({ paused }),
       updatePlaybook: (patch) => set((s) => ({ playbook: { ...s.playbook, ...patch } })),
       sendSignal: (id, note) =>
         set((s) => ({ signals: [...s.signals.slice(-19), { id, at: nowIso(), ...(note ? { note } : {}) }] })),
-      sendHeart: (note) => set((s) => ({ hearts: [...s.hearts.slice(-49), { at: nowIso(), ...(note ? { note } : {}) }] })),
+      sendHeart: (note) =>
+        set((s) => ({ hearts: [...s.hearts.slice(-49), { at: nowIso(), ...(note ? { note } : {}) }] })),
 
       setPairing: (pairing) => set({ pairing }),
       setHisName: (hisName) => set({ hisName }),
@@ -241,7 +254,8 @@ export const useStore = create<Store>()(
       undoLog: (key, date) => set((s) => ({ history: s.history.filter((h) => !(h.key === key && h.date === date)) })),
       addMention: (text, date) =>
         set((s) => ({ mentions: [...s.mentions, { id: `m-${Date.now().toString(36)}`, text: text.trim(), date }] })),
-      resolveMention: (id) => set((s) => ({ mentions: s.mentions.map((m) => (m.id === id ? { ...m, resolved: true } : m)) })),
+      resolveMention: (id) =>
+        set((s) => ({ mentions: s.mentions.map((m) => (m.id === id ? { ...m, resolved: true } : m)) })),
       acknowledge: (at) => set((s) => ({ acknowledged: [...s.acknowledged.slice(-49), at] })),
       setCalendar: (calendar) => set({ calendar }),
       receiveSnapshot: (snapshot) => set({ snapshot }),

@@ -7,7 +7,13 @@ export function actionLabel(a: NudgeAction): string {
   switch (a.type) {
     case 'order':
       if (a.label) return a.label;
-      return a.what === 'flowers' ? 'Find a florist' : a.what === 'food' ? 'Order in' : a.what === 'scent' ? 'Reorder' : 'Find nearby';
+      return a.what === 'flowers'
+        ? 'Find a florist'
+        : a.what === 'food'
+          ? 'Order in'
+          : a.what === 'scent'
+            ? 'Reorder'
+            : 'Find nearby';
     case 'reserve':
       return a.label ?? 'Find a table';
     case 'message':
@@ -20,7 +26,9 @@ export function actionLabel(a: NudgeAction): string {
 }
 
 const maps = (q: string) =>
-  Platform.OS === 'ios' ? `https://maps.apple.com/?q=${encodeURIComponent(q)}` : `https://www.google.com/maps/search/${encodeURIComponent(q)}`;
+  Platform.OS === 'ios'
+    ? `https://maps.apple.com/?q=${encodeURIComponent(q)}`
+    : `https://www.google.com/maps/search/${encodeURIComponent(q)}`;
 
 /**
  * Opens the right place for a nudge's shortcut. No partner integrations are
@@ -30,7 +38,11 @@ const maps = (q: string) =>
 export async function runAction(a: NudgeAction, draft?: string): Promise<void> {
   switch (a.type) {
     case 'order':
-      await Linking.openURL(a.what === 'scent' ? `https://www.google.com/search?q=${encodeURIComponent(a.query)}` : maps(a.what === 'flowers' ? `florist ${a.query}` : a.query));
+      await Linking.openURL(
+        a.what === 'scent'
+          ? `https://www.google.com/search?q=${encodeURIComponent(a.query)}`
+          : maps(a.what === 'flowers' ? `florist ${a.query}` : a.query),
+      );
       return;
     case 'reserve':
       await Linking.openURL(maps(a.query));

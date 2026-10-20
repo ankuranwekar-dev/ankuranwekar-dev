@@ -57,9 +57,7 @@ export function visibleUntil(data: CycleData, asOf: ISODate): CycleData {
   const keep = <T extends { date: ISODate }>(xs: T[] | undefined) => (xs ?? []).filter((x) => x.date <= asOf);
   return {
     ...data,
-    periods: data.periods
-      .filter((p) => p.start <= asOf)
-      .map((p) => (p.end && p.end > asOf ? { start: p.start } : p)),
+    periods: data.periods.filter((p) => p.start <= asOf).map((p) => (p.end && p.end > asOf ? { start: p.start } : p)),
     lhTests: keep(data.lhTests),
     temperatures: keep(data.temperatures),
     mucus: keep(data.mucus),

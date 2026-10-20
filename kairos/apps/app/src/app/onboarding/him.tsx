@@ -178,7 +178,13 @@ export default function HimOnboarding() {
           <T variant="headline">Daily idea at</T>
           <View style={styles.chips}>
             {TIMES.map((t) => (
-              <Chip key={t} label={t} selected={s.prefs.notifyAt === t} accent={accent} onPress={() => s.updatePrefs({ notifyAt: t })} />
+              <Chip
+                key={t}
+                label={t}
+                selected={s.prefs.notifyAt === t}
+                accent={accent}
+                onPress={() => s.updatePrefs({ notifyAt: t })}
+              />
             ))}
           </View>
         </View>

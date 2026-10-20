@@ -23,11 +23,19 @@ export default function Settings() {
   const [pregnancy, setPregnancy] = useState<'positive' | 'negative'>();
 
   return (
-    <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={[styles.root, { paddingTop: insets.top + Space.l, paddingBottom: insets.bottom + Space.xxxl }]}>
+    <ScrollView
+      style={{ backgroundColor: colors.bg }}
+      contentContainerStyle={[
+        styles.root,
+        { paddingTop: insets.top + Space.l, paddingBottom: insets.bottom + Space.xxxl },
+      ]}>
       <View style={styles.column}>
         <View style={styles.header}>
           <T variant="title">Settings</T>
-          <Press onPress={() => router.back()} accessibilityLabel="Close" style={[styles.close, { backgroundColor: alpha(colors.text, 0.08) }]}>
+          <Press
+            onPress={() => router.back()}
+            accessibilityLabel="Close"
+            style={[styles.close, { backgroundColor: alpha(colors.text, 0.08) }]}>
             <Icon name="close" size={15} color={colors.text} />
           </Press>
         </View>
@@ -35,13 +43,15 @@ export default function Settings() {
         {s.role === 'her' && s.intent === 'trying' ? (
           <>
             <SectionLabel>Pregnancy test</SectionLabel>
-            <Glass radius={Radius.l} style={[styles.card, section === 'pregnancy' ? { borderColor: pal.glow, borderWidth: 1 } : null]}>
+            <Glass
+              radius={Radius.l}
+              style={[styles.card, section === 'pregnancy' ? { borderColor: pal.glow, borderWidth: 1 } : null]}>
               {pregnancy === 'positive' ? (
                 <>
                   <T variant="title2">Congratulations.</T>
                   <T variant="callout" tone="secondary">
-                    Sharing is paused, quietly. Kairos will never tell him before you do. When you’re ready, tell him your way, then
-                    resume sharing from Sharing.
+                    Sharing is paused, quietly. Kairos will never tell him before you do. When you’re ready, tell him
+                    your way, then resume sharing from Sharing.
                   </T>
                 </>
               ) : pregnancy === 'negative' ? (
@@ -100,7 +110,13 @@ export default function Settings() {
               </T>
               <View style={styles.chips}>
                 {['07:30', '08:30', '12:00', '17:30'].map((t) => (
-                  <Chip key={t} label={t} selected={s.prefs.notifyAt === t} accent={pal.glow} onPress={() => s.updatePrefs({ notifyAt: t })} />
+                  <Chip
+                    key={t}
+                    label={t}
+                    selected={s.prefs.notifyAt === t}
+                    accent={pal.glow}
+                    onPress={() => s.updatePrefs({ notifyAt: t })}
+                  />
                 ))}
               </View>
               <T variant="headline" style={{ marginTop: Space.s }}>
@@ -161,8 +177,8 @@ export default function Settings() {
             <SectionLabel>Demo</SectionLabel>
             <Glass radius={Radius.l} style={styles.card}>
               <T variant="callout" tone="secondary">
-                You’re exploring with Maya and Alex, a simulated couple. Use the bar at the top to switch phones and move through
-                time.
+                You’re exploring with Maya and Alex, a simulated couple. Use the bar at the top to switch phones and
+                move through time.
               </T>
               <Button
                 label="Leave the demo"

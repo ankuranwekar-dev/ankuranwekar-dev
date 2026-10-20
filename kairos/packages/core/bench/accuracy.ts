@@ -141,7 +141,9 @@ for (let w = 0; w < WOMEN; w++) {
 }
 
 const pct = (n: number, d: number) => `${((100 * n) / Math.max(d, 1)).toFixed(0)}%`.padStart(5);
-console.log(`\nKairos forecast benchmark — ${WOMEN} simulated women × ${TEST} cycles (${HISTORY} cycles of history each)\n`);
+console.log(
+  `\nKairos forecast benchmark — ${WOMEN} simulated women × ${TEST} cycles (${HISTORY} cycles of history each)\n`,
+);
 console.log(
   'Data source'.padEnd(22),
   'Day-1 exact',

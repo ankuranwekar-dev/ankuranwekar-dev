@@ -96,8 +96,7 @@ export function estimateStats(data: CycleData): CycleStats {
   const lengths = cycles.map((c) => c.length);
 
   const statedCycle = data.statedCycleLength;
-  const cyclePrior =
-    statedCycle && statedCycle >= 20 && statedCycle <= 45 ? statedCycle : POPULATION.cycleMean;
+  const cyclePrior = statedCycle && statedCycle >= 20 && statedCycle <= 45 ? statedCycle : POPULATION.cycleMean;
   // Her own stated length is worth about two cycles of evidence; the population mean, one.
   const cyclePriorWeight = statedCycle ? 2 : 1;
   const cycleMean = weightedShrink(lengths, cyclePrior, cyclePriorWeight);

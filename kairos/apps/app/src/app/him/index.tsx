@@ -36,7 +36,9 @@ export default function HimToday() {
   const seasonName = k.copy?.name.toLowerCase() ?? 'season';
   const chips: string[] = [];
   if (k.summerIn !== undefined && k.snapshot.share === 'fertility') {
-    chips.push(`${k.snapshot.intent === 'trying' ? 'Fertile window' : 'Summer'} ${k.summerIn === 1 ? 'tomorrow' : `in ${k.summerIn} days`}`);
+    chips.push(
+      `${k.snapshot.intent === 'trying' ? 'Fertile window' : 'Summer'} ${k.summerIn === 1 ? 'tomorrow' : `in ${k.summerIn} days`}`,
+    );
   }
   if (k.phase === 'ovulatory' && k.snapshot.share === 'fertility') {
     const word = k.snapshot.intent === 'trying' ? 'Best' : 'Peak';
@@ -63,7 +65,10 @@ export default function HimToday() {
 
       <View style={styles.titleBlock}>
         <T variant="display" center>
-          {name}’s <T variant="display" italic color={ink(pal.glow, dark)}>{seasonName}</T>
+          {name}’s{' '}
+          <T variant="display" italic color={ink(pal.glow, dark)}>
+            {seasonName}
+          </T>
         </T>
         <T variant="callout" tone="secondary" center style={{ maxWidth: 360 }}>
           {k.copy?.read}
@@ -94,7 +99,12 @@ export default function HimToday() {
         ) : null}
 
         {k.activeSignal ? (
-          <SignalCard signal={k.activeSignal} name={name} season={k.season} onAck={() => s.acknowledge(k.activeSignal!.event.at)} />
+          <SignalCard
+            signal={k.activeSignal}
+            name={name}
+            season={k.season}
+            onAck={() => s.acknowledge(k.activeSignal!.event.at)}
+          />
         ) : null}
 
         {!quiet ? (
@@ -105,15 +115,36 @@ export default function HimToday() {
             snoozed={Boolean(snoozedAny)}
             onDone={() =>
               k.todayNudge &&
-              s.log({ key: k.todayNudge.key, nudgeId: k.todayNudge.templateId, kind: k.todayNudge.kind, date: k.today, outcome: 'done', title: k.todayNudge.title })
+              s.log({
+                key: k.todayNudge.key,
+                nudgeId: k.todayNudge.templateId,
+                kind: k.todayNudge.kind,
+                date: k.today,
+                outcome: 'done',
+                title: k.todayNudge.title,
+              })
             }
             onSwap={() =>
               k.todayNudge &&
-              s.log({ key: k.todayNudge.key, nudgeId: k.todayNudge.templateId, kind: k.todayNudge.kind, date: k.today, outcome: 'skipped', title: k.todayNudge.title })
+              s.log({
+                key: k.todayNudge.key,
+                nudgeId: k.todayNudge.templateId,
+                kind: k.todayNudge.kind,
+                date: k.today,
+                outcome: 'skipped',
+                title: k.todayNudge.title,
+              })
             }
             onSnooze={() =>
               k.todayNudge &&
-              s.log({ key: k.todayNudge.key, nudgeId: k.todayNudge.templateId, kind: k.todayNudge.kind, date: k.today, outcome: 'snoozed', title: k.todayNudge.title })
+              s.log({
+                key: k.todayNudge.key,
+                nudgeId: k.todayNudge.templateId,
+                kind: k.todayNudge.kind,
+                date: k.today,
+                outcome: 'snoozed',
+                title: k.todayNudge.title,
+              })
             }
             onUndo={() => {
               const entry = k.doneToday ?? snoozedAny;
@@ -130,7 +161,10 @@ export default function HimToday() {
             {k.upcoming.slice(0, 4).map((n, i) => (
               <View key={n.key}>
                 {i > 0 ? <View style={[styles.sep, { backgroundColor: colors.hairline }]} /> : null}
-                <Press haptics={false} onPress={() => router.push({ pathname: '/nudge', params: { key: n.key } })} style={styles.upRow}>
+                <Press
+                  haptics={false}
+                  onPress={() => router.push({ pathname: '/nudge', params: { key: n.key } })}
+                  style={styles.upRow}>
                   <View style={styles.upDay}>
                     <T variant="caption" tone="tertiary" style={{ letterSpacing: 0.6 }}>
                       {weekdayName(n.date).slice(0, 3)}
@@ -240,8 +274,21 @@ const styles = StyleSheet.create({
   chip: { paddingHorizontal: 12, height: 28, borderRadius: 14, justifyContent: 'center' },
   heart: { flexDirection: 'row', alignItems: 'center', gap: Space.m, padding: Space.l },
   sep: { height: StyleSheet.hairlineWidth, marginLeft: 72 },
-  upRow: { flexDirection: 'row', alignItems: 'center', gap: Space.m, paddingHorizontal: Space.l, paddingVertical: Space.m },
+  upRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Space.m,
+    paddingHorizontal: Space.l,
+    paddingVertical: Space.m,
+  },
   upDay: { width: 40, alignItems: 'center' },
-  input: { flexDirection: 'row', alignItems: 'center', gap: Space.s, borderRadius: Radius.m, paddingHorizontal: Space.m, height: 46 },
+  input: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Space.s,
+    borderRadius: Radius.m,
+    paddingHorizontal: Space.m,
+    height: 46,
+  },
   inputText: { flex: 1, fontSize: 16, height: 46 },
 });

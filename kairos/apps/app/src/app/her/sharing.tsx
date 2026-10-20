@@ -15,7 +15,11 @@ import { T } from '@/ui/text';
 import { alpha, Radius, seasonColors, Space, useTheme, ink } from '@/ui/theme';
 
 const INTENTS: { value: Intent; title: string; body: string }[] = [
-  { value: 'trying', title: 'Trying for a baby', body: 'He knows your fertile days and his part in them, and stays steady through the wait.' },
+  {
+    value: 'trying',
+    title: 'Trying for a baby',
+    body: 'He knows your fertile days and his part in them, and stays steady through the wait.',
+  },
   { value: 'closer', title: 'Growing closer', body: 'Your seasons guide his care and romance. No pregnancy goal.' },
   { value: 'basics', title: 'Just the basics', body: 'He gets a heads-up around your period. That’s all.' },
 ];
@@ -62,20 +66,34 @@ export default function Sharing() {
       <SectionLabel>Why you’re here</SectionLabel>
       <View style={{ gap: Space.s }}>
         {INTENTS.map((o) => (
-          <Option key={o.value} title={o.title} body={o.body} selected={s.intent === o.value} accent={pal.glow} onPress={() => s.setIntent(o.value)} />
+          <Option
+            key={o.value}
+            title={o.title}
+            body={o.body}
+            selected={s.intent === o.value}
+            accent={pal.glow}
+            onPress={() => s.setIntent(o.value)}
+          />
         ))}
       </View>
 
       <SectionLabel>{`What ${his} sees`}</SectionLabel>
       <View style={{ gap: Space.s }}>
         {LEVELS.map((o) => (
-          <Option key={o.value} title={o.title} body={o.body} selected={s.share === o.value} accent={pal.glow} onPress={() => s.setShare(o.value)} />
+          <Option
+            key={o.value}
+            title={o.title}
+            body={o.body}
+            selected={s.share === o.value}
+            accent={pal.glow}
+            onPress={() => s.setShare(o.value)}
+          />
         ))}
       </View>
       {s.share === 'fertility' && s.intent !== 'trying' ? (
         <T variant="footnote" tone="secondary" style={{ marginTop: Space.s, paddingHorizontal: 4 }}>
-          Fertility estimates help timing; they are not birth control. If you’re avoiding pregnancy, use contraception every day of the
-          cycle.
+          Fertility estimates help timing; they are not birth control. If you’re avoiding pregnancy, use contraception
+          every day of the cycle.
         </T>
       ) : null}
 
@@ -158,7 +176,9 @@ function Option({
   const { colors, dark } = useTheme();
   return (
     <Press onPress={onPress} accessibilityLabel={title}>
-      <Glass radius={Radius.l} style={[styles.option, selected ? { borderColor: alpha(accent, 0.7), borderWidth: 1 } : null]}>
+      <Glass
+        radius={Radius.l}
+        style={[styles.option, selected ? { borderColor: alpha(accent, 0.7), borderWidth: 1 } : null]}>
         <View style={[styles.radio, { borderColor: selected ? accent : colors.textTertiary }]}>
           {selected ? <View style={[styles.radioDot, { backgroundColor: accent }]} /> : null}
         </View>

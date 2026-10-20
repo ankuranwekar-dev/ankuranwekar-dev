@@ -68,7 +68,12 @@ export function Invite({ onPaired }: { onPaired?: () => void }) {
           }}
         />
         {Platform.OS !== 'web' ? (
-          <Button label="Send link" kind="secondary" compact onPress={() => Share.share({ message: `Join me on Kairos: ${link}` })} />
+          <Button
+            label="Send link"
+            kind="secondary"
+            compact
+            onPress={() => Share.share({ message: `Join me on Kairos: ${link}` })}
+          />
         ) : null}
       </View>
       {!relayConfigured ? (

@@ -73,7 +73,14 @@ export function CycleRing({
           const a1 = (i + 1) * step - gap / 2;
           return (
             <G key={date}>
-              <Path d={arc(cx, cy, r, a0, a1)} stroke={color} strokeOpacity={opacity} strokeWidth={isToday ? 20 : 14} fill="none" strokeLinecap="round" />
+              <Path
+                d={arc(cx, cy, r, a0, a1)}
+                stroke={color}
+                strokeOpacity={opacity}
+                strokeWidth={isToday ? 20 : 14}
+                fill="none"
+                strokeLinecap="round"
+              />
               {d?.fertile !== undefined && d.fertile > 0.04 ? (
                 <Path
                   d={arc(cx, cy, outer, a0 - gap / 2, a1 + gap / 2)}
@@ -174,8 +181,8 @@ export function SeasonWeeks({
             const pal = seasonColors(season);
             const past = date < today;
             const isToday = date === today;
-            const ahead = Math.max(0, diffDays(today, date));
-            const fade = past ? 0.28 : Math.max(0.7, 1 - ahead * 0.006);
+            // Past days dim; future days stay full color (alpha over near-black turns peach into mud).
+            const fade = past ? 0.28 : 1;
             return (
               <View
                 key={date}
@@ -190,7 +197,17 @@ export function SeasonWeeks({
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                {d?.peak ? <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: '#FFFFFF', opacity: past ? 0.5 : 0.95 }} /> : null}
+                {d?.peak ? (
+                  <View
+                    style={{
+                      width: 5,
+                      height: 5,
+                      borderRadius: 3,
+                      backgroundColor: '#FFFFFF',
+                      opacity: past ? 0.5 : 0.95,
+                    }}
+                  />
+                ) : null}
                 {(d?.bleeding ?? 0) > 0.35 && !d?.peak ? (
                   <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: '#FFFFFF', opacity: 0.55 }} />
                 ) : null}

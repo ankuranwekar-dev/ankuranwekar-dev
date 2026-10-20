@@ -33,14 +33,25 @@ export default function NudgeSheet() {
 
   const season = phaseSeason(nudge.phase);
   const pal = seasonColors(season);
-  const when = new Date(`${nudge.targetDate}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+  const when = new Date(`${nudge.targetDate}T12:00:00`).toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  });
   const isToday = nudge.date === k.today;
 
   return (
-    <ScrollView contentContainerStyle={[styles.root, { paddingTop: (Platform.OS === 'ios' ? 0 : insets.top) + Space.xl, paddingBottom: insets.bottom + Space.xxl }]}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.root,
+        { paddingTop: (Platform.OS === 'ios' ? 0 : insets.top) + Space.xl, paddingBottom: insets.bottom + Space.xxl },
+      ]}>
       <View style={styles.column}>
         <View style={styles.top}>
-          <Press onPress={() => router.back()} accessibilityLabel="Close" style={[styles.close, { backgroundColor: alpha(colors.text, 0.08) }]}>
+          <Press
+            onPress={() => router.back()}
+            accessibilityLabel="Close"
+            style={[styles.close, { backgroundColor: alpha(colors.text, 0.08) }]}>
             <Icon name="close" size={14} color={colors.text} />
           </Press>
         </View>
@@ -76,7 +87,10 @@ export default function NudgeSheet() {
               Starting points. Say it your way.
             </T>
             {nudge.action.drafts.map((d) => (
-              <Press key={d} onPress={() => runAction(nudge.action!, d).catch(() => {})} accessibilityLabel={`Text: ${d}`}>
+              <Press
+                key={d}
+                onPress={() => runAction(nudge.action!, d).catch(() => {})}
+                accessibilityLabel={`Text: ${d}`}>
                 <Glass radius={Radius.l} style={styles.draft}>
                   <T variant="callout" style={{ flex: 1 }}>
                     “{d}”
@@ -103,7 +117,14 @@ export default function NudgeSheet() {
             style={{ marginTop: Space.xl }}
             onPress={() => {
               haptic.success();
-              log({ key: nudge.key, nudgeId: nudge.templateId, kind: nudge.kind, date: k.today, outcome: 'done', title: nudge.title });
+              log({
+                key: nudge.key,
+                nudgeId: nudge.templateId,
+                kind: nudge.kind,
+                date: k.today,
+                outcome: 'done',
+                title: nudge.title,
+              });
               router.back();
             }}
           />

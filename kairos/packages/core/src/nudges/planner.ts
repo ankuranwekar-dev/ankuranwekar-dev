@@ -157,7 +157,17 @@ function learnedWeights(history: HistoryEntry[]): Record<NudgeKind, number> {
     tally.set(h.kind, t);
   }
   const out = {} as Record<NudgeKind, number>;
-  for (const k of ['presence', 'words', 'service', 'gift', 'touch', 'adventure', 'romance', 'care', 'prep'] as NudgeKind[]) {
+  for (const k of [
+    'presence',
+    'words',
+    'service',
+    'gift',
+    'touch',
+    'adventure',
+    'romance',
+    'care',
+    'prep',
+  ] as NudgeKind[]) {
     const t = tally.get(k) ?? { good: 0, bad: 0 };
     const mean = (1 + t.good) / (2 + t.good + t.bad); // Beta(1,1) posterior mean
     out[k] = 0.6 + 0.8 * mean;
@@ -197,14 +207,14 @@ export function planNudges(input: PlanInput): Plan {
   }
 
   // "Not today" on a nudge keeps it off today only, without counting against its kind.
-  const snoozedToday = new Set(history.filter((h) => h.outcome === 'snoozed' && h.date === input.from).map((h) => h.nudgeId));
+  const snoozedToday = new Set(
+    history.filter((h) => h.outcome === 'snoozed' && h.date === input.from).map((h) => h.nudgeId),
+  );
 
   const placed: Placed[] = [];
   const notifyTaken = new Set<ISODate>();
   const targetTaken = new Set<ISODate>();
-  const openMentions = (input.mentions ?? [])
-    .filter((m) => !m.resolved)
-    .sort((a, b) => (a.date < b.date ? -1 : 1));
+  const openMentions = (input.mentions ?? []).filter((m) => !m.resolved).sort((a, b) => (a.date < b.date ? -1 : 1));
   const usedMentions = new Set<string>();
 
   const inWindow = (d: ISODate) => d >= input.from && d <= end;
@@ -275,9 +285,8 @@ export function planNudges(input: PlanInput): Plan {
     const phase = byDate.get(date)?.phase;
     const cycle = cycleOf(date);
     const isWeekend = weekend.has(weekday(date));
-    const prevKind = [...placed]
-      .filter((p) => p.target < date)
-      .sort((a, b) => (a.target < b.target ? 1 : -1))[0]?.t.kind;
+    const prevKind = [...placed].filter((p) => p.target < date).sort((a, b) => (a.target < b.target ? 1 : -1))[0]
+      ?.t.kind;
 
     const inThisCycle = placed.filter((p) => p.cycle === cycle);
     const bigInSummer = inThisCycle.filter((p) => p.t.big && p.phase === 'ovulatory').length;
@@ -325,7 +334,10 @@ export function planNudges(input: PlanInput): Plan {
     scored.sort((x, y) => y.score - x.score);
     const top = scored.slice(0, 6);
     const rand = seededRandom(input.seed, 'pick', date);
-    const idx = sampleIndex(top.map((s) => s.score ** 3), rand);
+    const idx = sampleIndex(
+      top.map((s) => s.score ** 3),
+      rand,
+    );
     const chosen = top[Math.max(0, idx)]!.t;
     place(chosen, date, chosen.usesMention ? nextMention : undefined);
   }
@@ -388,4 +400,3 @@ export function summerShareOfBigGestures(items: PlannedNudge[]): number {
 export function nudgeFor(plan: Plan, date: ISODate): PlannedNudge | undefined {
   return plan.items.find((i) => i.date === date);
 }
-

@@ -143,14 +143,17 @@ function round(x: number, dp: number): number {
 }
 
 /** Restrict sensor observations to a subset, e.g. to compare "calendar only" with "calendar + LH". */
-export function withSensors(data: CycleData, keep: { lh?: boolean; bbt?: boolean; wrist?: boolean; mucus?: boolean }): CycleData {
+export function withSensors(
+  data: CycleData,
+  keep: { lh?: boolean; bbt?: boolean; wrist?: boolean; mucus?: boolean },
+): CycleData {
   const temps = (data.temperatures ?? []).filter(
     (t: TemperatureReading) => (t.source === 'bbt' && keep.bbt) || (t.source === 'wrist' && keep.wrist),
   );
   return {
     ...data,
-    lhTests: keep.lh ? data.lhTests ?? [] : [],
+    lhTests: keep.lh ? (data.lhTests ?? []) : [],
     temperatures: temps,
-    mucus: keep.mucus ? data.mucus ?? [] : [],
+    mucus: keep.mucus ? (data.mucus ?? []) : [],
   };
 }

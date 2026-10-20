@@ -68,7 +68,14 @@
       "description": "Her rhythm. Your moment. A private, cycle-aware companion for couples."
     },
     "plugins": [
-      "expo-router",
+      [
+        "expo-router",
+        {
+          "asyncRoutes": {
+            "web": false
+          }
+        }
+      ],
       "expo-secure-store",
       "expo-font",
       [

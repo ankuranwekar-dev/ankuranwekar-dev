@@ -10,7 +10,11 @@ import { Screen } from '@/ui/screen';
 import { T } from '@/ui/text';
 import { alpha, Radius, seasonColors, Space, useTheme, ink } from '@/ui/theme';
 
-const FAVORITES: { key: 'flowers' | 'treat' | 'scent' | 'drink' | 'comfortFood' | 'cuisine' | 'place' | 'music'; label: string; icon: IconName }[] = [
+const FAVORITES: {
+  key: 'flowers' | 'treat' | 'scent' | 'drink' | 'comfortFood' | 'cuisine' | 'place' | 'music';
+  label: string;
+  icon: IconName;
+}[] = [
   { key: 'flowers', label: 'Flowers', icon: 'sparkles' },
   { key: 'treat', label: 'Treat', icon: 'bag' },
   { key: 'scent', label: 'Scent', icon: 'drop' },
@@ -130,10 +134,14 @@ export default function HerPlaybook() {
               <View style={{ flex: 1 }}>
                 <T variant="callout">{m.text}</T>
                 <T variant="footnote" tone="tertiary">
-                  Saved {new Date(`${m.date}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  Saved{' '}
+                  {new Date(`${m.date}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </T>
               </View>
-              <Press onPress={() => resolve(m.id)} accessibilityLabel="Mark followed up" style={[styles.followed, { borderColor: colors.border }]}>
+              <Press
+                onPress={() => resolve(m.id)}
+                accessibilityLabel="Mark followed up"
+                style={[styles.followed, { borderColor: colors.border }]}>
                 <Icon name="check" size={14} color={colors.textSecondary} />
               </Press>
             </View>
@@ -151,6 +159,12 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Space.m },
   tile: { padding: Space.l, flexBasis: '47%', flexGrow: 1 },
   noteRow: { flexDirection: 'row', alignItems: 'center', gap: Space.m },
-  mention: { flexDirection: 'row', alignItems: 'center', gap: Space.m, paddingHorizontal: Space.l, paddingVertical: Space.m },
+  mention: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Space.m,
+    paddingHorizontal: Space.l,
+    paddingVertical: Space.m,
+  },
   followed: { width: 34, height: 34, borderRadius: 17, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
 });

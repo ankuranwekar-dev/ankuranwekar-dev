@@ -24,7 +24,9 @@ import {
 } from '../src/crypto/pairing';
 
 async function call(relay: ReturnType<typeof createRelay>, route: string, body: unknown) {
-  const res = await relay(new Request(`https://relay.test/functions/v1/relay/${route}`, { method: 'POST', body: JSON.stringify(body) }));
+  const res = await relay(
+    new Request(`https://relay.test/functions/v1/relay/${route}`, { method: 'POST', body: JSON.stringify(body) }),
+  );
   return { status: res.status, body: (await res.json()) as any };
 }
 
@@ -52,7 +54,10 @@ describe('relay', () => {
     const him = generateKeyPair();
     const scanned = decodeInvite(link);
     const join = createJoinRequest(him, scanned);
-    expect((await call(relay, 'send', { pairId, token: mailboxToken(scanned), from: 'him', type: 'join', envelope: join })).status).toBe(201);
+    expect(
+      (await call(relay, 'send', { pairId, token: mailboxToken(scanned), from: 'him', type: 'join', envelope: join }))
+        .status,
+    ).toBe(201);
     const hisSession = deriveSession('him', him, scanned.herPublicKey, scanned);
 
     // Her phone collects the join, verifies it, derives keys and sends a snapshot.
@@ -61,7 +66,13 @@ describe('relay', () => {
     const hisKey = verifyJoinRequest(got.body.messages[0].envelope as JoinRequest, invite);
     const herSession = deriveSession('her', her, hisKey, invite);
     const snapshot = { season: 'spring', playbook: { name: 'Maya', flowers: 'peonies' } };
-    await call(relay, 'send', { pairId, token, from: 'her', type: 'snapshot', envelope: seal(herSession, 'snapshot', 1, snapshot) });
+    await call(relay, 'send', {
+      pairId,
+      token,
+      from: 'her',
+      type: 'snapshot',
+      envelope: seal(herSession, 'snapshot', 1, snapshot),
+    });
 
     // He collects and decrypts.
     const mine = await call(relay, 'fetch', { pairId, token, for: 'him', after: 0 });
@@ -83,9 +94,25 @@ describe('relay', () => {
     expect(wrong.status).toBe(404);
     expect(missing.status).toBe(404);
     expect(wrong.body).toEqual(missing.body);
-    expect((await call(relay, 'send', { pairId, token: mailboxToken(invite), from: 'her', type: 'join', envelope: {} })).status).toBe(400);
-    expect((await call(relay, 'send', { pairId, token: mailboxToken(invite), from: 'her', type: 'evil', envelope: {} })).status).toBe(400);
-    expect((await call(relay, 'send', { pairId, token: mailboxToken(invite), from: 'her', type: 'signal', envelope: { x: 'a'.repeat(70_000) } })).status).toBe(413);
+    expect(
+      (await call(relay, 'send', { pairId, token: mailboxToken(invite), from: 'her', type: 'join', envelope: {} }))
+        .status,
+    ).toBe(400);
+    expect(
+      (await call(relay, 'send', { pairId, token: mailboxToken(invite), from: 'her', type: 'evil', envelope: {} }))
+        .status,
+    ).toBe(400);
+    expect(
+      (
+        await call(relay, 'send', {
+          pairId,
+          token: mailboxToken(invite),
+          from: 'her',
+          type: 'signal',
+          envelope: { x: 'a'.repeat(70_000) },
+        })
+      ).status,
+    ).toBe(413);
     expect((await call(relay, 'mailbox', { pairId: 'short', tokenHash: 'x' })).status).toBe(400);
   });
 

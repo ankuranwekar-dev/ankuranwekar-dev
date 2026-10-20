@@ -63,14 +63,7 @@ interface IconProps extends Omit<ComponentProps<typeof SymbolView>, 'name'> {
 
 export function Icon({ name, size = 20, color, ...rest }: IconProps) {
   const [ios, material] = ICONS[name];
-  return (
-    <SymbolView
-      {...rest}
-      name={{ ios, android: material, web: material }}
-      size={size}
-      tintColor={color}
-    />
-  );
+  return <SymbolView {...rest} name={{ ios, android: material, web: material }} size={size} tintColor={color} />;
 }
 
 /** Icons for her one-tap signals. */

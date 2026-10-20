@@ -72,7 +72,8 @@ export function buildSnapshot(f: Forecast, opts: SnapshotOptions): PartnerSnapsh
   const level = SHARE_ORDER[opts.share];
   // Always include the whole current cycle, so his ring can draw it.
   const lookbackFrom = addDays(f.asOf, -lookback);
-  const from = f.cycleStart && f.cycleStart < lookbackFrom && diffDays(f.cycleStart, f.asOf) <= 60 ? f.cycleStart : lookbackFrom;
+  const from =
+    f.cycleStart && f.cycleStart < lookbackFrom && diffDays(f.cycleStart, f.asOf) <= 60 ? f.cycleStart : lookbackFrom;
   const to = addDays(f.asOf, horizon);
   const days: SharedDay[] = f.days
     .filter((d) => d.date >= from && d.date <= to)
@@ -108,7 +109,11 @@ function round2(x: number): number {
 
 /** Plain-language list of exactly what he can see, for her "What he sees" screen. */
 export function describeShare(share: ShareLevel, intent: Intent): string[] {
-  const lines = ['When her period is likely to start, as a range', 'A heads-up in the days before it', 'Your playbook and your signals'];
+  const lines = [
+    'When her period is likely to start, as a range',
+    'A heads-up in the days before it',
+    'Your playbook and your signals',
+  ];
   if (SHARE_ORDER[share] >= 1) lines.splice(2, 0, 'Which season you are in, every day');
   if (SHARE_ORDER[share] >= 2) {
     lines.splice(3, 0, intent === 'trying' ? 'Your fertile window and best days' : 'Your peak days');

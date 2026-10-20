@@ -37,7 +37,11 @@ export function SignalCard({
   const action: NudgeAction | undefined = signal.response.action;
   return (
     <Animated.View entering={FadeInDown.springify().damping(16)} exiting={FadeOut.duration(200)}>
-      <Glass radius={Radius.xl} tint={pal.glow} strong style={[styles.card, { borderColor: alpha(pal.glow, 0.55), borderWidth: 1 }]}>
+      <Glass
+        radius={Radius.xl}
+        tint={pal.glow}
+        strong
+        style={[styles.card, { borderColor: alpha(pal.glow, 0.55), borderWidth: 1 }]}>
         <View style={styles.header}>
           <View style={[styles.glyph, { backgroundColor: alpha(pal.glow, 0.22) }]}>
             <Icon name={SIGNAL_ICON[signal.response.signal.id] ?? 'heart'} size={20} color={ink(pal.glow, dark)} />

@@ -1,14 +1,15 @@
 import { PHASE_COPY, type Phase } from '@kairos/core';
 import { useState } from 'react';
-import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
-import { syncSeasonsToCalendar } from '@/platform/calendar';
+import { calendarAvailable, syncSeasonsToCalendar } from '@/platform/calendar';
 import { haptic } from '@/platform/haptics';
 import { useKairos } from '@/state/kairos';
 import { useStore } from '@/state/store';
 import { Button, SectionLabel } from '@/ui/controls';
 import { Glass } from '@/ui/glass';
 import { Icon } from '@/ui/icon';
+import { useScreenSize } from '@/ui/frame';
 import { CycleRing, SeasonWeeks } from '@/ui/ring';
 import { Screen } from '@/ui/screen';
 import { T } from '@/ui/text';
@@ -30,7 +31,7 @@ const LEGEND: { phase: Phase; label: string }[] = [
 export default function Rhythm() {
   const k = useKairos();
   const { colors, dark } = useTheme();
-  const { width } = useWindowDimensions();
+  const { width } = useScreenSize();
   const calendar = useStore((s) => s.calendar);
   const setCalendar = useStore((s) => s.setCalendar);
   const [busy, setBusy] = useState(false);
@@ -63,9 +64,12 @@ export default function Rhythm() {
     setBusy(true);
     setError(undefined);
     try {
-      await syncSeasonsToCalendar(snap.days.filter((d) => d.date >= k.today), {
-        ...(calendar.codenames ? { codenames: calendar.codenames } : {}),
-      });
+      await syncSeasonsToCalendar(
+        snap.days.filter((d) => d.date >= k.today),
+        {
+          ...(calendar.codenames ? { codenames: calendar.codenames } : {}),
+        },
+      );
       haptic.success();
       setCalendar({ ...calendar, synced: true, lastSync: new Date().toISOString() });
     } catch (e) {
@@ -160,19 +164,35 @@ export default function Rhythm() {
             <Icon name="calendar" size={18} color={ink(pal.glow, dark)} />
           </View>
           <View style={{ flex: 1 }}>
-            <T variant="headline">{calendar.synced ? 'Seasons are in your calendar' : 'Add seasons to your calendar'}</T>
+            <T variant="headline">
+              {calendar.synced ? 'Seasons are in your calendar' : 'Add seasons to your calendar'}
+            </T>
             <T variant="footnote" tone="secondary">
               All-day, marked free, titled only “Spring”, “Summer”… Nobody looking over your shoulder learns a thing.
             </T>
           </View>
         </View>
-        <Button
-          label={busy ? 'Adding…' : calendar.synced ? 'Refresh' : Platform.OS === 'web' ? 'Download .ics' : 'Add to Calendar'}
-          kind={calendar.synced ? 'secondary' : 'primary'}
-          accent={calendar.synced ? undefined : pal.glow}
-          onPress={sync}
-          disabled={busy}
-        />
+        {calendarAvailable() ? (
+          <Button
+            label={
+              busy
+                ? 'Adding…'
+                : calendar.synced
+                  ? 'Refresh'
+                  : Platform.OS === 'web'
+                    ? 'Download .ics'
+                    : 'Add to Calendar'
+            }
+            kind={calendar.synced ? 'secondary' : 'primary'}
+            accent={calendar.synced ? undefined : pal.glow}
+            onPress={sync}
+            disabled={busy}
+          />
+        ) : (
+          <T variant="footnote" tone="tertiary">
+            In the iPhone and Android apps this is one tap. This embedded preview can’t save files.
+          </T>
+        )}
         {error ? (
           <T variant="footnote" color={colors.danger}>
             {error}
@@ -183,7 +203,10 @@ export default function Rhythm() {
       <SectionLabel>Forecast</SectionLabel>
       <Glass radius={Radius.l} style={{ padding: Space.xl, gap: Space.xs }}>
         <T variant="headline">
-          Confidence: <T variant="headline" color={ink(pal.glow, dark)}>{conf.label}</T>
+          Confidence:{' '}
+          <T variant="headline" color={ink(pal.glow, dark)}>
+            {conf.label}
+          </T>
         </T>
         <T variant="footnote" tone="secondary">
           {conf.body} Seasons are tendencies, not rules. When she sends a signal, it always beats the forecast.

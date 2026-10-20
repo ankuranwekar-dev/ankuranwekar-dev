@@ -14,3 +14,12 @@ export async function syncSeasonsToCalendar(days: SharedDay[], opts: CodenameOpt
   setTimeout(() => URL.revokeObjectURL(url), 4000);
   return (ics.match(/BEGIN:VEVENT/g) ?? []).length;
 }
+
+/** Inside an embedded preview, browsers refuse downloads; the website opened directly can save the file. */
+export function calendarAvailable(): boolean {
+  try {
+    return window.top === window.self;
+  } catch {
+    return false;
+  }
+}

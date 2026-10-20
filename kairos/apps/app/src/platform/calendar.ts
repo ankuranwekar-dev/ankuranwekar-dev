@@ -69,3 +69,7 @@ export async function syncSeasonsToCalendar(days: SharedDay[], opts: CodenameOpt
   }
   return blocks.length;
 }
+
+export function calendarAvailable(): boolean {
+  return true;
+}
