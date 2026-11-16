@@ -12,15 +12,18 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "bench": "tsx bench/accuracy.ts"
+    "bench": "tsx bench/accuracy.ts",
+    "bench:calendars": "tsx bench/calendars/run.ts"
   },
   "dependencies": {
     "@noble/ciphers": "^2.4.0",
     "@noble/curves": "^2.4.0",
-    "@noble/hashes": "^2.4.0"
+    "@noble/hashes": "^2.4.0",
+    "fflate": "^0.8.3"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "playwright-core": "1.56.1",
     "tsx": "^4.20.0",
     "typescript": "~6.0.3",
     "vitest": "^5.0.5"

@@ -16,3 +16,5 @@ export * from './crypto/encoding';
 export * from './crypto/pairing';
 export * from './calendar/ics';
 export * from './sim/simulate';
+export * from './import/png';
+export * from './import/calendar-image';

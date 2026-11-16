@@ -1,0 +1,179 @@
+[
+  {
+    "file": "coral-00.png",
+    "today": "2027-08-29",
+    "months": [
+      "2027-07-01",
+      "2027-08-01",
+      "2027-09-01"
+    ],
+    "periods": [
+      {
+        "start": "2027-07-30",
+        "end": "2027-08-03"
+      },
+      {
+        "start": "2027-08-27"
+      }
+    ],
+    "weekStart": 0,
+    "exact": true
+  },
+  {
+    "file": "coral-01.png",
+    "today": "2027-10-09",
+    "months": [
+      "2027-09-01",
+      "2027-10-01",
+      "2027-11-01"
+    ],
+    "periods": [
+      {
+        "start": "2027-09-20",
+        "end": "2027-09-22"
+      }
+    ],
+    "weekStart": 0,
+    "exact": true
+  },
+  {
+    "file": "health-00.png",
+    "today": "2025-03-09",
+    "months": [
+      "2025-02-01",
+      "2025-03-01",
+      "2025-04-01"
+    ],
+    "periods": [
+      {
+        "start": "2025-03-02",
+        "end": "2025-03-04"
+      }
+    ],
+    "weekStart": 0,
+    "exact": true
+  },
+  {
+    "file": "health-01.png",
+    "today": "2025-04-14",
+    "months": [
+      "2025-03-01",
+      "2025-04-01"
+    ],
+    "periods": [
+      {
+        "start": "2025-04-14"
+      }
+    ],
+    "weekStart": 0,
+    "exact": true
+  },
+  {
+    "file": "health-dark-01.png",
+    "today": "2025-01-20",
+    "months": [
+      "2024-11-01",
+      "2024-12-01",
+      "2025-01-01"
+    ],
+    "periods": [
+      {
+        "start": "2024-12-20",
+        "end": "2024-12-22"
+      }
+    ],
+    "weekStart": 0,
+    "exact": true
+  },
+  {
+    "file": "clue-00.png",
+    "today": "2026-01-31",
+    "months": [
+      "2026-01-01"
+    ],
+    "periods": [
+      {
+        "start": "2026-01-25",
+        "end": "2026-01-28"
+      }
+    ],
+    "weekStart": 1,
+    "exact": true
+  },
+  {
+    "file": "petal-00.png",
+    "today": "2024-01-15",
+    "months": [
+      "2023-12-01"
+    ],
+    "periods": [
+      {
+        "start": "2023-12-19",
+        "end": "2023-12-21"
+      }
+    ],
+    "weekStart": 0,
+    "exact": true
+  },
+  {
+    "file": "petal-01.png",
+    "today": "2024-04-01",
+    "months": [
+      "2024-03-01"
+    ],
+    "periods": [
+      {
+        "start": "2024-03-19",
+        "end": "2024-03-24"
+      }
+    ],
+    "weekStart": 0,
+    "exact": true
+  },
+  {
+    "file": "noir-01.png",
+    "today": "2026-03-29",
+    "months": [
+      "2026-03-01"
+    ],
+    "periods": [
+      {
+        "start": "2026-03-10",
+        "end": "2026-03-15"
+      }
+    ],
+    "weekStart": 1,
+    "exact": true
+  },
+  {
+    "file": "ledger-01.png",
+    "today": "2027-07-26",
+    "months": [
+      "2027-04-01",
+      "2027-05-01",
+      "2027-06-01"
+    ],
+    "periods": [
+      {
+        "start": "2027-04-20",
+        "end": "2027-04-23"
+      },
+      {
+        "start": "2027-05-25",
+        "end": "2027-05-28"
+      }
+    ],
+    "weekStart": 1,
+    "exact": true
+  },
+  {
+    "file": "dots-00.png",
+    "today": "2026-09-06",
+    "months": [
+      "2026-09-01"
+    ],
+    "periods": [],
+    "weekStart": 0,
+    "exact": true
+  }
+]
