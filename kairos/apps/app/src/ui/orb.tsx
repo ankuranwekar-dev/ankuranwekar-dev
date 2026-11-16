@@ -1,5 +1,5 @@
 import type { Season } from '@kairos/core';
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
@@ -59,7 +59,9 @@ export function Orb({ season, size = 240, breath = 5.5, dim }: OrbProps) {
 
   const glow = size * 1.9;
   const r = size / 2;
-  const id = `orb-${season ?? 'none'}`;
+  // Unique per instance: two orbs on screen (or one on a screen kept alive underneath) must not
+  // share gradient ids, or the browser paints one with the other's, possibly hidden, definition.
+  const id = `orb-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }} pointerEvents="none">

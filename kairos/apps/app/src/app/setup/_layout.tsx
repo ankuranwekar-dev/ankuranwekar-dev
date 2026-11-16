@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 
 import { useTheme } from '@/ui/theme';
 
-export default function OnboardingLayout() {
+export default function SetupLayout() {
   const { colors } = useTheme();
   return (
     <Stack

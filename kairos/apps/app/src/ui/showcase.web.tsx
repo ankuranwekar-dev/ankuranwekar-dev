@@ -90,19 +90,19 @@ function StatusBarMock() {
 
 const PILLARS: { icon: IconName; title: string; body: string }[] = [
   {
-    icon: 'today',
-    title: 'Timed to her seasons',
-    body: 'One small, specific idea a day, shaped by where she is in her cycle and what she loves.',
+    icon: 'photo',
+    title: 'Works with any period app',
+    body: 'A screenshot of her calendar is enough. It is read on the phone and goes nowhere.',
   },
   {
-    icon: 'heart',
-    title: 'Never only then',
-    body: 'Big gestures are spread across her whole cycle, so care never looks like a transaction.',
+    icon: 'today',
+    title: 'One idea a day',
+    body: 'Small and specific, timed to her season. Done in a tap.',
   },
   {
     icon: 'lock',
     title: 'Private by design',
-    body: 'Her raw data never leaves her phone. What she shares is end-to-end encrypted.',
+    body: 'No account. Her data stays on the phone; anything shared is end-to-end encrypted.',
   },
 ];
 
@@ -122,8 +122,8 @@ function Pitch() {
           Her rhythm. Your moment.
         </T>
         <T variant="body" tone="secondary" style={{ fontSize: 18, lineHeight: 27, marginTop: Space.s }}>
-          A private companion for couples. She shares as much of her cycle as she likes. He gets one small, specific
-          idea a day, timed to her seasons, so he can be there before she has to ask.
+          Kairos turns her cycle into four seasons, and gives him one small thing to do each day so he is there before
+          she has to ask.
         </T>
       </View>
 
@@ -143,7 +143,7 @@ function Pitch() {
                   kind={s.role === r ? 'primary' : 'secondary'}
                   onPress={() => {
                     s.setRole(r);
-                    router.replace(r === 'him' ? '/him' : '/her');
+                    router.replace('/today');
                   }}
                 />
               ))}
@@ -163,7 +163,7 @@ function Pitch() {
                 accent={accent}
                 onPress={() => {
                   s.startDemo('him');
-                  router.replace('/him');
+                  router.replace('/today');
                 }}
               />
             </View>

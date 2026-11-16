@@ -51,6 +51,9 @@ const ICONS = {
   sun: ['sun.max', 'sunny'],
   party: ['party.popper', 'celebration'],
   home: ['house', 'home'],
+  photo: ['photo.on.rectangle', 'photo_library'],
+  day: ['calendar', 'calendar_today'],
+  minus: ['minus', 'remove'],
 } as const satisfies Record<string, readonly [SFName, MaterialName]>;
 
 export type IconName = keyof typeof ICONS;

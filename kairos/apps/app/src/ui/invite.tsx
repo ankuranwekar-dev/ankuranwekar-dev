@@ -27,7 +27,7 @@ export function Invite({ onPaired }: { onPaired?: () => void }) {
     if (!relayConfigured || pairing.status !== 'none') return;
     startInvite()
       .then(({ link, pairId }) => setPairing({ status: 'inviting', invite: link, pairId }))
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : 'Could not create an invite'));
+      .catch(() => setError('Couldn’t reach the pairing service. Check the connection and try again.'));
   }, [pairing.status, setPairing]);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export function Invite({ onPaired }: { onPaired?: () => void }) {
         {pairing.status === 'inviting' ? 'Waiting for him to scan…' : 'Have him scan this'}
       </T>
       <T variant="footnote" tone="secondary" center style={{ maxWidth: 300 }}>
-        In person is best: the code carries the key, and it never touches the internet.
+        The code carries the key. In person is best.
       </T>
       <View style={styles.row}>
         <Button
@@ -78,7 +78,7 @@ export function Invite({ onPaired }: { onPaired?: () => void }) {
       </View>
       {!relayConfigured ? (
         <T variant="footnote" tone="tertiary" center>
-          No relay is configured in this build, so pairing is simulated. Set EXPO_PUBLIC_RELAY_URL to pair real phones.
+          Pairing is switched off in this build.
         </T>
       ) : null}
       {error ? (

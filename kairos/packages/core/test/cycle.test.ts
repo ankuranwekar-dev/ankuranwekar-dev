@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { addDays, diffDays } from '../src/dates';
-import { completedCycles, estimateStats, normalisePeriods } from '../src/cycle/history';
+import { completedCycles, estimateStats, normalisePeriods, withAssumedPeriods } from '../src/cycle/history';
 import { detectThermalShift, fertileProbability, ovulationPosterior } from '../src/cycle/ovulation';
 import { forecast } from '../src/cycle/forecast';
 import { POPULATION } from '../src/cycle/population';
@@ -199,5 +199,38 @@ describe('forecast', () => {
     const t0 = performance.now();
     for (let i = 0; i < 10; i++) forecast(data, { asOf: '2026-09-25', seed: String(i) });
     expect((performance.now() - t0) / 10).toBeLessThan(150);
+  });
+});
+
+describe('assumed periods (his phone, without hers)', () => {
+  const data = { periods: [{ start: '2026-09-01' }], statedCycleLength: 30 };
+
+  it('assumes nothing while the next period is not yet two days overdue', () => {
+    expect(withAssumedPeriods(data, '2026-09-20').assumed).toEqual([]);
+    expect(withAssumedPeriods(data, '2026-10-02').assumed).toEqual([]);
+  });
+
+  it('assumes the period came on schedule once it is two days past', () => {
+    const r = withAssumedPeriods(data, '2026-10-03');
+    expect(r.assumed).toEqual(['2026-10-01']);
+    expect(r.data.periods.map((p) => p.start)).toEqual(['2026-09-01', '2026-10-01']);
+  });
+
+  it('keeps the seasons moving across several unconfirmed cycles', () => {
+    expect(withAssumedPeriods(data, '2026-12-05').assumed).toEqual(['2026-10-01', '2026-10-31', '2026-11-30']);
+  });
+
+  it('holds off when he said "not yet", then resumes', () => {
+    expect(withAssumedPeriods(data, '2026-10-03', '2026-10-06').assumed).toEqual([]);
+    expect(withAssumedPeriods(data, '2026-10-07', '2026-10-06').assumed).toEqual(['2026-10-01']);
+  });
+
+  it('uses her own recent cycle length when two periods are known', () => {
+    const two = { periods: [{ start: '2026-08-01' }, { start: '2026-08-27' }], statedCycleLength: 30 };
+    expect(withAssumedPeriods(two, '2026-09-25').assumed).toEqual(['2026-09-22']);
+  });
+
+  it('does nothing without a period to start from', () => {
+    expect(withAssumedPeriods({ periods: [] }, '2026-10-03')).toEqual({ data: { periods: [] }, assumed: [] });
   });
 });

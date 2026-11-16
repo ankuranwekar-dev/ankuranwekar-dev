@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
+  addDays,
   localToday,
+  normalisePeriods,
   type CycleData,
   type HistoryEntry,
   type Intent,
@@ -9,6 +11,7 @@ import {
   type Mention,
   type PartnerPrefs,
   type PartnerSnapshot,
+  type PeriodLog,
   type Phase,
   type Playbook,
   type ShareLevel,
@@ -58,7 +61,12 @@ interface Data {
   paused: boolean;
   playbook: Playbook;
   signals: SignalEvent[];
-  healthSource: 'apple-health' | 'health-connect' | 'manual';
+  healthSource: 'apple-health' | 'health-connect' | 'screenshot' | 'manual';
+  /**
+   * On his phone without hers ("solo"): he said her period has not started yet, so Kairos stops
+   * assuming it has until this day.
+   */
+  notYetUntil?: ISODate;
 
   // Shared
   pairing: Pairing;
@@ -86,6 +94,11 @@ interface Actions {
   logLH: (date: ISODate, result: LHResult) => void;
   logPregnancyTest: (date: ISODate, positive: boolean) => void;
   importCycle: (data: CycleData, source: Data['healthSource']) => void;
+  /** Adds periods read from a screenshot or picked by hand, keeping everything already known. */
+  addPeriods: (periods: PeriodLog[], source: Data['healthSource'], cycleLength?: number) => void;
+  /** He confirms the starts Kairos had assumed. */
+  confirmPeriods: (starts: ISODate[]) => void;
+  notYet: () => void;
   setStatedCycle: (cycleLength: number, lastStart: ISODate) => void;
   setIntent: (intent: Intent) => void;
   setShare: (share: ShareLevel) => void;
@@ -196,6 +209,7 @@ export const useStore = create<Store>()(
 
       logPeriodStart: (date) =>
         set((s) => ({
+          notYetUntil: undefined,
           cycle: { ...s.cycle, periods: [...s.cycle.periods.filter((p) => p.start !== date), { start: date }] },
         })),
       logPeriodEnd: (date) =>
@@ -214,6 +228,25 @@ export const useStore = create<Store>()(
           cycle: { ...s.cycle, pregnancyTests: [...(s.cycle.pregnancyTests ?? []), { date, positive }] },
         })),
       importCycle: (data, source) => set({ cycle: data, healthSource: source }),
+      addPeriods: (periods, source, cycleLength) =>
+        set((s) => ({
+          healthSource: source,
+          notYetUntil: undefined,
+          cycle: {
+            ...s.cycle,
+            periods: normalisePeriods([...s.cycle.periods, ...periods]),
+            ...(cycleLength ? { statedCycleLength: cycleLength } : {}),
+          },
+        })),
+      confirmPeriods: (starts) =>
+        set((s) => ({
+          notYetUntil: undefined,
+          cycle: {
+            ...s.cycle,
+            periods: normalisePeriods([...s.cycle.periods, ...starts.map((start) => ({ start }))]),
+          },
+        })),
+      notYet: () => set({ notYetUntil: addDays(localToday(), 3) }),
       setStatedCycle: (cycleLength, lastStart) =>
         set((s) => ({
           cycle: {
@@ -262,7 +295,9 @@ export const useStore = create<Store>()(
     }),
     {
       name: 'kairos-v1',
-      version: 1,
+      version: 2,
+      // v2 added screenshot import and solo mode; every v1 field is unchanged.
+      migrate: (state) => state as Store,
       storage: createJSONStorage(() => safeStorage),
     },
   ),

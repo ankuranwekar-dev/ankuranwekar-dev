@@ -1,30 +1,27 @@
 import type { Season } from '@kairos/core';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { ReactNode } from 'react';
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useStore } from '@/state/store';
 
-import { useInShowcase } from './frame';
 import { DEMO_BAR_HEIGHT } from './demo-bar';
+import { useInShowcase } from './frame';
 import { alpha, MaxWidth, seasonColors, Space, useTheme } from './theme';
 
-/** Bottom space reserved for the floating tab bar. */
-export const TAB_CLEARANCE = Platform.select({ ios: 96, android: 110, default: 120 })!;
-
+/** A full screen: warm background, a wash of the season's colour at the top, one centred column. */
 export function Screen({
   children,
   season,
   scroll = true,
-  tabs = true,
-  padTop = true,
+  footer,
 }: {
   children: ReactNode;
   season?: Season;
   scroll?: boolean;
-  tabs?: boolean;
-  padTop?: boolean;
+  /** Pinned to the bottom, above the home indicator. */
+  footer?: ReactNode;
 }) {
   const { colors, dark } = useTheme();
   const insets = useSafeAreaInsets();
@@ -36,8 +33,8 @@ export function Screen({
       style={[
         styles.content,
         {
-          paddingTop: padTop ? insets.top + Space.l + (demo ? DEMO_BAR_HEIGHT : 0) : 0,
-          paddingBottom: (tabs ? TAB_CLEARANCE : Space.xxl) + insets.bottom,
+          paddingTop: insets.top + Space.m + (demo ? DEMO_BAR_HEIGHT : 0),
+          paddingBottom: footer ? Space.l : insets.bottom + Space.xxl,
         },
       ]}>
       {children}
@@ -47,7 +44,7 @@ export function Screen({
     <View style={[styles.root, { backgroundColor: colors.bg }]}>
       <LinearGradient
         pointerEvents="none"
-        colors={[alpha(glow, dark ? 0.22 : 0.28), alpha(glow, 0)]}
+        colors={[alpha(glow, dark ? 0.24 : 0.3), alpha(glow, 0)]}
         style={styles.glow}
       />
       {scroll ? (
@@ -59,15 +56,23 @@ export function Screen({
           {content}
         </ScrollView>
       ) : (
-        content
+        <View style={styles.fill}>{content}</View>
       )}
+      {footer ? (
+        <View style={[styles.footer, { paddingBottom: insets.bottom + Space.l }]}>
+          <View style={styles.footerColumn}>{footer}</View>
+        </View>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  glow: { position: 'absolute', top: 0, left: 0, right: 0, height: 460 },
+  fill: { flex: 1, alignItems: 'center' },
+  glow: { position: 'absolute', top: 0, left: 0, right: 0, height: 480 },
   scroll: { flexGrow: 1, alignItems: 'center' },
   content: { width: '100%', maxWidth: MaxWidth, paddingHorizontal: Space.xl, flexGrow: 1 },
+  footer: { alignItems: 'center', paddingHorizontal: Space.xl, paddingTop: Space.s },
+  footerColumn: { width: '100%', maxWidth: MaxWidth, gap: Space.s },
 });

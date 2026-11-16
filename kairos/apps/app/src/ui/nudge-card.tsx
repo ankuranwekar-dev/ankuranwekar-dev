@@ -3,15 +3,14 @@ import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeOut, LinearTransition, ZoomIn } from 'react-native-reanimated';
 
-import { actionLabel, runAction } from '@/platform/actions';
 import { haptic } from '@/platform/haptics';
 import type { Logged } from '@/state/store';
 
-import { Button, Press } from './controls';
+import { Button, IconButton, Press } from './controls';
 import { Glass } from './glass';
 import { Icon, type IconName } from './icon';
 import { T } from './text';
-import { alpha, Radius, seasonColors, Space, useTheme, ink } from './theme';
+import { ink, Radius, seasonColors, Space, useTheme } from './theme';
 
 export const KIND_ICON: Record<NudgeKind, IconName> = {
   presence: 'eye',
@@ -44,6 +43,7 @@ export function effort(minutes: number): string {
   return `${h % 1 === 0 ? h : h.toFixed(1)} hr`;
 }
 
+/** Today's one idea: a title, a line, and Done. Everything else is a tap away. */
 export function NudgeCard({
   nudge,
   season,
@@ -69,25 +69,23 @@ export function NudgeCard({
   if (done) {
     return (
       <Animated.View entering={FadeIn.duration(400)} layout={LinearTransition}>
-        <Glass radius={Radius.xl} tint={pal.glow} style={styles.card}>
-          <View style={styles.doneRow}>
-            <Animated.View
-              entering={ZoomIn.springify().damping(12)}
-              style={[styles.doneBadge, { backgroundColor: pal.glow }]}>
-              <Icon name="check" size={22} color="#1A1214" />
-            </Animated.View>
-            <View style={{ flex: 1, gap: 3 }}>
-              <T variant="headline">Done. She’ll feel it.</T>
-              <T variant="footnote" tone="secondary" numberOfLines={2}>
-                {done.title}
-              </T>
-            </View>
-            <Press onPress={onUndo} accessibilityLabel="Undo">
-              <T variant="label" tone="tertiary">
-                Undo
-              </T>
-            </Press>
+        <Glass radius={Radius.xl} tint={pal.glow} style={[styles.card, styles.doneRow]}>
+          <Animated.View
+            entering={ZoomIn.springify().damping(12)}
+            style={[styles.doneBadge, { backgroundColor: pal.glow }]}>
+            <Icon name="check" size={22} color="#1A1214" />
+          </Animated.View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <T variant="headline">Done.</T>
+            <T variant="footnote" tone="secondary" numberOfLines={1}>
+              {done.title}
+            </T>
           </View>
+          <Press onPress={onUndo} accessibilityLabel="Undo">
+            <T variant="label" tone="tertiary">
+              Undo
+            </T>
+          </Press>
         </Glass>
       </Animated.View>
     );
@@ -96,21 +94,16 @@ export function NudgeCard({
   if (!nudge || snoozed) {
     return (
       <Animated.View entering={FadeIn.duration(400)} layout={LinearTransition}>
-        <Glass radius={Radius.xl} style={styles.card}>
-          <T variant="caption" tone="tertiary">
-            Today
+        <Glass radius={Radius.xl} style={[styles.card, { alignItems: 'center', gap: Space.xs }]}>
+          <T variant="title2" center>
+            {snoozed ? 'Nothing today.' : 'A rest day.'}
           </T>
-          <T variant="title2" style={{ marginTop: Space.s }}>
-            {snoozed ? 'Nothing for today.' : 'A rest day.'}
-          </T>
-          <T variant="callout" tone="secondary" style={{ marginTop: Space.xs }}>
-            {snoozed
-              ? 'Fair enough. Tomorrow’s idea is already lined up.'
-              : 'No idea today, on purpose. The small things you do anyway count the most.'}
+          <T variant="callout" tone="secondary" center>
+            {snoozed ? 'Tomorrow’s idea is ready.' : 'No idea today, on purpose.'}
           </T>
           {snoozed ? (
-            <Press onPress={onUndo} style={{ marginTop: Space.m }} accessibilityLabel="Undo">
-              <T variant="label" tone="secondary">
+            <Press onPress={onUndo} style={{ marginTop: Space.s }} accessibilityLabel="Show it again">
+              <T variant="label" tone="tertiary">
                 Show it again
               </T>
             </Press>
@@ -130,41 +123,20 @@ export function NudgeCard({
         <Press
           haptics={false}
           onPress={() => router.push({ pathname: '/nudge', params: { key: nudge.key } })}
-          accessibilityLabel={`Open ${nudge.title}`}>
+          accessibilityLabel={`${nudge.title}. More`}>
           <View style={styles.meta}>
-            <View style={[styles.kind, { backgroundColor: alpha(pal.glow, 0.16) }]}>
-              <Icon name={KIND_ICON[nudge.kind]} size={12} color={ink(pal.glow, dark)} />
-              <T variant="caption" color={ink(pal.glow, dark)} style={{ letterSpacing: 0.8 }}>
-                {KIND_LABEL[nudge.kind]}
-              </T>
-            </View>
-            <View style={styles.effort}>
-              <Icon name="timer" size={12} color={colors.textTertiary} />
-              <T variant="footnote" tone="tertiary">
-                {effort(nudge.minutes)}
-              </T>
-            </View>
+            <Icon name={KIND_ICON[nudge.kind]} size={13} color={ink(pal.glow, dark)} />
+            <T variant="caption" color={ink(pal.glow, dark)} style={{ letterSpacing: 0.9, flex: 1 }}>
+              {KIND_LABEL[nudge.kind]} · {effort(nudge.minutes)}
+            </T>
+            <Icon name="chevron" size={12} color={colors.textTertiary} />
           </View>
-          <T variant="title2" style={{ marginTop: Space.m }}>
+          <T variant="title2" style={{ marginTop: Space.s, fontSize: 28, lineHeight: 32 }}>
             {nudge.title}
           </T>
-          <T variant="callout" tone="secondary" style={{ marginTop: Space.s }}>
+          <T variant="callout" tone="secondary" numberOfLines={2} style={{ marginTop: Space.s }}>
             {nudge.detail}
           </T>
-          {nudge.targetDate !== nudge.date ? (
-            <T variant="footnote" color={ink(pal.glow, dark)} style={{ marginTop: Space.s }}>
-              Set it up today so it lands on{' '}
-              {new Date(`${nudge.targetDate}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long' })}.
-            </T>
-          ) : null}
-          <View style={[styles.why, { borderColor: colors.hairline }]}>
-            <T variant="footnote" tone="tertiary">
-              <T variant="footnote" tone="secondary" style={{ fontWeight: '600' }}>
-                Why now{'  '}
-              </T>
-              {nudge.why}
-            </T>
-          </View>
         </Press>
         <View style={styles.actions}>
           <Button
@@ -177,31 +149,8 @@ export function NudgeCard({
               onDone();
             }}
           />
-          {nudge.action ? (
-            <Button
-              label={actionLabel(nudge.action)}
-              kind="secondary"
-              style={{ flex: 1.2 }}
-              onPress={() => {
-                if (nudge.action?.type === 'message') router.push({ pathname: '/nudge', params: { key: nudge.key } });
-                else runAction(nudge.action!).catch(() => {});
-              }}
-            />
-          ) : null}
-        </View>
-        <View style={styles.secondary}>
-          <Press onPress={onSwap} style={styles.textButton} accessibilityLabel="Another idea">
-            <Icon name="swap" size={13} color={colors.textSecondary} />
-            <T variant="label" tone="secondary">
-              Another idea
-            </T>
-          </Press>
-          <Press onPress={onSnooze} style={styles.textButton} accessibilityLabel="Not today">
-            <Icon name="later" size={13} color={colors.textSecondary} />
-            <T variant="label" tone="secondary">
-              Not today
-            </T>
-          </Press>
+          <IconButton icon="swap" label="Another idea" size={50} onPress={onSwap} />
+          <IconButton icon="later" label="Not today" size={50} onPress={onSnooze} />
         </View>
       </Glass>
     </Animated.View>
@@ -210,13 +159,8 @@ export function NudgeCard({
 
 const styles = StyleSheet.create({
   card: { padding: Space.xl },
-  meta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  kind: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, height: 26, borderRadius: 13 },
-  effort: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  why: { marginTop: Space.l, paddingTop: Space.m, borderTopWidth: StyleSheet.hairlineWidth },
-  actions: { flexDirection: 'row', gap: Space.s, marginTop: Space.l },
-  secondary: { flexDirection: 'row', justifyContent: 'center', gap: Space.xxl, marginTop: Space.m },
-  textButton: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 32 },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: Space.s, marginTop: Space.l },
   doneRow: { flexDirection: 'row', alignItems: 'center', gap: Space.m },
   doneBadge: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
 });

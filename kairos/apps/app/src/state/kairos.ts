@@ -8,6 +8,7 @@ import {
   planNudges,
   respondToSignal,
   seasonOf,
+  withAssumedPeriods,
   type Forecast,
   type ISODate,
   type PartnerSnapshot,
@@ -49,6 +50,10 @@ export interface Kairos {
   periodIn?: { from: number; to: number; likely: number };
   /** Days until the fertile window opens, if shared and upcoming. */
   summerIn?: number;
+  /** His phone is working from a screenshot or a date, without her app. */
+  solo: boolean;
+  /** Solo only: period starts Kairos is assuming because nobody has said otherwise, oldest first. */
+  assumed: ISODate[];
 }
 
 const SIGNAL_TTL_HOURS = 14;
@@ -69,27 +74,35 @@ function useKairosCompute(): Kairos {
   const s = useStore();
   const today = useToday(s.demo ? s.dayOffset : 0);
 
-  // Her side (or both sides, in the demo): the full forecast runs on her phone only.
+  const solo = s.role === 'him' && !s.demo && s.pairing.status !== 'paired' && s.cycle.periods.length > 0;
+
+  // The forecast runs wherever the cycle data lives: her phone, the demo, or his phone when he
+  // set up alone from a screenshot or a date.
+  const source = useMemo(() => {
+    if (solo) return withAssumedPeriods(s.cycle, today, s.notYetUntil);
+    return { data: s.demo ? visibleUntil(s.cycle, today) : s.cycle, assumed: [] as ISODate[] };
+  }, [solo, s.demo, s.cycle, today, s.notYetUntil]);
+
   const forecast = useMemo(() => {
-    if (s.role !== 'her' && !s.demo) return undefined;
-    const data = s.demo ? visibleUntil(s.cycle, today) : s.cycle;
-    if (data.periods.length === 0) return undefined;
-    return runForecast(data, { asOf: today, seed: s.pairing.pairId ?? 'kairos', lookback: 45, horizon: 90 });
-  }, [s.role, s.demo, s.cycle, today, s.pairing.pairId]);
+    if (s.role !== 'her' && !s.demo && !solo) return undefined;
+    if (source.data.periods.length === 0) return undefined;
+    return runForecast(source.data, { asOf: today, seed: s.pairing.pairId ?? 'kairos', lookback: 45, horizon: 90 });
+  }, [s.role, s.demo, solo, source, today, s.pairing.pairId]);
 
   const snapshot = useMemo<PartnerSnapshot | undefined>(() => {
     if (forecast) {
       return buildSnapshot(forecast, {
         intent: s.intent,
-        share: s.share,
+        // Alone, he is looking at her calendar already; there is nothing left to hold back.
+        share: solo ? 'fertility' : s.share,
         playbook: s.playbook,
-        signals: s.signals,
-        paused: s.paused,
+        signals: solo ? [] : s.signals,
+        paused: solo ? false : s.paused,
         horizon: 63,
       });
     }
     return s.snapshot;
-  }, [forecast, s.intent, s.share, s.playbook, s.signals, s.paused, s.snapshot]);
+  }, [forecast, solo, s.intent, s.share, s.playbook, s.signals, s.paused, s.snapshot]);
 
   const plan = useMemo<Plan>(() => {
     if (!snapshot || snapshot.status !== 'ok') return { items: [], restDays: [] };
@@ -160,8 +173,10 @@ function useKairosCompute(): Kairos {
       ...(recentHeart ? { recentHeart } : {}),
       ...(periodIn ? { periodIn } : {}),
       ...(summerIn !== undefined ? { summerIn } : {}),
+      solo,
+      assumed: source.assumed,
     };
-  }, [today, forecast, snapshot, plan, s.history, s.acknowledged, s.hearts]);
+  }, [today, forecast, snapshot, plan, solo, source, s.history, s.acknowledged, s.hearts]);
 }
 
 const KairosContext = createContext<Kairos | null>(null);

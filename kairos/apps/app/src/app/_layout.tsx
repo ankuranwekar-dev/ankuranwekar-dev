@@ -72,9 +72,10 @@ function App() {
               }}>
               <Stack.Screen name="index" />
               <Stack.Screen name="welcome" />
-              <Stack.Screen name="onboarding" />
-              <Stack.Screen name="him" />
-              <Stack.Screen name="her" />
+              <Stack.Screen name="setup" />
+              <Stack.Screen name="today" />
+              <Stack.Screen name="import" options={{ animation: 'slide_from_right' }} />
+              <Stack.Screen name="scan" options={{ animation: 'slide_from_right' }} />
               <Stack.Screen
                 name="nudge"
                 options={{
@@ -87,10 +88,35 @@ function App() {
                 }}
               />
               <Stack.Screen
-                name="settings"
+                name="rhythm"
                 options={{
-                  presentation: 'modal',
-                  contentStyle: { backgroundColor: colors.bg },
+                  presentation: 'formSheet',
+                  sheetAllowedDetents: [0.95],
+                  sheetGrabberVisible: true,
+                  sheetCornerRadius: 32,
+                  contentStyle: { backgroundColor: colors.bgRaised },
+                  animation: 'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen
+                name="profile"
+                options={{
+                  presentation: 'formSheet',
+                  sheetAllowedDetents: [0.95],
+                  sheetGrabberVisible: true,
+                  sheetCornerRadius: 32,
+                  contentStyle: { backgroundColor: colors.bgRaised },
+                  animation: 'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen
+                name="invite"
+                options={{
+                  presentation: 'formSheet',
+                  sheetAllowedDetents: [0.75, 0.95],
+                  sheetGrabberVisible: true,
+                  sheetCornerRadius: 32,
+                  contentStyle: { backgroundColor: colors.bgRaised },
                   animation: 'slide_from_bottom',
                 }}
               />

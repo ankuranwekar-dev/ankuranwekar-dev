@@ -1,5 +1,5 @@
 import { addDays, localToday, weekdayName } from '@kairos/core';
-import { router, usePathname } from 'expo-router';
+import { usePathname } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -31,7 +31,7 @@ export function DemoBar() {
   const path = usePathname();
   const { colors } = useTheme();
   const inShowcase = useInShowcase();
-  const hidden = ['/welcome', '/onboarding', '/nudge', '/settings'].some((p) => path.startsWith(p));
+  const hidden = path !== '/today';
   if (!demo || hidden || inShowcase) return null;
 
   const date = addDays(localToday(), offset);
@@ -40,7 +40,6 @@ export function DemoBar() {
   const switchTo = (r: 'him' | 'her') => {
     if (r === role) return;
     setRole(r);
-    router.replace(r === 'him' ? '/him' : '/her');
   };
 
   return (

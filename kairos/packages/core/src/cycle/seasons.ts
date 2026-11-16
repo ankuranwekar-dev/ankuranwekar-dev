@@ -38,7 +38,11 @@ export interface SeasonCopy {
   phase: Phase;
   name: string;
   glyph: string;
-  /** One line for him, shown under the orb. */
+  /** A few words for him, shown under the orb. */
+  brief: string;
+  /** A few words for her, about her own week. */
+  herBrief: string;
+  /** The longer version for him, one tap down. */
   read: string;
   /** What tends to land well. */
   helps: string[];
@@ -56,6 +60,8 @@ export const PHASE_COPY: Record<Phase, SeasonCopy> = {
     phase: 'menstrual',
     name: 'Winter',
     glyph: '❄︎',
+    brief: 'Low energy. Bring comfort.',
+    herBrief: 'Rest counts.',
     read: 'Her energy is at its lowest. Comfort beats plans.',
     helps: [
       'Warmth: a heat pad, tea, the good blanket',
@@ -72,6 +78,8 @@ export const PHASE_COPY: Record<Phase, SeasonCopy> = {
     phase: 'follicular',
     name: 'Spring',
     glyph: '❀',
+    brief: 'Energy rising. Try something new.',
+    herBrief: 'Momentum is building.',
     read: 'Energy and optimism are rising. She’s open to something new.',
     helps: [
       'Plan something you have never done together',
@@ -87,6 +95,8 @@ export const PHASE_COPY: Record<Phase, SeasonCopy> = {
     phase: 'ovulatory',
     name: 'Summer',
     glyph: '☀︎',
+    brief: 'Her brightest days.',
+    herBrief: 'Your brightest days.',
     read: 'She’s at her most radiant. Connection comes easily.',
     helps: ['A real date: dress up a little', 'Specific compliments, not generic ones', 'Closeness, with no agenda'],
     avoid: ['Making it about one thing', 'Scrolling through dinner'],
@@ -98,6 +108,8 @@ export const PHASE_COPY: Record<Phase, SeasonCopy> = {
     phase: 'luteal',
     name: 'Autumn',
     glyph: '❦',
+    brief: 'Winding down. Keep it easy.',
+    herBrief: 'Turning inward.',
     read: 'Settling in. Calm, routine and comfort matter more now.',
     helps: ['Cozy plans at home', 'Handle the logistics', 'Long hugs, early nights'],
     avoid: ['Last-minute plan changes', 'Overbooking the weekend'],
@@ -109,6 +121,8 @@ export const PHASE_COPY: Record<Phase, SeasonCopy> = {
     phase: 'premenstrual',
     name: 'Late autumn',
     glyph: '❦',
+    brief: 'Tender days. Be her calm.',
+    herBrief: 'Be gentle with yourself.',
     read: 'Patience season. Small things can feel big; be her calm.',
     helps: [
       'Stock her favorite snacks before she asks',

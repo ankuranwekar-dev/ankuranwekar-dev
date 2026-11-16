@@ -126,3 +126,34 @@ export function estimateStats(data: CycleData): CycleStats {
     ovulationsObserved: luteals.length,
   };
 }
+
+/**
+ * On her phone, no logged period means no period yet. On his phone alone it means nothing: he
+ * simply has not told Kairos. So once a predicted start is two days past, assume it happened on
+ * schedule, keep the seasons moving, and ask him to confirm when he next looks.
+ */
+export function withAssumedPeriods(
+  cycle: CycleData,
+  today: ISODate,
+  notYetUntil?: ISODate,
+): { data: CycleData; assumed: ISODate[] } {
+  const periods = normalisePeriods(cycle.periods);
+  const last = periods[periods.length - 1];
+  if (!last) return { data: cycle, assumed: [] };
+  const gaps: number[] = [];
+  for (let i = Math.max(1, periods.length - 3); i < periods.length; i++) {
+    const g = diffDays(periods[i - 1]!.start, periods[i]!.start);
+    if (g >= 20 && g <= 45) gaps.push(g);
+  }
+  const length = gaps.length
+    ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length)
+    : Math.min(45, Math.max(20, cycle.statedCycleLength ?? 28));
+  const assumed: ISODate[] = [];
+  for (let next = addDays(last.start, length); addDays(next, 2) <= today; next = addDays(next, length)) {
+    const current = addDays(next, length) > today;
+    if (current && notYetUntil && notYetUntil >= today) break;
+    assumed.push(next);
+  }
+  if (assumed.length === 0) return { data: cycle, assumed };
+  return { data: { ...cycle, periods: [...periods, ...assumed.map((start) => ({ start }))] }, assumed };
+}

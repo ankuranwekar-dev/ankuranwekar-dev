@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, Switch, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { haptic } from '@/platform/haptics';
@@ -175,6 +175,119 @@ export function Segmented<V extends string>({
   );
 }
 
+/** An on/off switch in the season's colour, looking the same on every platform. */
+export function Toggle({
+  value,
+  onChange,
+  label,
+  accent,
+}: {
+  value: boolean;
+  onChange: (on: boolean) => void;
+  label: string;
+  accent: string;
+}) {
+  const { dark } = useTheme();
+  const web = { activeThumbColor: '#FFFFFF' } as object; // react-native-web only
+  return (
+    <Switch
+      value={value}
+      onValueChange={(on) => {
+        haptic.tap();
+        onChange(on);
+      }}
+      accessibilityLabel={label}
+      trackColor={{ false: dark ? 'rgba(255,255,255,0.18)' : 'rgba(30,21,25,0.16)', true: accent }}
+      thumbColor="#FFFFFF"
+      ios_backgroundColor={dark ? 'rgba(255,255,255,0.18)' : 'rgba(30,21,25,0.16)'}
+      {...web}
+    />
+  );
+}
+
+/** A round glass button holding one icon: the only chrome on the main screens. */
+export function IconButton({
+  icon,
+  label,
+  onPress,
+  size = 40,
+  tint,
+  text,
+}: {
+  icon: IconName;
+  /** Read by screen readers; never shown. */
+  label: string;
+  onPress?: () => void;
+  size?: number;
+  tint?: string;
+  /** One character shown instead of the icon, e.g. her initial. */
+  text?: string;
+}) {
+  const { colors, dark } = useTheme();
+  return (
+    <Press
+      onPress={onPress}
+      accessibilityLabel={label}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: tint ? alpha(tint, 0.18) : dark ? 'rgba(255,255,255,0.09)' : 'rgba(30,21,25,0.06)',
+      }}>
+      {text ? (
+        <T variant="title2" style={{ fontSize: size * 0.5, lineHeight: size * 0.62 }}>
+          {text}
+        </T>
+      ) : (
+        <Icon name={icon} size={Math.round(size * 0.42)} color={tint ?? colors.text} />
+      )}
+    </Press>
+  );
+}
+
+/** One big, tappable choice: an icon, two or three words, and a quieter line under them. */
+export function Tile({
+  icon,
+  title,
+  caption,
+  onPress,
+  accent,
+}: {
+  icon: IconName;
+  title: string;
+  caption?: string;
+  onPress?: () => void;
+  accent: string;
+}) {
+  const { colors, dark } = useTheme();
+  return (
+    <Press onPress={onPress} accessibilityLabel={caption ? `${title}. ${caption}` : title}>
+      <View
+        style={[
+          styles.tile,
+          { backgroundColor: dark ? 'rgba(255,255,255,0.065)' : 'rgba(255,255,255,0.8)', borderColor: colors.border },
+        ]}>
+        <View style={[styles.tileIcon, { backgroundColor: alpha(accent, dark ? 0.18 : 0.22) }]}>
+          <Icon name={icon} size={24} color={dark ? accent : colors.text} />
+        </View>
+        <View style={{ flex: 1, gap: 2 }}>
+          <T variant="headline" style={{ fontSize: 18 }}>
+            {title}
+          </T>
+          {caption ? (
+            <T variant="footnote" tone="secondary">
+              {caption}
+            </T>
+          ) : null}
+        </View>
+        <Icon name="chevron" size={13} color={colors.textTertiary} />
+      </View>
+    </Press>
+  );
+}
+
 export function SectionLabel({ children, right }: { children: string; right?: ReactNode }) {
   return (
     <View style={styles.sectionLabel}>
@@ -268,6 +381,16 @@ const styles = StyleSheet.create({
     marginBottom: Space.s,
     paddingHorizontal: 4,
   },
+  tile: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Space.l,
+    padding: Space.l,
+    minHeight: 84,
+    borderRadius: Radius.xl,
+    borderWidth: StyleSheet.hairlineWidth * 2,
+  },
+  tileIcon: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: Space.m, paddingVertical: 13, paddingHorizontal: Space.l },
   rowIcon: { width: 30, height: 30, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
 });
