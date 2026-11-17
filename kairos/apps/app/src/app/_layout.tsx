@@ -76,6 +76,7 @@ function App() {
               <Stack.Screen name="today" />
               <Stack.Screen name="import" options={{ animation: 'slide_from_right' }} />
               <Stack.Screen name="scan" options={{ animation: 'slide_from_right' }} />
+              <Stack.Screen name="pair" />
               <Stack.Screen
                 name="nudge"
                 options={{

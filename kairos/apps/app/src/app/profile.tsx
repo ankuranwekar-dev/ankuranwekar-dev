@@ -89,19 +89,40 @@ function Favourites({ playbook, onChange }: { playbook: Playbook; onChange?: (pa
   );
 }
 
-function startOver(reset: () => void) {
+/**
+ * Erasing everything takes a second, deliberate tap. On the web that is a button that asks
+ * "Tap again to erase" (hosts that embed the page suppress browser dialogs); on a phone it is
+ * the system alert.
+ */
+function StartOver() {
+  const reset = useStore((s) => s.reset);
+  const { colors } = useTheme();
+  const [armed, setArmed] = useState(false);
   const go = () => {
     reset();
     router.dismissTo('/welcome');
   };
-  if (Platform.OS === 'web') {
-    if (typeof window === 'undefined' || window.confirm('Erase everything on this device and start over?')) go();
-    return;
-  }
-  Alert.alert('Start over?', 'This erases everything Kairos holds on this phone.', [
-    { text: 'Cancel', style: 'cancel' },
-    { text: 'Erase', style: 'destructive', onPress: go },
-  ]);
+  const press = () => {
+    if (Platform.OS !== 'web') {
+      Alert.alert('Start over?', 'This erases everything Kairos holds on this phone.', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Erase', style: 'destructive', onPress: go },
+      ]);
+      return;
+    }
+    if (armed) go();
+    else {
+      setArmed(true);
+      setTimeout(() => setArmed(false), 4000);
+    }
+  };
+  return (
+    <Press onPress={press} accessibilityLabel={armed ? 'Tap again to erase everything' : 'Start over'}>
+      <T variant="label" color={colors.danger}>
+        {armed ? 'Tap again to erase everything' : 'Start over'}
+      </T>
+    </Press>
+  );
 }
 
 /** Everything that is not Today, in one sheet: who she is, what is shared, how ideas arrive. */
@@ -223,11 +244,9 @@ function HimProfile() {
         ))}
       </Section>
 
-      <Press onPress={() => startOver(s.reset)} style={styles.reset} accessibilityLabel="Start over">
-        <T variant="label" color={colors.danger}>
-          Start over
-        </T>
-      </Press>
+      <View style={styles.reset}>
+        <StartOver />
+      </View>
     </Sheet>
   );
 }
@@ -357,11 +376,7 @@ function HerProfile() {
             </T>
           </Press>
         ) : null}
-        <Press onPress={() => startOver(s.reset)} accessibilityLabel="Start over">
-          <T variant="label" color={colors.danger}>
-            Start over
-          </T>
-        </Press>
+        <StartOver />
       </View>
     </Sheet>
   );

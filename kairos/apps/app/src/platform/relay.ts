@@ -38,6 +38,13 @@ const RELAY_KEY = process.env.EXPO_PUBLIC_RELAY_ANON_KEY;
 
 export const relayConfigured = Boolean(RELAY_URL && RELAY_KEY);
 
+/**
+ * Where a pairing link points. With a domain of your own (EXPO_PUBLIC_LINK_BASE, e.g.
+ * https://example.com/pair) it opens the app from any messenger; without one the app's own
+ * scheme is used. Either way the key rides in the fragment and reaches no server.
+ */
+const LINK_BASE = process.env.EXPO_PUBLIC_LINK_BASE ?? 'kairos://pair';
+
 type Role = 'her' | 'him';
 
 interface StoredPairing {
@@ -91,7 +98,7 @@ function mailbox(invite: Invite) {
 export async function startInvite(): Promise<{ link: string; pairId: string }> {
   const kp = generateKeyPair();
   const invite = createInvite(kp);
-  const link = encodeInvite(invite);
+  const link = encodeInvite(invite, LINK_BASE);
   const { pairId, token } = mailbox(invite);
   await call('mailbox', { pairId, tokenHash: tokenHash(token) });
   await save({

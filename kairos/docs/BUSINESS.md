@@ -2,7 +2,7 @@
 
 ## The position in one line
 
-Not another period tracker. She already has one. **Kairos turns what she tracks into what he does.**
+Not another period tracker. She already has one, and she can keep it. **Kairos turns what she tracks into what he does**, starting from a screenshot of whichever app that is.
 
 ## The market, honestly
 
@@ -19,8 +19,11 @@ What none of them do well, as far as the public material shows:
 | Never transactional | Not addressed | Planner constraint: big gestures spread across the whole cycle |
 | Privacy | Account-based, server-side data; the category has a record of FTC actions and a 2025 jury verdict | End-to-end encrypted, no accounts, raw data never leaves her phone |
 | Trying to conceive | Her fertile days | His part: clear evenings, keep it spontaneous, the two-week wait, test day, gentleness if her period comes |
+| Getting started | She must use that tracker, then invite him | He starts alone from a screenshot of any tracker; pairing is the upgrade |
 
 The wedge is **action plus trust**. Action is what he lacks; trust is what she requires.
+
+The screenshot path changes the funnel. Every partner-sharing feature on the market sits inside one tracker and needs her to be on it. Kairos does not care which tracker she uses, and does not need her to install anything for him to get his first idea. That removes the two-install barrier that kills most couples' apps, at the price of a weaker product until they pair (see `CONCEPT.md`, section 3).
 
 ## Who pays
 
@@ -50,8 +53,8 @@ The levers are obvious from the table: pairing rate and his conversion dominate.
 
 1. **Lead with her trust, sell to him.** The story that travels is "the app that makes men better at being there", and the proof she needs is "he can't see my data". Every channel carries both halves.
 2. **Two funnels.**
-   - *Her first:* she installs (for the signals, the period support, or because they are trying), and invites him from the Sharing screen.
-   - *Him first:* he installs, and the app helps him ask her: a beautiful invite that leads with what she controls. This is the growth loop most partner apps lack.
+   - *Him first (the default now):* he installs, asks her for a screenshot of her cycle calendar, and is using the app a minute later. The ask is small and the answer is something she already has. Later the app invites her in, for the things only she can give it: her signals, her favourites, an always-current forecast.
+   - *Her first:* she installs (for the signals, the period support, or because they are trying), and invites him from her profile.
 3. **Trying-to-conceive couples are the beachhead.** Highest motivation, clearest value, natural partners (fertility clinics, OB-GYNs, prenatal brands). Roughly one in six people face infertility; the evaluation prompt at 12 months (6 if 35+) is a genuine service.
 4. **GCC launch angle.** A marriage-centred culture and low, falling fertility (the UAE was at about 1.2 children per woman in 2023, World Bank). Requirements: Arabic with right-to-left layout, tasteful copy (the library already avoids explicit content), both Saturday–Sunday (UAE) and Friday–Saturday (Saudi Arabia, Qatar) weekends (already supported in settings), and legal review under the UAE ICT health law and PDPL.
 5. **Creators, not ads.** Couples creators, men's self-improvement podcasts, and wedding planners. The app's screenshots do the explaining: an orb, a season, one kind idea.
@@ -79,6 +82,7 @@ What Kairos can do is narrower and worth doing:
 | Phase | Weeks | Team | Output |
 | --- | --- | --- | --- |
 | 0. Prototype | Done | — | This repository: engine, app, relay, docs, live demo |
+| 0.5 First release | 1–4 | Founder plus one engineer with a Mac | The solo edition on the App Store: native build, simulator and device testing, the reader checked against real screenshots from the main trackers (`docs/APP_STORE.md`) |
 | 1. Private beta | 1–12 | 2 React Native engineers, 1 product designer, founder/PM, fractional security engineer, clinical advisor (OB-GYN or reproductive endocrinologist) | Real pairing on TestFlight and Play internal testing, push-to-wake, Siri and widget signals, Arabic, 50 couples |
 | 2. Launch | 13–24 | + growth lead, + support | App Store and Play launch in the UAE and English-speaking markets, security audit published, subscriptions live |
 | 3. Proof | 25–52 | + data scientist (privacy-preserving, opt-in) | Prospective accuracy study, clinic partnerships, Apple Watch, Android widget |

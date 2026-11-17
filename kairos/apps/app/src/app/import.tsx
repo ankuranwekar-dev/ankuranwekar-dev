@@ -15,6 +15,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { haptic } from '@/platform/haptics';
 import { configureNotifications } from '@/platform/notifications';
+import { sampleAvailable, sampleCalendar } from '@/platform/sample';
 import { deviceHints, pickScreenshot } from '@/platform/screenshot';
 import { useStore } from '@/state/store';
 import { Button, IconButton, Press } from '@/ui/controls';
@@ -158,7 +159,23 @@ export default function Import() {
 
   if (phase === 'intro' || phase === 'failed') {
     return (
-      <Screen season="winter" footer={<Button label="Choose a screenshot" icon="photo" onPress={choose} />}>
+      <Screen
+        season="winter"
+        footer={
+          <>
+            <Button label="Choose a screenshot" icon="photo" onPress={choose} />
+            {sampleAvailable ? (
+              <Button
+                label="Try with a sample"
+                kind="ghost"
+                onPress={() => {
+                  const pixels = sampleCalendar(today);
+                  if (pixels) read(pixels);
+                }}
+              />
+            ) : null}
+          </>
+        }>
         <View style={styles.back}>
           <IconButton icon="back" label="Back" onPress={back} />
         </View>

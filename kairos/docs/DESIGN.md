@@ -4,12 +4,28 @@ Kairos should feel like weather, not a dashboard: something he glances at and un
 
 ## Principles
 
-1. **One screen, one thought.** His Today screen answers one question: what can I do for her today? Everything else is one level down.
-2. **Ambient before interactive.** Most of the value arrives without opening the app: a notification he can complete in place, a codenamed calendar, a widget. The app is for the occasional deeper look.
-3. **Every tap earns its place.** He sets up in three taps; she in five. Done is one tap, on the notification.
-4. **Warm, adult, quiet.** Not the pinks-and-petals of femtech, not the locker room of men's apps. Closer to a good hotel than a fitness app.
-5. **Honest about uncertainty.** Fertile days glow with an intensity equal to their probability. Edges are soft because the science is.
-6. **Private by default.** Nothing on a lock screen, calendar or widget names a period, a phase or fertility.
+1. **One screen.** The app is Today. His answers one question: what can I do for her today? Hers answers another: what do I want him to know? There are no tabs.
+2. **Two doors out of it.** Tapping the orb opens Rhythm (where she is, what is coming). The round button at the top right opens everything else (who she is, what is shared, how ideas arrive). Nothing is more than one tap from Today, and nothing else competes with it.
+3. **Fewer words.** A screen gets a title and, at most, one line. A season is a colour and a word. The next three weeks are a ribbon, not a sentence. Explanations live one tap down, on the idea itself.
+4. **Ambient before interactive.** Most of the value arrives without opening the app: a notification he can complete in place, a codenamed calendar, a widget.
+5. **Every tap earns its place.** Setup is one choice and one confirmation. Done is one tap, on the notification.
+6. **Warm, adult, quiet.** Not the pinks-and-petals of femtech, not the locker room of men's apps. Closer to a good hotel than a fitness app.
+7. **Honest about uncertainty.** Fertile days glow with an intensity equal to their probability. What was read from a screenshot is shown for correction, never applied silently.
+8. **Private by default.** Nothing on a lock screen, calendar or widget names a period, a phase or fertility.
+
+### What the second version removed
+
+The first build had three tabs a side, a five-step and a three-step onboarding, and a Today screen that carried chips, a "coming up" list and a note field under the idea. All of it was defensible and together it was too much. Now:
+
+| Was | Is |
+| --- | --- |
+| Three tabs per person | One screen, two sheets |
+| Onboarding of 5 steps (her) and 3 (him) | One choice, one confirmation |
+| Season read of one or two sentences | Three to five words |
+| Text chips ("Fertile window in 2 days", "Period in 17–23 days") | A three-week colour ribbon and one fact |
+| Idea card with kind, time, title, detail, "why now", four buttons | Title, one or two lines, Done, two icon buttons |
+| "Coming up", "She mentioned", calendar sync on Today | Moved one level down |
+| Settings as a separate modal | Folded into the one profile sheet |
 
 ## Language: seasons
 
@@ -39,7 +55,7 @@ Two moods, both warm: **Dusk** (dark, the hero) `#0D0A0C` and **Dawn** (light) `
 
 ## Materials
 
-- **iOS 26+:** real Liquid Glass (`expo-glass-effect`) for cards and the system tab bar (`NativeTabs`), which also gives the tab bar its native minimise-on-scroll behaviour.
+- **iOS 26+:** real Liquid Glass (`expo-glass-effect`) for cards, and the system's own glass for the sheets.
 - **Older iOS and the web:** frosted blur with a hairline border and a top sheen.
 - **Android:** tonal Material 3 surfaces; no real-time blur, because it costs more battery than it is worth on mid-range phones.
 
@@ -58,18 +74,22 @@ One orchestrated motion per moment: the orb breathes; cards fade up; the Done ba
 
 | Surface | His side | Her side | Status |
 | --- | --- | --- | --- |
-| App: Today | Orb, season read, chips (fertile window, period range), signal card, today's idea with Done / Another idea / Not today, coming up, "She mentioned…" capture | Orb, her read, eight signal tiles, quick log, his side in surprise mode, "He did something lovely" | Built |
-| App: second tab | Rhythm: cycle ring with fertile glow and best-day dots, eight-week season grid, what helps / what doesn't, calendar sync, confidence | Playbook: what makes her feel loved, favorites, please-don't list, notes for him | Built |
-| App: third tab | Her playbook as he sees it, and the things she mentioned | Sharing: why she's here, what he sees, live "he can see / never shared" list, pause, unpair | Built |
+| Today | Orb, her season, a few words, three-week ribbon, one fact, today's idea with Done / another / not today. A signal from her, or "did her period start?", appears above the idea when there is one | Orb, her season, day of cycle, eight signal tiles, one period button, a heart for when he gets it right | Built |
+| Rhythm (tap the orb) | Cycle ring, five-week season grid, what lands well now, the next three ideas, add seasons to calendar | Ring and grid | Built |
+| Profile (button, top right) | Her name, how her cycle is kept current, trying-for-a-baby switch, how often and when ideas arrive, what she loves, things she mentioned | Her name, what he sees, pause, what she loves, her cycle sources | Built |
+| Idea detail (tap the idea) | Why now, message starting points or a shortcut, Done | — | Built |
+| Setup | One choice of three (her screenshot, her code, a date), then a calendar to confirm | One choice of three (Health, a screenshot, a date), then what he sees with a live preview | Built |
 | Notifications | Local, discreet, actionable (Done, Tomorrow) | — | Built |
 | Calendar | Codenamed seasons in a local calendar; `.ics` on the web | — | Built |
-| Home and lock-screen widget (iOS) | Codename, glyph, today's idea if opted in | Her season | Built (WidgetKit via `expo-widgets`; compiled, not yet run on a device) |
+| Home and lock-screen widget (iOS) | Codename, glyph, today's idea if opted in | Her season | Built (compiled, not yet run on a device) |
 | Apple Watch complication, Control Center control, Siri / App Intents | Today's idea | One-tap signals | Roadmap |
 | Android Glance widget | | | Roadmap |
 | Desktop website | Pitch with the live app in a phone frame, his/her switch and a cycle scrubber | | Built |
+
+The sheets are native form sheets on iOS (Liquid Glass on iOS 26), and full pages with a close button on Android and the web.
 
 ## Accessibility
 
 In place: system fonts, accessibility labels on interactive controls, primary buttons at least 50 pt tall, color never the only carrier of meaning (seasons are always named in text), Reduce Motion honoured, light and dark themes both designed, and on the web the host page's forced theme (`data-theme`) respected.
 
-Still to do before launch: a full VoiceOver and TalkBack pass; raising chips and compact controls (36–38 pt) to the 44 pt minimum; Dynamic Type limits on the display serif; an Arabic right-to-left layout pass.
+Still to do before launch: a full VoiceOver and TalkBack pass; raising chips and compact controls (34–40 pt) to the 44 pt minimum; a text alternative for the colour ribbon beyond its single label; Dynamic Type limits on the display serif; an Arabic right-to-left layout pass.

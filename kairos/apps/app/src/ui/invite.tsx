@@ -43,7 +43,7 @@ export function Invite({ onPaired }: { onPaired?: () => void }) {
     return () => clearInterval(id);
   }, [pairing, setPairing, onPaired]);
 
-  const link = pairing.invite ?? 'https://kairos.love/pair#demo';
+  const link = pairing.invite ?? 'kairos://pair#demo';
 
   return (
     <Glass radius={Radius.xl} style={styles.card}>

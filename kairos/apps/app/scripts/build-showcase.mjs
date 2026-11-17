@@ -16,7 +16,14 @@ const html = fs.readFileSync(path.join(dist, 'index.html'), 'utf8');
 const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
 const styles = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map((m) => m[1]);
 const read = (p) => fs.readFileSync(path.join(dist, p.replace(/^\//, '')));
-const MIME = { '.ttf': 'font/ttf', '.otf': 'font/otf', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
+const MIME = {
+  '.ttf': 'font/ttf',
+  '.otf': 'font/otf',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
+  '.woff2': 'font/woff2',
+};
 
 let inlined = 0;
 const inlineAssets = (js) =>
@@ -24,14 +31,16 @@ const inlineAssets = (js) =>
     const file = path.join(dist, p.replace(/^\//, ''));
     if (!fs.existsSync(file)) return whole;
     inlined++;
-    return JSON.stringify(`data:${MIME[path.extname(p)] ?? 'application/octet-stream'};base64,${fs.readFileSync(file).toString('base64')}`);
+    return JSON.stringify(
+      `data:${MIME[path.extname(p)] ?? 'application/octet-stream'};base64,${fs.readFileSync(file).toString('base64')}`,
+    );
   });
 
 const js = scripts.map((s) => inlineAssets(read(s).toString('utf8')).replace(/<\/script/gi, '<\\/script')).join('\n');
 const css = styles.map((s) => read(s).toString('utf8')).join('\n');
 
 const page = `<title>Kairos</title>
-<meta name="description" content="Her rhythm. Your moment. A private, cycle-aware companion for couples.">
+<meta name="description" content="Her rhythm. Your moment. One small idea a day, timed to her cycle.">
 <style>
 :root { --bg: #0D0A0C; color-scheme: dark; }
 @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #F7F2EE; color-scheme: light; } }

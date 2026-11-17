@@ -1,7 +1,7 @@
 # Kairos: product concept
 
 > **Her rhythm. Your moment.**
-> A private companion for couples. She shares as much of her cycle as she wants. He gets one small, specific idea a day, timed to where she is in her cycle and shaped by what she loves, so he can be there before she has to ask.
+> A private companion for couples. He gets one small, specific idea a day, timed to where she is in her cycle, so he can be there before she has to ask. It starts from a screenshot of whatever period app she already uses, and gets better if she joins in.
 
 *Kairos* is the ancient Greek word for the right, opportune moment, as opposed to *chronos*, clock time. The whole product is an argument that good timing is a form of care.
 
@@ -15,7 +15,7 @@ The brief: women have fertile days, men have no idea when they are, so build an 
 
 **2. Gestures concentrated in her fertile week will be decoded as a transaction.** Flowers that only ever arrive in the same week of every month are a pattern she will notice within two or three cycles. After that every gesture reads as a means to an end, and the product has made the relationship worse. Kairos is built around the opposite rule, **never only then**: care runs through her whole cycle, big gestures are capped inside her fertile days and actively encouraged outside them, and the planner enforces it as a hard constraint (see `packages/core/src/nudges/planner.ts`).
 
-**3. She is the gatekeeper. Without her, there is no product.** The data is hers, the consent is hers, and she can unpair with one tap. A "men's app" that treats her cycle as an input will be deleted the day she sees it. So Kairos is designed for her first: it gives her a voice (one-tap signals), control (three share levels, instant pause), support she does not have to ask for, and a partner who is visibly more attentive. If she does not love it, he never gets to use it.
+**3. She is the gatekeeper.** The data is hers. A "men's app" that treats her cycle as an input will be deleted the day she sees it. The first version of Kairos took this to its limit and required her to install the app before he could do anything. That was principled and it was a mistake of proportion: asking two people to install something before either gets any value is where most couples' apps die, and she already has a tracker she is happy with. The second version (section 3) lets him start from a screenshot she sends him, and keeps everything that made the product hers, signals, share levels, pause, for couples who both install it.
 
 **4. If they are not trying for a baby, nudging intimacy toward peak fertility raises the odds of an unplanned pregnancy.** The app therefore asks *why* they are here. "Trying for a baby", "Growing closer" and "Just the basics" lead to different forecasts on his phone, different nudges, and different defaults for what he can see. Fertility estimates help timing; they are not birth control, and the product says so wherever it matters.
 
@@ -46,7 +46,27 @@ Seasons describe tendencies, not rules. Prospective studies of mood across the c
 
 ---
 
-## 3. Three reasons to be here
+## 3. Two ways in
+
+| | Solo: his phone only | Paired: both phones |
+| --- | --- | --- |
+| Setup | A screenshot of her tracker's month view, or the date her last period started | She installs Kairos, he scans her code |
+| Time to first idea | Under a minute | A few minutes, two people |
+| Where her data lives | The dates from the screenshot, on his phone | On her phone; he receives only what she chooses, end-to-end encrypted |
+| What keeps it current | He adds a new screenshot now and then, or answers "did her period start?" | Automatic, from her phone |
+| Forecast quality | Calendar-level (period dates only) | Up to LH, temperature and mucus if she tracks them |
+| Her voice | None in the app | Eight one-tap signals, her playbook, pause |
+| Server | None | A relay that holds ciphertext |
+
+**How the screenshot is read.** Every tracker's month view has the same bones: day numbers on a seven-column grid, with period days marked in a red-to-pink colour. Kairos finds the grid, works out which day is which from where the one-digit days end and the two-digit days begin, identifies the month from the weekday of the 1st, and reads the marks. It runs on the phone in a second or two; the image is not uploaded and is not kept. The result is shown as a calendar he can correct with a tap before anything is saved. Details and measured accuracy are in `SCIENCE.md`.
+
+**What solo mode cannot know.** On her phone, no logged period means no period yet. On his phone it means nothing: nobody told the app. So when a predicted period is two days past, Kairos assumes it arrived on schedule, keeps the seasons moving, and asks him once: *Did her period start around Wednesday?* Yes, Not yet, or Other day.
+
+**What it costs.** Solo mode is the easier door and the weaker product. The forecast is only as good as period dates allow, it goes stale if he stops updating it, and she has no say inside the app. It also cannot tell a screenshot she sent from a photo of her phone taken without asking. The app says to ask her and is built so that she would be glad he did; it cannot enforce that. Solo is the way in. Paired is the product.
+
+---
+
+## 4. Three reasons to be here
 
 | | Trying for a baby | Growing closer | Just the basics |
 | --- | --- | --- | --- |
@@ -65,7 +85,7 @@ Never shared at any level: temperatures, test results, symptoms, notes, and a pr
 
 ---
 
-## 4. The two people
+## 5. The two people
 
 ### Her
 
@@ -90,7 +110,7 @@ He wants to be good at this and does not want a biology lecture. What Kairos giv
 
 ---
 
-## 5. Core loops
+## 6. Core loops
 
 ```mermaid
 flowchart LR
@@ -121,7 +141,7 @@ flowchart LR
 
 ---
 
-## 6. A cycle in the life of Maya and Alex
+## 7. A cycle in the life of Maya and Alex
 
 This is the demo couple in the prototype, with the ideas the planner actually generated for them. They are trying for a baby; Maya shares seasons and fertility.
 
@@ -143,22 +163,26 @@ Across eight simulated seeds and both intents, the planner never places more tha
 
 ---
 
-## 7. Minimum taps
+## 8. Minimum taps
 
 | Task | Taps | How |
 | --- | --- | --- |
-| He sets up | 3 | Scan her code, check four emoji match, pick a time |
-| She sets up | 5 | Connect Health (or pick a date), pick why, pick what he sees, optional favorites, show QR |
+| He sets up from a screenshot | 4 | I'm her partner → Her screenshot → choose it → Looks right |
+| He sets up from a date | 4 | I'm her partner → Pick a date → tap the day → Continue |
+| He sets up by pairing | 3 | I'm her partner → Scan her code → point the camera |
+| She sets up | 4 | I track my cycle → source → Seasons (or another level) → Invite him |
 | He sees today's idea | 0 | Notification at his chosen time, or the widget |
 | He marks it done | 1 | "Done" on the notification itself; the app never has to open |
-| She sends a signal | 1 | One tile on Today (roadmap: widget, Control Center, Apple Watch, Siri) |
-| She logs a period | 0–1 | Read from Health automatically, or one chip |
-| He adds her seasons to his calendar | 1 | Rhythm → Add to Calendar |
-| She pauses everything | 1 | Sharing → Pause |
+| She sends a signal | 1 | One tile on Today |
+| She logs a period | 0–1 | Read from Health automatically, or one button |
+| He confirms her period started | 1 | Yes / Not yet on Today (solo) |
+| Either of them reaches anything else | 1 | The orb opens Rhythm; the button top right opens everything else |
+
+The whole app is one screen per person. There are no tabs.
 
 ---
 
-## 8. Product rules
+## 9. Product rules
 
 These are enforced in code, not left to copywriters.
 
@@ -173,9 +197,9 @@ These are enforced in code, not left to copywriters.
 
 ---
 
-## 9. Safety by design
+## 10. Safety by design
 
-A cycle-sharing app could be misused by a controlling partner. The design closes the obvious routes without lecturing anyone:
+A cycle-sharing app could be misused by a controlling partner. When both phones are paired, the design closes the obvious routes:
 
 - She owns the data and the keys. He receives a reduced forecast, never her logs.
 - She can pause instantly; he sees "paused", with no reason and no timestamp of what changed.
@@ -184,9 +208,11 @@ A cycle-sharing app could be misused by a controlling partner. The design closes
 - Pregnancy results are never shared. "Late" is never shown.
 - The relay holds ciphertext only, so a subpoena to the company yields nothing readable.
 
+Solo mode has none of these controls, because her phone is not involved. What it has instead is a small footprint: his phone holds a handful of period dates and nothing else, nothing is transmitted, and there is no log of her symptoms, moods or location to browse. A partner intent on monitoring her could already photograph her tracker; Kairos adds a forecast to that, not access. That is a real limit of the solo edition and the reason the paired edition exists.
+
 ---
 
-## 10. What to measure
+## 11. What to measure
 
 - **North star: gestures she noticed.** Hearts per couple per month. It is the only metric that measures whether the product did its job.
 - **Pairing rate.** Share of her installs that pair within seven days. Below 50% means the invite moment is failing.
@@ -197,7 +223,7 @@ A cycle-sharing app could be misused by a controlling partner. The design closes
 
 ---
 
-## 11. Roadmap
+## 12. Roadmap
 
 **Built in this repository (v0.1)**: forecast engine, seasons, nudge library and planner, signals, share levels, end-to-end encryption, relay, iOS/Android/web app with onboarding, demo couple, local notifications, calendar sync, Health import, iOS widget, desktop website shell.
 
@@ -209,7 +235,7 @@ A cycle-sharing app could be misused by a controlling partner. The design closes
 
 ---
 
-## 12. Risks
+## 13. Risks
 
 | Risk | Likelihood | Impact | Mitigation |
 | --- | --- | --- | --- |
@@ -220,4 +246,6 @@ A cycle-sharing app could be misused by a controlling partner. The design closes
 | Unplanned pregnancy blamed on the app | Low | High | Intents, "not birth control" copy, fertility hidden by default outside "trying" |
 | Data breach or subpoena | Low | Severe | End-to-end encryption, ciphertext-only relay, 30-day retention, no accounts or names |
 | App Store rejection over health data or sexual content | Medium | Medium | No HealthKit data used for marketing; tasteful copy; clear privacy labels |
-| Misuse by a controlling partner | Low | Severe | See section 9 |
+| Misuse by a controlling partner | Low | Severe | See section 10 |
+| Solo forecasts drift because he stops updating | High | Medium | Assume-and-confirm prompt, one-tap answer, "New screenshot" one level down; pairing removes the problem |
+| The screenshot reader misreads a real app's calendar | Unknown until tested on real screenshots | High at first use | Result is always shown for correction; uncertain reads are flagged; a date can be picked instead |

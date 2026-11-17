@@ -2,32 +2,41 @@
 
 Expo SDK 58 · Expo Router · React Native 0.88 · one codebase for iOS, Android and the web.
 
-![Onboarding](../../docs/screenshots/onboarding.jpg)
+![Setup](../../docs/screenshots/setup.jpg)
 
 ## Structure
 
 ```
+app.json, app.config.ts  static config, plus the switch between the solo and paired editions
+eas.json                 build profiles
+store.config.json        App Store listing (EAS Metadata)
 src/
-  app/                 routes (Expo Router)
-    welcome.tsx        first screen: choose her side or his, or explore the demo
-    onboarding/        her.tsx (5 steps) and him.tsx (3 steps)
-    him/               Today · Rhythm · her playbook (as he sees it)
-    her/               Today (signals, log) · Playbook · Sharing
-    nudge.tsx          an idea in full (sheet)
-    settings.tsx       his cadence, budget, weekend, lock-screen detail; her pregnancy-test flow
+  app/                   routes (Expo Router)
+    welcome.tsx          the first screen
+    setup/               him.tsx (three ways in) · her.tsx (cycle source) · share.tsx (what he sees)
+    import.tsx           her cycle from a screenshot or a date, shown as a calendar to confirm
+    scan.tsx, pair.tsx   pairing by code or by link (paired edition)
+    today.tsx            the app: his Today or hers
+    rhythm.tsx           sheet: cycle ring, weeks ahead, what is planned
+    profile.tsx          sheet: her name, sharing, how ideas arrive
+    nudge.tsx            sheet: an idea in full
+    invite.tsx           sheet: her pairing code
+  screens/               him-today.tsx · her-today.tsx
   state/
-    store.ts           persisted state (zustand + AsyncStorage, never throws)
-    kairos.ts          forecast → snapshot → plan, computed once for the tree
-    effects.ts         notifications, widget, encrypted sync
-    demo.ts            the simulated couple
-  platform/            native integrations, split by platform file
-    health.ios.ts      HealthKit (read-only)
-    health.android.ts  Health Connect (read-only)
-    notifications.ts   local scheduling, actionable categories
-    calendar.ts        local "Seasons" calendar (.web: .ics file)
-    relay.ts           encrypted pairing and messaging client
-  ui/                  design system: theme, text, glass, orb, ring, controls, tabs, showcase
-  widgets/             iOS WidgetKit widget via expo-widgets
+    store.ts             persisted state (zustand + AsyncStorage, never throws)
+    kairos.ts            forecast → snapshot → plan, computed once for the tree
+    effects.ts           notifications, widget, encrypted sync
+    demo.ts              the simulated couple
+  platform/              native integrations, split by platform file
+    screenshot.ts        choose an image, shrink it, hand pixels to the reader (.web: canvas)
+    sample.web.ts        draws a sample tracker calendar so the web demo can show the reader working
+    health.ios.ts        HealthKit (read-only)
+    health.android.ts    Health Connect (read-only)
+    notifications.ts     local scheduling, actionable categories
+    calendar.ts          local "Seasons" calendar (.web: .ics file)
+    relay.ts             encrypted pairing and messaging client
+  ui/                    design system: theme, text, glass, orb, ring, day strip, month grid, controls, sheet, showcase
+  widgets/               iOS WidgetKit widget via expo-widgets
 ```
 
 ## Commands
@@ -42,7 +51,8 @@ node scripts/build-showcase.mjs     # dist/ packed into one self-contained HTML 
 
 ## Notes
 
-- `NativeTabs` gives the system tab bar on iOS (Liquid Glass on iOS 26) and Material bottom navigation on Android; the web uses a floating glass capsule (`ui/tabs.web.tsx`).
+- There are no tabs. Today is the app; Rhythm and the profile are native form sheets on iOS and full pages elsewhere.
 - `ui/glass.tsx` uses real Liquid Glass where available, a frosted blur on older iOS and the web, and tonal surfaces on Android.
 - On screens 980 px and wider, `ui/showcase.web.tsx` turns the web app into the website: pitch on the left, the live app in a phone frame on the right.
-- Configure the relay with `EXPO_PUBLIC_RELAY_URL` and `EXPO_PUBLIC_RELAY_ANON_KEY`. Without them, real pairing is off and the demo is the way in.
+- **Editions.** With no relay configured the build is the solo edition: his phone only, no camera, no health capabilities, no network. Set `EXPO_PUBLIC_RELAY_URL` and `EXPO_PUBLIC_RELAY_ANON_KEY` for the paired edition; `app.config.ts` then adds the camera, HealthKit and Health Connect plugins.
+- Shipping: see [docs/APP_STORE.md](../../docs/APP_STORE.md).

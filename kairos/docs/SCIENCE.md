@@ -86,7 +86,40 @@ How to read it:
 
 ---
 
-## 6. What Kairos is not
+## 6. Reading a calendar from a screenshot
+
+He can start from a screenshot of whatever tracker she uses. The reader (`packages/core/src/import/calendar-image.ts`) runs on the phone, uses no OCR model and no network, and knows nothing about any particular app. It relies on four things every month view has in common.
+
+1. **Numerals are thin strokes on a seven-column lattice.** A morphological top-hat (closing minus image, and image minus opening) pulls out anything thin, whatever it sits on: white numerals on a red disc, grey ones on white, coloured ones on black. A local median then discards the gaps between strokes, which are thin too but are only background showing through. Connected components of one height that pair up into one- and two-glyph groups are the day numbers; a least-squares fit finds the seven columns and the row pitch.
+2. **Days 1–9 have one glyph, days 10–31 have two.** The only place a run of nine single-glyph cells meets a run of double-glyph cells is the 9th and 10th. That numbers every cell without recognising a single digit, and tolerates a few misread cells.
+3. **The column of the 1st and the length of the month identify the month.** Each candidate month near today is scored against the grid. Which columns of the weekday header carry the same letter (S·····S and ··T·T·· when the week starts on Sunday; ·T·T·SS on Monday) settles the week start; failing that, the phone's own setting does.
+4. **Period days are marked in the red-to-pink family** in nearly every tracker, fertile days in a cool colour. Marks are measured per cell against the page colour and grouped by style. Where two red styles appear (a solid disc and a pale one, a solid ring and a dashed one), the heavier is what she logged and the lighter is the app's prediction; days after today are always predictions.
+
+The result is checked for plausibility (a period is two to ten days; starts are at least fifteen days apart; a decoration on nearly half the days is the calendar's default look, not information) and is always shown as a calendar to confirm. If the next predicted period is visible, the gap to her last logged one is taken as the other app's own estimate of her cycle length, which reflects more history than one screenshot can.
+
+### How well it reads
+
+`pnpm --filter @kairos/core bench:calendars` renders look-alike calendars in nine styles drawn from the patterns real trackers use (filled discs, rounded squares, continuous bands, rings, dashed predictions, icons or dots under the numeral, tinted numerals; light and dark; scrolling and paged; Sunday and Monday weeks; five typefaces), at six phone sizes, with half of them re-compressed as a messenger would. It screenshots each in Chromium and compares what the reader returns with what was drawn. 60 scenarios per style, 540 in all:
+
+| | Result |
+| --- | --- |
+| Periods read exactly (every start and end) | 530 of 540 (98%) |
+| Month and every date correct | 98% |
+| Read is wrong but flagged for checking | 9 |
+| **Read is wrong and not flagged** | **1** |
+| No calendar found | 0 |
+| Flagged "check this" overall | 26%, mostly screens that show no period at all |
+| Time per screenshot | about 0.3 s in Node; expect a second or two on a phone |
+
+**What this does not show.** These are calendars drawn for the benchmark, not screenshots of Flo, Clue, Apple Health, Natural Cycles or anything else. Real apps will have layouts, fonts and decorations the benchmark did not anticipate, and the reader has not been run on a single real screenshot. Known gaps: a cycle wheel or week strip (there is no month grid to find); apps that colour every day, such as green and red days for contraception (detected and refused, since red there means "fertile", not "period"); a February of exactly four rows, which looks the same as the first four rows of March (flagged, with the other month offered); and photographs of a screen, which add perspective and moiré the reader was not built for. Testing against real screenshots from the main trackers is the first job before release.
+
+### What a screenshot is worth
+
+A screenshot yields period dates and nothing else, so the forecast it supports is the "Calendar only" row above: the right ovulation day about one time in seven, within two days about six times in ten. It also goes stale. Kairos assumes an unreported period arrived on schedule and asks him to confirm, which keeps the seasons roughly right for a regular cycle and lets errors build for an irregular one. Pairing with her phone removes both limits.
+
+---
+
+## 7. What Kairos is not
 
 - **Not contraception.** Natural Cycles (FDA De Novo, August 2018; ~93% effective with typical use) and Clue Birth Control (FDA 510(k), 2021) went through regulatory clearance to make that claim. Kairos makes no such claim and says so wherever fertility is shown outside "trying".
 - **Not a diagnosis.** It nudges couples toward a clinician at 12 months of trying (6 if 35+), and should when cycles are persistently shorter than 21 or longer than 35 days.

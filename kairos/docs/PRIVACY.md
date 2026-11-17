@@ -27,12 +27,24 @@ This is a design constraint, not a feature. Reproductive health data has become 
 
 There are no accounts. A pairing is identified by a random mailbox id derived from the invite secret.
 
+### The solo edition
+
+When he sets up alone, from a screenshot of her tracker or a date, the table collapses to one column:
+
+| Data | His phone | Anywhere else |
+| --- | --- | --- |
+| The screenshot | Read in memory, then discarded. It is not copied into the app's storage | ✘ |
+| Period dates read from it, and her usual cycle length | ✔ app storage | ✘ |
+| Forecast, ideas, history, her name and favourites as he typed them | ✔ computed and kept on device | ✘ |
+
+The solo edition has no server and its code makes no network request. It asks for no photo-library permission: the system picker hands over the one image he chooses. What it cannot offer is any control on her side, because her phone is not part of it; see the threat model.
+
 ## 2. Pairing
 
 Implemented in `packages/core/src/crypto/pairing.ts` with audited, pure-JavaScript libraries (`@noble/curves`, `@noble/ciphers`, `@noble/hashes`).
 
 1. **Her phone** generates an X25519 key pair and a 32-byte invite secret, derives the mailbox id (`HKDF(secret, "pairing-id")`, 16 bytes) and a mailbox token (`HKDF(secret, "mailbox-token")`), and opens a mailbox on the relay by sending only the id and `SHA-256(token)`.
-2. The invite travels **out of band**: a QR code he scans in person (best), or a link `https://kairos.love/pair#k1.<herPublicKey>.<secret>`. The secret is in the URL fragment, which browsers never send to servers.
+2. The invite travels **out of band**: a QR code he scans in person (best), or a link ending `#k1.<herPublicKey>.<secret>` (the app's own `kairos://pair` scheme by default, or `https://<a domain you run>/pair`). The secret is in the URL fragment, which browsers never send to servers.
 3. **His phone** generates its own X25519 key pair and posts a join request: his public key plus `HMAC-SHA256(HKDF(secret, "join-mac"), herPublicKey ‖ hisPublicKey)`. The relay cannot forge or swap this without the secret.
 4. **Both phones** compute `X25519(mine, theirs)`, run `HKDF-SHA256` salted with the invite secret and bound to both public keys, and split the output into two directional 32-byte keys.
 5. **Both phones show the same four emoji** (`SHA-256` of both public keys, 24 bits). Matching emoji prove no one sat in the middle.
@@ -76,7 +88,8 @@ Key material is stored in the iOS Keychain / Android Keystore-backed secure stor
 | Apple / Google / Expo push services | See that his phone was woken | See why |
 | A malicious relay trying to sit in the middle of pairing | Withhold or delay messages | Substitute its own key (the join MAC needs the invite secret; the safety emoji would differ) |
 | Someone who picks up his unlocked phone | See what he sees: her season and, at the fertility level, her fertile days | See her temperatures, tests, notes or a pregnancy result |
-| A controlling partner | See only what she shares | Stop her pausing or unpairing; see why she paused |
+| A controlling partner, paired edition | See only what she shares | Stop her pausing or unpairing; see why she paused |
+| A controlling partner, solo edition | Feed the app a photo of her tracker taken without asking, and get a forecast from it | Get anything he could not already see on her screen; the app has no access to her phone, and holds only period dates |
 
 **Known v1 limitations, stated plainly:** keys are static for the life of a pairing (no forward secrecy; re-pairing rotates them); traffic metadata is visible to the relay; the share levels control what he is shown, not what he could infer by arithmetic (a period forecast implies an approximate ovulation date). v2 moves to a ratcheting protocol (MLS) and adds padding and batched delivery.
 
