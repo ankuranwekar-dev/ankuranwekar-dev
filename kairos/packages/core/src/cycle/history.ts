@@ -28,6 +28,16 @@ export function normalisePeriods(periods: PeriodLog[]): PeriodLog[] {
   return out;
 }
 
+/**
+ * Adds newly supplied periods to what is already known, letting the new ones win: a stored start
+ * within ten days of an incoming one is the same period seen less accurately (an assumed date he
+ * is now correcting, or an older screenshot), so it is replaced rather than merged.
+ */
+export function mergePeriods(existing: PeriodLog[], incoming: PeriodLog[]): PeriodLog[] {
+  const kept = existing.filter((old) => !incoming.some((p) => Math.abs(diffDays(old.start, p.start)) < 10));
+  return normalisePeriods([...kept, ...incoming]);
+}
+
 const RECENCY = 0.85;
 
 function weightedShrink(values: number[], priorMean: number, priorWeight: number): number {

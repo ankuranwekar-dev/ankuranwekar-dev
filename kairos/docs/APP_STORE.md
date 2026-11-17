@@ -34,7 +34,7 @@ Requirements: a current Xcode, Node 22, pnpm 10, CocoaPods, and membership of th
 ```bash
 cd kairos
 pnpm install
-pnpm test                      # 96 engine tests
+pnpm test                      # 100 engine tests
 
 cd apps/app
 npx expo-doctor                # checks dependency versions against the SDK

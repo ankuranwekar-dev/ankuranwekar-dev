@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   addDays,
   localToday,
-  normalisePeriods,
+  mergePeriods,
   type CycleData,
   type HistoryEntry,
   type Intent,
@@ -234,7 +234,7 @@ export const useStore = create<Store>()(
           notYetUntil: undefined,
           cycle: {
             ...s.cycle,
-            periods: normalisePeriods([...s.cycle.periods, ...periods]),
+            periods: mergePeriods(s.cycle.periods, periods),
             ...(cycleLength ? { statedCycleLength: cycleLength } : {}),
           },
         })),
@@ -243,7 +243,10 @@ export const useStore = create<Store>()(
           notYetUntil: undefined,
           cycle: {
             ...s.cycle,
-            periods: normalisePeriods([...s.cycle.periods, ...starts.map((start) => ({ start }))]),
+            periods: mergePeriods(
+              s.cycle.periods,
+              starts.map((start) => ({ start })),
+            ),
           },
         })),
       notYet: () => set({ notYetUntil: addDays(localToday(), 3) }),

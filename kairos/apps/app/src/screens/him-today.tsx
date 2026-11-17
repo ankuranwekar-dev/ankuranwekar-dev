@@ -1,4 +1,4 @@
-import { relativeDayLabel, weekdayName } from '@kairos/core';
+import { diffDays, weekdayName, type ISODate } from '@kairos/core';
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
@@ -16,6 +16,12 @@ import { Screen } from '@/ui/screen';
 import { SignalCard } from '@/ui/signal-card';
 import { T } from '@/ui/text';
 import { ink, Radius, seasonColors, Space, useTheme } from '@/ui/theme';
+
+/** "Wednesday" for the last few days, "Nov 4" for anything older, where a weekday alone would be ambiguous. */
+function aroundDay(date: ISODate, today: ISODate): string {
+  if (diffDays(date, today) <= 6) return weekdayName(date);
+  return new Date(`${date}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
 
 /** The one fact worth a line under the orb: what is coming next. */
 function nextUp(k: Kairos): string | undefined {
@@ -128,8 +134,7 @@ export function HimToday() {
           <Animated.View entering={FadeInDown.duration(400)}>
             <Glass radius={Radius.xl} style={styles.ask}>
               <T variant="headline" center>
-                Did her period start{' '}
-                {relativeDayLabel(assumed, k.today) === 'today' ? 'today' : `around ${weekdayName(assumed)}`}?
+                Did her period start around {aroundDay(assumed, k.today)}?
               </T>
               <View style={styles.askRow}>
                 <Button

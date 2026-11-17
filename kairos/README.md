@@ -24,7 +24,7 @@ Read the full concept in [docs/CONCEPT.md](docs/CONCEPT.md).
 
 | Path | What it is |
 | --- | --- |
-| [`packages/core`](packages/core) | The engine, in dependency-light TypeScript shared by every platform: the screenshot reader and a small PNG decoder, cycle history and Bayesian ovulation model, Monte Carlo forecast, seasons, a 70+ idea nudge library and planner, her signals, the share-level snapshot, X25519 / XChaCha20-Poly1305 pairing and envelopes, discreet calendar export, a cycle simulator and two benchmarks. 96 tests |
+| [`packages/core`](packages/core) | The engine, in dependency-light TypeScript shared by every platform: the screenshot reader and a small PNG decoder, cycle history and Bayesian ovulation model, Monte Carlo forecast, seasons, a 70+ idea nudge library and planner, her signals, the share-level snapshot, X25519 / XChaCha20-Poly1305 pairing and envelopes, discreet calendar export, a cycle simulator and two benchmarks. 100 tests |
 | [`apps/app`](apps/app) | The app: Expo SDK 58 and Expo Router, one codebase for iOS, Android and the web. Two editions from one build switch: solo (his phone only) and paired (both phones). Setup from a screenshot, a pairing code or a date; one Today screen each; rhythm, profile and idea detail as sheets; a demo couple with time travel; local notifications, calendar sync, HealthKit and Health Connect import, an iOS widget, and a desktop website shell |
 | [`supabase`](supabase) | The ciphertext-only relay for the paired edition: Postgres schema with row-level security and retention, and an Edge Function with mailbox-token auth and content-free wake-up pushes |
 | [`site`](site) | Privacy policy and support pages, ready to host |
@@ -40,7 +40,7 @@ Requirements: Node 22 and pnpm 10.
 
 ```bash
 pnpm install
-pnpm test                                        # 96 engine, reader, crypto and relay tests
+pnpm test                                        # 100 engine, reader, crypto and relay tests
 pnpm bench                                       # forecast accuracy on simulated cycles (~1 min)
 pnpm --filter @kairos/core bench:calendars       # screenshot reader against rendered calendars (needs Chromium)
 pnpm web                                         # the app in a browser
@@ -72,7 +72,7 @@ Getting it onto the App Store is covered step by step in [docs/APP_STORE.md](doc
 
 | Check | Status |
 | --- | --- |
-| Engine, reader, crypto and relay protocol tests | 96 passing (`pnpm test`) |
+| Engine, reader, crypto and relay protocol tests | 100 passing (`pnpm test`) |
 | TypeScript, engine and app | Clean |
 | Screenshot reader | 530 of 540 rendered look-alike calendars read exactly; 9 of the rest flagged for checking, 1 not. **Not yet run on real screenshots from real apps** |
 | Web build | Builds; setup from a date, from a sample screenshot and from an image file, the demo, both sides and every sheet exercised in Chromium at phone and desktop sizes, light and dark |

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { addDays, diffDays } from '../src/dates';
-import { completedCycles, estimateStats, normalisePeriods, withAssumedPeriods } from '../src/cycle/history';
+import {
+  completedCycles,
+  estimateStats,
+  mergePeriods,
+  normalisePeriods,
+  withAssumedPeriods,
+} from '../src/cycle/history';
 import { detectThermalShift, fertileProbability, ovulationPosterior } from '../src/cycle/ovulation';
 import { forecast } from '../src/cycle/forecast';
 import { POPULATION } from '../src/cycle/population';
@@ -232,5 +238,33 @@ describe('assumed periods (his phone, without hers)', () => {
 
   it('does nothing without a period to start from', () => {
     expect(withAssumedPeriods({ periods: [] }, '2026-10-03')).toEqual({ data: { periods: [] }, assumed: [] });
+  });
+});
+
+describe('merging newly supplied periods', () => {
+  const known = [{ start: '2026-09-01', end: '2026-09-05' }, { start: '2026-10-01' }];
+
+  it('adds a period that is new', () => {
+    expect(mergePeriods(known, [{ start: '2026-10-30' }]).map((p) => p.start)).toEqual([
+      '2026-09-01',
+      '2026-10-01',
+      '2026-10-30',
+    ]);
+  });
+
+  it('lets a corrected start replace the stored one, earlier or later', () => {
+    expect(mergePeriods(known, [{ start: '2026-10-03' }]).map((p) => p.start)).toEqual(['2026-09-01', '2026-10-03']);
+    expect(mergePeriods(known, [{ start: '2026-09-28' }]).map((p) => p.start)).toEqual(['2026-09-01', '2026-09-28']);
+  });
+
+  it('takes the end date from the newer reading', () => {
+    expect(mergePeriods(known, [{ start: '2026-10-01', end: '2026-10-06' }])[1]).toEqual({
+      start: '2026-10-01',
+      end: '2026-10-06',
+    });
+  });
+
+  it('leaves everything alone when nothing is supplied', () => {
+    expect(mergePeriods(known, [])).toEqual(known);
   });
 });
