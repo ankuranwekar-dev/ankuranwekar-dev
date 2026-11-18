@@ -14,6 +14,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
-    ]
+    ],
+    "patchedDependencies": {
+      "expo-modules-core@58.0.23": "patches/expo-modules-core@58.0.23.patch"
+    }
   }
 }
