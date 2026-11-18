@@ -10,7 +10,7 @@ This is the runbook for the steps that need a Mac and an Apple Developer account
 | iOS and Android JavaScript bundles | Build (`expo export`), Hermes bytecode |
 | App configuration (`app.json`, `app.config.ts`, `eas.json`) | Done; resolves cleanly for both editions |
 | Privacy manifest, permission strings | Done |
-| Store listing (`apps/app/store.config.json`) | Drafted; four `REPLACE` fields are yours to fill |
+| Store listing (`apps/app/store.config.json`) | Drafted. Publisher name, copyright and review email are filled in; the App Review contact phone is still a placeholder (`+1 000 000 0000`), and App Store Connect requires a real one |
 | Privacy policy and support pages (`site/`) | Drafted; need your name, contact address and a public URL |
 | Native iOS build (Xcode / CocoaPods) | Done, Debug and Release, on Xcode 26.0. Needs one dependency patch there (see "Building on an older Xcode") |
 | Simulator testing | Done on an iPhone 17 Pro Max simulator, light and dark, smallest and largest text sizes. **Not run on a physical iPhone** |
@@ -26,7 +26,7 @@ The first native build is where problems usually surface: a config plugin that d
 2. **Bundle identifier.** `love.kairos.app` is a placeholder. Use a reverse-domain identifier you control: set `KAIROS_BUNDLE_ID` in the build environment, or edit `app.json`.
 3. **Edition.** The default build is the **solo** edition: his phone only, set up from a screenshot or a date, no server. This is the one to ship first: it has nothing to operate and the smallest review surface. The **paired** edition (her app, pairing, signals, Apple Health) switches on when `EXPO_PUBLIC_RELAY_URL` is set, and needs the relay deployed (see the end of this page).
 4. **Price.** The listing assumes free. Subscriptions are not implemented.
-5. **Publisher details.** Replace the placeholders in `site/privacy.html`, `site/support.html` and `apps/app/store.config.json`.
+5. **Publisher details.** Done: name, contact email and date are in `site/privacy.html`, `site/support.html` and `apps/app/store.config.json`. Still to do: the review contact phone number in `store.config.json`. Update the "Last updated" date in `site/privacy.html` whenever the policy changes.
 
 ## Path A: your Mac, with Xcode
 

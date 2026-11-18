@@ -27,11 +27,11 @@
       "LIFESTYLE",
       "HEALTH_AND_FITNESS"
     ],
-    "copyright": "2026 REPLACE WITH YOUR NAME OR COMPANY",
+    "copyright": "2026 Ankur Anwekar",
     "review": {
-      "firstName": "REPLACE",
-      "lastName": "REPLACE",
-      "email": "REPLACE@example.com",
+      "firstName": "Ankur",
+      "lastName": "Anwekar",
+      "email": "ankuranwekar.dev@gmail.com",
       "phone": "+1 000 000 0000",
       "demoRequired": false,
       "notes": "No account or sign-in is needed. On the first screen, tap \"See a demo\" for a fully populated example (a simulated couple). To test setup: tap \"I'm her partner\", then \"Pick a date\" and choose any past day; or \"Her screenshot\" and choose a screenshot of any period-tracking app's month calendar. The screenshot is analysed on the device and is not uploaded. This edition of the app sends no data to any server; a few ideas offer a button that opens Maps or Messages. Cycle estimates are informational only; the app makes no contraceptive or medical claims."
