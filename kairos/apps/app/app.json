@@ -79,7 +79,12 @@
           }
         }
       ],
-      "expo-secure-store",
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": false
+        }
+      ],
       "expo-font",
       [
         "expo-splash-screen",
@@ -98,7 +103,8 @@
       [
         "expo-calendar",
         {
-          "calendarPermission": "Kairos adds a private “Seasons” calendar with all-day, free events. It never reads your other events."
+          "calendarPermission": "Kairos adds a private “Seasons” calendar with all-day, free events. It never reads your other events.",
+          "remindersPermission": false
         }
       ],
       [
