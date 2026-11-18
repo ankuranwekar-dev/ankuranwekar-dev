@@ -277,7 +277,9 @@ export function Tile({
           <Icon name={icon} size={24} color={dark ? accent : colors.text} />
         </View>
         <View style={{ flex: 1, gap: 2 }}>
-          <T variant="headline" style={{ fontSize: 18 }}>
+          {/* Capped so a word like "screenshot" still fits beside the icon at the largest text size, but not
+              below the caption's size (13pt x 3.1 at the top setting), so the title stays the stronger line. */}
+          <T variant="headline" maxFontSizeMultiplier={2.3} style={{ fontSize: 18 }}>
             {title}
           </T>
           {caption ? (

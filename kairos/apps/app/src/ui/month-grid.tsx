@@ -66,8 +66,12 @@ export function MonthGrid({
                       ? { backgroundColor: alpha(colors.text, 0.1) }
                       : null,
               ]}>
+              {/* The day circle is a fixed 38pt, so its number can't grow with the text size: capped at 1.4x
+                  (about 21pt). Without the cap the digits are cut off at the largest setting and a date can't be
+                  picked. VoiceOver still reads the full label on the button. */}
               <T
                 variant="callout"
+                maxFontSizeMultiplier={1.4}
                 color={on ? '#FFFFFF' : future ? colors.textTertiary : colors.text}
                 style={{ fontWeight: on || date === today ? '700' : '400', fontVariant: ['tabular-nums'] }}>
                 {Number(date.slice(8))}
