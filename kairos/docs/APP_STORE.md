@@ -12,9 +12,10 @@ This is the runbook for the steps that need a Mac and an Apple Developer account
 | Privacy manifest, permission strings | Done |
 | Store listing (`apps/app/store.config.json`) | Drafted; four `REPLACE` fields are yours to fill |
 | Privacy policy and support pages (`site/`) | Drafted; need your name, contact address and a public URL |
-| **Native iOS build (Xcode / CocoaPods)** | **Not run. No Mac was available** |
-| **Simulator and device testing** | **Not run** |
-| **Screenshots from a real simulator** | **Not captured** (the ones in `docs/screenshots` are from the web build) |
+| Native iOS build (Xcode / CocoaPods) | Done, Debug and Release, on Xcode 26.0. Needs one dependency patch there (see "Building on an older Xcode") |
+| Simulator testing | Done on an iPhone 17 Pro Max simulator, light and dark, smallest and largest text sizes. **Not run on a physical iPhone** |
+| Screenshots from a real simulator | Captured from the Release build: `docs/store-screenshots/` (6.9-inch, 1320 x 2868; light in the folder, dark in `dark/`) |
+| **Widget and notifications on a device** | **Not run.** The widget has never been seen on a Home or Lock Screen, and no notification has been seen to fire |
 | **Upload and submission** | **Not done.** Needs your Apple Developer account |
 
 The first native build is where problems usually surface: a config plugin that disagrees with the SDK, a pod that fails to compile, a layout that the safe area clips. Budget time for that; none of it has been tested.
@@ -55,6 +56,17 @@ Capture store screenshots from a 6.9-inch simulator (iPhone 16 Pro Max or newer)
 ```bash
 xcrun simctl io booted screenshot today.png
 ```
+
+The nine screens in `docs/store-screenshots/` avoid the demo's fertile-window wording on purpose (see "Health claims" below). If you retake them, step the demo forward to autumn or winter instead of using day 0, and answer the notification prompt before capturing.
+
+### Building on an older Xcode
+
+Expo SDK 58 is built against a newer Swift than Xcode 26.0 ships (Expo's own build images use Xcode 27.1). On Xcode 26.0 this repo builds because of one committed patch, `patches/expo-modules-core@58.0.23.patch`, which rewrites a single `weak let`. Two things to know:
+
+- **Do not take the `expo install --fix` bump yet.** `expo-modules-jsi` 58.0.21 and later add code that Xcode 26.0 rejects, so `expo-doctor` stays at 19 of 20 checks (the failing one is the 29 packages a patch version behind).
+- **With a newer Xcode**, delete the patch (`patches/` and the `patchedDependencies` entry in `kairos/package.json`), run `npx expo install --fix`, and rebuild. Try that first if you are updating Xcode anyway.
+
+Finishing setup crashed the app on Xcode 26.0 until notification setup was moved after the screen transition (a fault in Expo's notification module, not in Kairos). It has not crashed in six cold runs since, but it was timing-dependent, so check it again on a real iPhone.
 
 Then archive and upload: open `ios/Kairos.xcworkspace` in Xcode, choose your team under *Signing & Capabilities*, select *Any iOS Device*, then *Product → Archive → Distribute App → App Store Connect*.
 
