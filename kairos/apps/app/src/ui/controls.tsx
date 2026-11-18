@@ -89,7 +89,11 @@ export function Button({
         style,
       ]}>
       {icon ? <Icon name={icon} size={compact ? 15 : 17} color={fg} /> : null}
-      <T variant="label" color={fg} style={{ fontSize: compact ? 14 : 16 }}>
+      <T
+        variant="label"
+        color={fg}
+        center
+        style={{ fontSize: compact ? 14 : 16, lineHeight: compact ? 18 : 20, flexShrink: 1 }}>
         {label}
       </T>
     </Press>
@@ -348,6 +352,8 @@ const styles = StyleSheet.create({
     minHeight: 50,
     borderRadius: Radius.pill,
     paddingHorizontal: Space.xl,
+    // So the pill grows around a label that wraps at large text sizes; at normal sizes minHeight decides.
+    paddingVertical: Space.m,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

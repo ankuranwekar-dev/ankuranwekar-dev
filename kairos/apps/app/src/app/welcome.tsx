@@ -1,7 +1,7 @@
 import type { Season } from '@kairos/core';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -33,12 +33,18 @@ export default function Welcome() {
 
   const orb = Math.min(250, Math.max(170, height * 0.28));
 
+  // A ScrollView whose content is at least as tall as the screen: at normal text sizes it looks and behaves
+  // as before (hero fills the gap, actions sit at the bottom); at the largest accessibility sizes the content
+  // grows past the screen and scrolls, so the buttons stay reachable instead of being pushed off.
   return (
-    <View
-      style={[
+    <ScrollView
+      style={{ backgroundColor: colors.bg }}
+      contentContainerStyle={[
         styles.root,
-        { backgroundColor: colors.bg, paddingTop: insets.top + Space.l, paddingBottom: insets.bottom + Space.l },
-      ]}>
+        { paddingTop: insets.top + Space.l, paddingBottom: insets.bottom + Space.l },
+      ]}
+      contentInsetAdjustmentBehavior="never"
+      showsVerticalScrollIndicator={false}>
       <View style={styles.column}>
         <Animated.View entering={FadeIn.duration(900)}>
           <T variant="caption" tone="tertiary" center style={{ letterSpacing: 3 }}>
@@ -57,10 +63,12 @@ export default function Welcome() {
             </Animated.View>
           </View>
           <Animated.View key={`w-${season}`} entering={FadeIn.duration(900)} exiting={FadeOut.duration(500)}>
+            {/* Capped so "her autumn" never wraps: the word changes every few seconds and a wrap would move the buttons. */}
             <T
               variant="title2"
               italic
               center
+              maxFontSizeMultiplier={1.5}
               color={ink(seasonColors(season).glow, dark)}
               style={{ marginTop: Space.xl }}>
               her {season}
@@ -69,7 +77,8 @@ export default function Welcome() {
         </View>
 
         <Animated.View entering={FadeInDown.delay(200).duration(700)} style={{ gap: Space.s }}>
-          <T variant="display" center style={{ fontSize: 44, lineHeight: 46 }}>
+          {/* Capped so "rhythm." still fits on one line at the largest text size; everything else scales fully. */}
+          <T variant="display" center maxFontSizeMultiplier={1.3} style={{ fontSize: 44, lineHeight: 46 }}>
             Her rhythm.{'\n'}Your moment.
           </T>
           <T variant="callout" tone="secondary" center>
@@ -109,14 +118,14 @@ export default function Welcome() {
           </Press>
         </Animated.View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, alignItems: 'center' },
-  column: { flex: 1, width: '100%', maxWidth: MaxWidth, paddingHorizontal: Space.xl },
-  hero: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 240 },
+  root: { flexGrow: 1, alignItems: 'center' },
+  column: { flexGrow: 1, width: '100%', maxWidth: MaxWidth, paddingHorizontal: Space.xl },
+  hero: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', minHeight: 240 },
   actions: { gap: Space.s, paddingTop: Space.xxl },
-  demo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, height: 44 },
+  demo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 44, paddingVertical: Space.s },
 });
