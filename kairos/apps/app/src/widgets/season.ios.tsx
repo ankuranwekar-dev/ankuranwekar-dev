@@ -9,12 +9,15 @@ import type { SeasonWidgetProps } from './season-props';
  *
  * The layout below is compiled to a string by the 'widget' directive and runs
  * inside the widget extension, where every @expo/ui SwiftUI view and modifier
- * is a global. It must be a function expression and self-contained.
+ * is a global. It must be an anonymous function expression and self-contained:
+ * babel-preset-expo's widgets plugin turns a named function expression into a
+ * `var name = ...` declaration, which is invalid as a call argument and throws
+ * "Property '<name>' doesn't exist" the moment the app starts.
  *
  * Privacy: it only ever shows a codename ("Spring") and, if he opted into
  * detailed notifications, today's idea. Never a phase name, never a date.
  */
-export const SeasonWidget = createWidget<SeasonWidgetProps>('SeasonWidget', function SeasonWidgetLayout(props, env) {
+export const SeasonWidget = createWidget<SeasonWidgetProps>('SeasonWidget', function (props, env) {
   'widget';
   if (env.widgetFamily === 'accessoryInline') {
     return <Text>{`${props.glyph} ${props.title}`}</Text>;
