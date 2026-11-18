@@ -19,6 +19,7 @@ import { useStore } from './store';
 export function useBackgroundWork(ready: boolean) {
   const role = useStore((s) => s.role);
   const demo = useStore((s) => s.demo);
+  const onboarded = useStore((s) => s.onboarded);
   const paired = useStore((s) => s.pairing.status === 'paired');
   const k = useKairos();
   const native = Platform.OS !== 'web';
@@ -42,17 +43,34 @@ export function useBackgroundWork(ready: boolean) {
     });
   }, [ready, role, detailed, k.copy, k.season, k.cycleDay, k.todayNudge]);
 
-  // His notifications.
+  // His notifications. Only once setup is finished: choosing "I'm her partner" sets the role straight away,
+  // and without this check the system permission prompt appeared on the setup screen, before he had even
+  // picked a date (finishing setup asks for it, as the runbook says).
   useEffect(() => {
-    if (!ready || !native || role !== 'him' || demo) return;
+    if (!ready || !native || role !== 'him' || demo || !onboarded) return;
     let cancelled = false;
-    configureNotifications()
-      .then((ok) => (ok && !cancelled ? scheduleNudges(k.plan.items) : 0))
-      .catch(() => {});
+    // Not at the instant setup finishes. The notification module returns its results from a background
+    // thread, and on Xcode 26.0 with Expo SDK 58 that raced with JavaScript running in Hermes: finishing
+    // setup (navigating and rendering Today at the same moment) crashed the app. Waiting for the transition
+    // to end and the JS thread to go quiet avoids the overlap.
+    let idle: number | undefined;
+    const timer = setTimeout(() => {
+      idle = requestIdleCallback(
+        () => {
+          if (cancelled) return;
+          configureNotifications()
+            .then((ok) => (ok && !cancelled ? scheduleNudges(k.plan.items) : 0))
+            .catch(() => {});
+        },
+        { timeout: 3000 },
+      );
+    }, 1500);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
+      if (idle !== undefined) cancelIdleCallback(idle);
     };
-  }, [ready, native, role, demo, k.plan]);
+  }, [ready, native, role, demo, onboarded, k.plan]);
 
   useEffect(() => {
     if (!native) return;

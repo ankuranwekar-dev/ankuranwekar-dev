@@ -149,7 +149,9 @@ export default function Import() {
     if (next === 'share') router.replace('/setup/share');
     else if (next === 'today') {
       s.finishOnboarding();
-      configureNotifications().catch(() => {});
+      // His phone sets notifications up from the background effect once Today has settled (calling it here as
+      // well started two identical calls within milliseconds of each other, at the busiest moment).
+      if (!him) configureNotifications().catch(() => {});
       router.dismissTo('/today');
     } else router.back();
   };
