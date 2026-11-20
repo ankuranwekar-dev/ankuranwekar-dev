@@ -96,13 +96,18 @@ If you connect your Mac to the Claude session that built this, the simulator bui
 
 **Export compliance.** The app contains its own implementation of standard encryption (X25519, HKDF-SHA-256, XChaCha20-Poly1305) for pairing. `ITSAppUsesNonExemptEncryption` is deliberately not set, so App Store Connect will ask. Answer that the app uses standard encryption algorithms in addition to those in the operating system, and follow what it tells you from there (France has an extra declaration). This is a legal question; the answer above is a starting point, not advice.
 
-**Age rating.** Answer the questionnaire honestly: there is no explicit content, but there are romantic themes and references to fertility. Expect 12+ or higher.
+**Age rating.** Apple requires a rating for every app; there is no "unrated" option. Answer the questionnaire honestly: there is no explicit content, but there are romantic themes and references to fertility and wellness topics. The privacy policy says Kairos is intended for adults, and App Store Connect lets you set a higher age rating than the questionnaire computes, so choosing 18+ is possible; check the exact wording in the Age Rating section when you get there.
 
 **Health claims.** The listing and the app say plainly that Kairos is not a contraceptive and not a medical device. Keep it that way in any screenshots or marketing text you add; reviewers reject fertility apps that imply otherwise.
 
 **Review notes** are in `store.config.json`. The demo needs no login.
 
-**URLs.** Host the `site/` folder anywhere public (GitHub Pages works) and enter `…/privacy.html` as the privacy policy URL and `…/support.html` as the support URL.
+**URLs.** The `site/` folder is published with GitHub Pages from the `gh-pages` branch of this repository:
+
+- Privacy policy URL: `https://ankuranwekar-dev.github.io/ankuranwekar-dev/privacy.html`
+- Support URL: `https://ankuranwekar-dev.github.io/ankuranwekar-dev/support.html`
+
+After editing anything in `site/` (the pages name the app, so a rename needs this), run `kairos/scripts/publish-site.sh`. It copies `site/` to `gh-pages` and force-pushes that branch, which only ever holds a copy of `site/`. Check that the privacy page still matches what the app does before each release.
 
 ## Review risks worth knowing
 
