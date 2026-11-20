@@ -70,7 +70,15 @@ function toPeriods(marked: ReadonlySet<ISODate>, today: ISODate): PeriodLog[] {
  * result is shown as a calendar that can be corrected with a tap.
  */
 export default function Import() {
-  const params = useLocalSearchParams<{ mode?: Mode; next?: Next; file?: string; today?: string }>();
+  const params = useLocalSearchParams<{
+    mode?: Mode;
+    next?: Next;
+    file?: string;
+    today?: string;
+    pick?: string;
+    name?: string;
+    finish?: string;
+  }>();
   const mode: Mode = params.mode === 'date' ? 'date' : 'screenshot';
   const next: Next = params.next ?? 'back';
   const s = useStore();
@@ -161,6 +169,20 @@ export default function Import() {
     read(() => readPicked({ uri, width: 0, height: 0, kind: 'photo' }, { today, ...hints }), false, uri);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [devFile]);
+
+  // Developer check only: mark days, give her a name and finish, so the screens after setup can be reached and
+  // captured on a device without anyone tapping through it.
+  useEffect(() => {
+    if (!DEV_READ) return;
+    if (params.pick) setMarked(new Set(params.pick.split(',') as ISODate[]));
+    if (params.name) setName(params.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const devFinish = DEV_READ && params.finish === '1';
+  useEffect(() => {
+    if (devFinish && phase === 'review' && periods.length > 0) finish();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [devFinish, phase, periods.length]);
 
   const toggle = (date: ISODate) => {
     haptic.tap();

@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { actionLabel, runAction } from '@/platform/actions';
+import { DEV_READ } from '@/platform/dev';
 import { haptic } from '@/platform/haptics';
 import { useKairos } from '@/state/kairos';
 import { useStore } from '@/state/store';
@@ -18,7 +19,11 @@ export default function NudgeSheet() {
   const k = useKairos();
   const log = useStore((s) => s.log);
   const { colors, dark } = useTheme();
-  const nudge = k.plan.items.find((i) => i.key === key);
+  // Developer check only: key=first opens today's idea (or the first one), so the sheet can be captured on a device.
+  const nudge =
+    DEV_READ && key === 'first'
+      ? (k.plan.items.find((i) => i.date === k.today) ?? k.plan.items[0])
+      : k.plan.items.find((i) => i.key === key);
 
   if (!nudge) {
     return (

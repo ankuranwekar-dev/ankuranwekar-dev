@@ -262,7 +262,9 @@ export const useStore = create<Store>()(
       receiveSnapshot: (snapshot) => set({ snapshot }),
     }),
     {
-      name: 'kairos-v1',
+      // A build made for developer checks (EXPO_PUBLIC_DEV_READ=1) keeps its own data, so driving it with links can
+      // never touch the data of a real install on the same phone.
+      name: process.env.EXPO_PUBLIC_DEV_READ === '1' ? 'kairos-v1-dev' : 'kairos-v1',
       version: 3,
       // v2 added screenshot import and solo mode; every v1 field is unchanged. v3 removed the demo: a phone that was
       // showing the simulated couple starts clean rather than keeping Maya's cycle as if it were real.
