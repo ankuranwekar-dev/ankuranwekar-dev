@@ -45,7 +45,7 @@ npx expo run:ios               # generates ios/, builds, launches the iPhone sim
 
 Walk through it in the simulator:
 
-- Welcome → **I'm her partner** → **Pick a date** → Today.
+- Welcome → **I'm her partner** → **Pick a date** → **Continue** → *You're all set* (**Turn on morning ideas**, which asks for notifications there, or **Not now**) → Today → **I did it**, which ends on *That's today's, done*.
 - Welcome → **Her calendar** → **Take a photo** (on a device; point it at another phone's month view), or **Choose a photo or screenshot** (in the simulator, drag a screenshot of any tracker's month view in first so it is in Photos).
 - Tap the orb (Rhythm), her initial (profile), and the idea card (detail).
 - Notifications: finish setup, allow them, then check `Settings → Notifications → Tender`.

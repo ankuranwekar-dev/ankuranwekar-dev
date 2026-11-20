@@ -12,6 +12,7 @@ Tender should feel like weather, not a dashboard: something he glances at and un
 6. **Warm, adult, quiet.** Not the pinks-and-petals of femtech, not the locker room of men's apps. Closer to a good hotel than a fitness app.
 7. **Honest about uncertainty.** Fertile days glow with an intensity equal to their probability. What was read from a screenshot is shown for correction, never applied silently.
 8. **Private by default.** Nothing on a lock screen, calendar or widget names a period, a phase or fertility.
+9. **Every action closes.** A person who has just done something must be told what happened and what is left. Setup ends on a page (*You’re all set*) that says what Tender now knows, what will happen and what he has to do, and asks about notifications there rather than by surprise on the next screen. “I did it” ends on a card that says today is done, when the next idea comes, and that he can close the app.
 
 ### What the second version removed
 
@@ -79,7 +80,8 @@ One orchestrated motion per moment: the orb breathes; cards fade up; the Done ba
 | Rhythm (tap the orb) | Cycle ring, five-week season grid, what lands well now, the next three ideas, add seasons to calendar | Ring and grid | Built |
 | Profile (button, top right) | Her name, how her cycle is kept current, trying-for-a-baby switch, how often and when ideas arrive, what she loves, things she mentioned | Her name, what he sees, pause, what she loves, her cycle sources | Built |
 | Idea detail (tap the idea) | Why now, message starting points or a shortcut, Done | — | Built |
-| Setup | One choice of three (her screenshot, her code, a date), then a calendar to confirm | One choice of three (Health, a screenshot, a date), then what he sees with a live preview | Built |
+| Setup | One choice (her calendar by photo or screenshot, her code, a date), then a calendar to confirm, then *You’re all set* | One choice of three (Health, a screenshot, a date), then what he sees with a live preview | Built |
+| After “I did it” | “That’s today’s, done”, the next idea’s day and time, “You can close Tender now”, links to her rhythm and what she loves; a button to turn on morning ideas if they are off | | Built |
 | Notifications | Local, discreet, actionable (Done, Tomorrow) | — | Built |
 | Calendar | Codenamed seasons in a local calendar; `.ics` on the web | — | Built |
 | Home and lock-screen widget (iOS) | Codename, glyph, today's idea if opted in | Her season | Built (compiled, not yet run on a device) |

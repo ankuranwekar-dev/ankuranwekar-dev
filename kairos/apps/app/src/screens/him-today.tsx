@@ -1,11 +1,14 @@
-import { diffDays, weekdayName, type ISODate } from '@kairos/core';
+import { addDays, diffDays, weekdayName, type ISODate } from '@kairos/core';
 import { router } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Linking, Platform, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { haptic } from '@/platform/haptics';
+import { configureNotifications, notificationsGranted } from '@/platform/notifications';
 import { rangeLabel, useKairos, type Kairos } from '@/state/kairos';
 import { useStore } from '@/state/store';
+import { clockLabel } from '@/ui/clock';
 import { Button, IconButton, Press } from '@/ui/controls';
 import { DayStrip } from '@/ui/day-strip';
 import { Glass } from '@/ui/glass';
@@ -48,6 +51,21 @@ export function HimToday() {
   const name = k.snapshot?.playbook.name || s.playbook.name || s.pairing.partnerName || '';
   const pal = seasonColors(k.season);
 
+  // Whether morning ideas can reach him: checked whenever today's idea is done, because that is when it is said.
+  const [notifOff, setNotifOff] = useState(false);
+  const doneId = k.doneToday?.key;
+  useEffect(() => {
+    if (Platform.OS === 'web' || !doneId) return;
+    notificationsGranted()
+      .then((on) => setNotifOff(!on))
+      .catch(() => {});
+  }, [doneId]);
+  const enableNotifications = async () => {
+    const ok = await configureNotifications(true).catch(() => false);
+    if (ok) setNotifOff(false);
+    else Linking.openSettings().catch(() => {});
+  };
+
   const top = (
     <View style={styles.top}>
       <View style={{ flex: 1 }} />
@@ -88,6 +106,10 @@ export function HimToday() {
   const quiet = k.activeSignal?.response.quietUntil && Date.parse(k.activeSignal.response.quietUntil) > Date.now();
   const snoozed = s.history.find((h) => h.date === k.today && h.outcome === 'snoozed');
   const fact = nextUp(k);
+  const following = k.upcoming[0];
+  const next = following
+    ? `${following.date === addDays(k.today, 1) ? 'tomorrow' : weekdayName(following.date)} at ${clockLabel(following.notifyAt)}`
+    : undefined;
   const assumed = k.assumed[k.assumed.length - 1];
   const log = (outcome: 'done' | 'skipped' | 'snoozed') =>
     k.todayNudge &&
@@ -186,6 +208,9 @@ export function HimToday() {
             season={k.season}
             {...(k.doneToday ? { done: k.doneToday } : {})}
             snoozed={Boolean(snoozed)}
+            {...(next ? { next } : {})}
+            firstTime={s.history.length === 0}
+            {...(notifOff ? { onEnableNotifications: enableNotifications } : {})}
             onDone={() => log('done')}
             onSwap={() => log('skipped')}
             onSnooze={() => log('snoozed')}

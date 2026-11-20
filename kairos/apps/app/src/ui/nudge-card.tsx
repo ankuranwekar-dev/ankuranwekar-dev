@@ -53,6 +53,9 @@ export function NudgeCard({
   onSwap,
   onSnooze,
   onUndo,
+  next,
+  firstTime,
+  onEnableNotifications,
 }: {
   nudge?: PlannedNudge;
   season?: Season;
@@ -62,6 +65,12 @@ export function NudgeCard({
   onSwap: () => void;
   onSnooze: () => void;
   onUndo: () => void;
+  /** When the next idea arrives, as a phrase: "tomorrow at 8:30 am". */
+  next?: string;
+  /** Nothing has been done yet: say what the button is for. */
+  firstTime?: boolean;
+  /** Present when notifications are off: offers to turn them on. */
+  onEnableNotifications?: () => void;
 }) {
   const { colors, dark } = useTheme();
   const pal = seasonColors(season);
@@ -69,23 +78,69 @@ export function NudgeCard({
   if (done) {
     return (
       <Animated.View entering={FadeIn.duration(400)} layout={LinearTransition}>
-        <Glass radius={Radius.xl} tint={pal.glow} style={[styles.card, styles.doneRow]}>
-          <Animated.View
-            entering={ZoomIn.springify().damping(12)}
-            style={[styles.doneBadge, { backgroundColor: pal.glow }]}>
-            <Icon name="check" size={22} color="#1A1214" />
-          </Animated.View>
-          <View style={{ flex: 1, gap: 2 }}>
-            <T variant="headline">Done.</T>
-            <T variant="footnote" tone="secondary" numberOfLines={1}>
-              {done.title}
-            </T>
+        <Glass radius={Radius.xl} tint={pal.glow} style={styles.card}>
+          <View style={styles.doneRow}>
+            <Animated.View
+              entering={ZoomIn.springify().damping(12)}
+              style={[styles.doneBadge, { backgroundColor: pal.glow }]}>
+              <Icon name="check" size={22} color="#1A1214" />
+            </Animated.View>
+            <View style={{ flex: 1, gap: 2 }}>
+              <T variant="headline">That’s today’s, done.</T>
+              <T variant="footnote" tone="secondary" numberOfLines={1}>
+                {done.title}
+              </T>
+            </View>
+            <Press onPress={onUndo} accessibilityLabel="Undo">
+              <T variant="label" tone="tertiary">
+                Undo
+              </T>
+            </Press>
           </View>
-          <Press onPress={onUndo} accessibilityLabel="Undo">
-            <T variant="label" tone="tertiary">
-              Undo
-            </T>
-          </Press>
+          {/* The closure: nothing is left to do today, and he is told so. */}
+          <View style={styles.closing}>
+            {onEnableNotifications ? (
+              <>
+                <T variant="callout">Tomorrow brings another idea.</T>
+                <T variant="footnote" tone="tertiary">
+                  Turn on morning ideas and it finds you, so you don’t have to remember to open Tender.
+                </T>
+              </>
+            ) : (
+              <>
+                <T variant="callout">{next ? `Next idea ${next}.` : 'Tomorrow brings another.'}</T>
+                <T variant="footnote" tone="tertiary">
+                  You can close Tender now.
+                </T>
+              </>
+            )}
+          </View>
+          {onEnableNotifications ? (
+            <Button
+              label="Turn on morning ideas"
+              icon="bell"
+              compact
+              accent={pal.glow}
+              style={{ marginTop: Space.l }}
+              onPress={onEnableNotifications}
+            />
+          ) : null}
+          <View style={styles.links}>
+            <Button
+              label="Her rhythm"
+              compact
+              kind="secondary"
+              style={{ flex: 1 }}
+              onPress={() => router.push('/rhythm')}
+            />
+            <Button
+              label="What she loves"
+              compact
+              kind="secondary"
+              style={{ flex: 1 }}
+              onPress={() => router.push('/profile')}
+            />
+          </View>
         </Glass>
       </Animated.View>
     );
@@ -140,7 +195,7 @@ export function NudgeCard({
         </Press>
         <View style={styles.actions}>
           <Button
-            label="Done"
+            label="I did it"
             icon="check"
             accent={pal.glow}
             style={{ flex: 1 }}
@@ -152,6 +207,11 @@ export function NudgeCard({
           <IconButton icon="swap" label="Another idea" size={50} onPress={onSwap} />
           <IconButton icon="later" label="Not today" size={50} onPress={onSnooze} />
         </View>
+        {firstTime ? (
+          <T variant="footnote" tone="tertiary" style={{ marginTop: Space.m }}>
+            Do it today, then tap “I did it”. Tender picks tomorrow’s.
+          </T>
+        ) : null}
       </Glass>
     </Animated.View>
   );
@@ -162,5 +222,7 @@ const styles = StyleSheet.create({
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   actions: { flexDirection: 'row', alignItems: 'center', gap: Space.s, marginTop: Space.l },
   doneRow: { flexDirection: 'row', alignItems: 'center', gap: Space.m },
+  closing: { marginTop: Space.l, gap: 2 },
+  links: { flexDirection: 'row', gap: Space.s, marginTop: Space.l },
   doneBadge: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
 });

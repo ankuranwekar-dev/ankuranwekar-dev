@@ -24,7 +24,16 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export async function configureNotifications(): Promise<boolean> {
+/** Whether notifications are on for Tender right now. Never asks. */
+export async function notificationsGranted(): Promise<boolean> {
+  return (await Notifications.getPermissionsAsync()).granted;
+}
+
+/**
+ * Registers the notification categories. With `ask` (the default) it also puts the system permission question to him
+ * if it has not been answered; without it, it only reports whether permission is already there.
+ */
+export async function configureNotifications(ask = true): Promise<boolean> {
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('nudges', {
       name: 'Daily ideas',
@@ -48,6 +57,7 @@ export async function configureNotifications(): Promise<boolean> {
   ]);
   const current = await Notifications.getPermissionsAsync();
   if (current.granted) return true;
+  if (!ask) return false;
   const asked = await Notifications.requestPermissionsAsync({
     ios: { allowAlert: true, allowSound: false, allowBadge: false, provideAppNotificationSettings: true },
   });

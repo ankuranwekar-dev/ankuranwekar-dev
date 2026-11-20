@@ -57,7 +57,7 @@ export function useBackgroundWork(ready: boolean) {
       idle = requestIdleCallback(
         () => {
           if (cancelled) return;
-          configureNotifications()
+          configureNotifications(false)
             .then((ok) => (ok && !cancelled ? scheduleNudges(k.plan.items) : 0))
             .catch(() => {});
         },

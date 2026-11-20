@@ -63,6 +63,7 @@ function App() {
               <Stack.Screen name="index" />
               <Stack.Screen name="welcome" />
               <Stack.Screen name="setup" />
+              <Stack.Screen name="ready" options={{ gestureEnabled: false }} />
               <Stack.Screen name="today" />
               <Stack.Screen name="import" options={{ animation: 'slide_from_right' }} />
               <Stack.Screen name="scan" options={{ animation: 'slide_from_right' }} />
