@@ -1,0 +1,19 @@
+{
+  "name": "kairos",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Kairos \u2014 a cycle-aware companion that helps a partner be there before she asks.",
+  "scripts": {
+    "test": "pnpm --filter @kairos/core test",
+    "typecheck": "pnpm -r typecheck",
+    "bench": "pnpm --filter @kairos/core bench",
+    "app": "pnpm --filter @kairos/app start",
+    "web": "pnpm --filter @kairos/app web"
+  },
+  "packageManager": "pnpm@10.28.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
