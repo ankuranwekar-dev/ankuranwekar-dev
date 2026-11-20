@@ -66,8 +66,13 @@ export async function readPicked(picked: Picked, options: ReadOptions): Promise<
     const got = await attempt(run);
     if (!got) continue;
     if (!best || rank(got.reading) > rank(best.reading)) best = got;
-    // A confident first reading is final; otherwise let the other reader try.
-    if (best.reading.status === 'ok' && best.reading.confidence >= 0.8) break;
+    // The text route is fast and made for photographs: unless it found no calendar at all, its answer stands (the
+    // shape reader would only spend seconds on a photograph). A confident shape reading is final; otherwise the text
+    // route gets a turn too.
+    if (
+      run === text ? got.reading.status !== 'not-found' : best.reading.status === 'ok' && best.reading.confidence >= 0.8
+    )
+      break;
   }
   if (!best) throw new Error('Could not read that image');
   return best;

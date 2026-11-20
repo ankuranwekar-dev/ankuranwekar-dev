@@ -12,8 +12,9 @@ This is the runbook for the steps that need a Mac and an Apple Developer account
 | Privacy manifest, permission strings | Done |
 | Store listing (`apps/app/store.config.json`) | Drafted. Publisher name, copyright and review email are filled in; the App Review contact phone is still a placeholder (`+1 000 000 0000`), and App Store Connect requires a real one |
 | Privacy policy and support pages (`site/`) | Drafted; need your name, contact address and a public URL |
-| Native iOS build (Xcode / CocoaPods) | Done: Release for iOS devices builds on Xcode 27.2 (see "Xcode version"). Not yet signed or run on a device |
-| Simulator testing | Done on an iPhone 17 Pro Max simulator, light and dark, smallest and largest text sizes. **Not run on a physical iPhone** |
+| Native iOS build (Xcode / CocoaPods) | Done: Release for iOS devices builds on Xcode 27.2 (see "Xcode version"), signs with team UMD9S65GU8 and installs on an iPhone 17 running iOS 27.2 |
+| Simulator testing | Done on an iPhone 17 Pro Max simulator, light and dark, smallest and largest text sizes (before photo reading was added) |
+| **Photo of her calendar** | Built: Apple Vision text recognition plus a perspective fit (`docs/SCIENCE.md`). 61 of 66 simulated camera photos read exactly, 16 of 18 of them through the real app on an iPhone. **Never tried on a real photograph of a real app**; do that before launch (see "Review risks") |
 | Screenshots from a real simulator | Captured from the Release build: `docs/store-screenshots/` (6.9-inch, 1320 x 2868; light in the folder, dark in `dark/`) |
 | **Widget and notifications on a device** | **Not run.** The widget has never been seen on a Home or Lock Screen, and no notification has been seen to fire |
 | **Upload and submission** | **Not done.** Needs your Apple Developer account |
@@ -45,7 +46,7 @@ npx expo run:ios               # generates ios/, builds, launches the iPhone sim
 Walk through it in the simulator:
 
 - Welcome → **I'm her partner** → **Pick a date** → Today.
-- Welcome → **Her screenshot**: drag a screenshot of any tracker's month view onto the simulator first so it is in Photos.
+- Welcome → **Her calendar** → **Take a photo** (on a device; point it at another phone's month view), or **Choose a photo or screenshot** (in the simulator, drag a screenshot of any tracker's month view in first so it is in Photos).
 - **See a demo**, and use the bar at the top to move through a cycle and to switch phones.
 - Tap the orb (Rhythm), her initial (profile), and the idea card (detail).
 - Notifications: finish setup, allow them, then check `Settings → Notifications → Tender`.
@@ -111,7 +112,7 @@ After editing anything in `site/` (the pages name the app, so a rename needs thi
 ## Review risks worth knowing
 
 - **A woman's health data on a man's phone.** Nothing in Apple's guidelines forbids it, and the data never leaves the device, but a reviewer may ask. The answer: she provides the screenshot, the app says so, and nothing is transmitted.
-- **Screenshot reading is unproven on real apps.** It scores well on look-alike calendars rendered for the benchmark (see `docs/SCIENCE.md`), but it has not been run on real screenshots from Flo, Clue, Apple Health and the rest. Test with real ones before launch; the confirm screen lets the user correct a bad read, but a reviewer who sees a wrong first read will not be impressed.
+- **Reading is unproven on real apps.** Screenshots and photographs both score well on look-alike calendars rendered or simulated for the benchmark (see `docs/SCIENCE.md`), but neither has been run on real screenshots or real photographs of Flo, Clue, Apple Health and the rest. Test with real ones before launch (a photo of a real tracker, in daylight and indoors, straight on and at an angle); the confirm screen lets the user correct a bad read, but a reviewer who sees a wrong first read will not be impressed. To measure the photo route on a phone without a second phone: build with `EXPO_PUBLIC_DEV_READ=1`, copy JPEGs and a `manifest.json` into the app's `Documents/photos` with `xcrun devicectl device copy to`, open `tender://dev-read`, and copy `Documents/results.json` back (never set that variable for a store build).
 - **The widget and notifications have never run on a device.**
 
 ## The paired edition

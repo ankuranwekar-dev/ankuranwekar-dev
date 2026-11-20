@@ -43,62 +43,70 @@ export function MonthGrid({
     ...Array.from({ length }, (_, i) => addDays(first, i)),
   ];
   while (cells.length % 7) cells.push(null);
+  // Explicit weeks of seven equal cells. A wrapping row of cells each `100/7 %` wide is a hair over 100% once rounded,
+  // and on some phone widths the seventh column wrapped onto the next line and shifted every date.
+  const weeks: (ISODate | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
 
   return (
     <View style={{ gap: 6 }}>
       <T variant="headline" style={{ paddingLeft: 6 }}>
         {monthName(first)}
       </T>
-      <View style={styles.grid}>
-        {cells.map((date, i) => {
-          if (!date) return <View key={`b${i}`} style={styles.cell} />;
-          const on = marked.has(date);
-          const future = date > today;
-          const body = (
-            <View
-              style={[
-                styles.day,
-                on
-                  ? { backgroundColor: accent }
-                  : soft?.has(date)
-                    ? { borderWidth: 1.5, borderColor: alpha(accent, 0.55), borderStyle: 'dashed' }
-                    : date === today
-                      ? { backgroundColor: alpha(colors.text, 0.1) }
-                      : null,
-              ]}>
-              {/* The day circle is a fixed 38pt, so its number can't grow with the text size: capped at 1.4x
+      <View>
+        {weeks.map((week, w) => (
+          <View key={w} style={styles.week}>
+            {week.map((date, i) => {
+              if (!date) return <View key={`b${i}`} style={styles.cell} />;
+              const on = marked.has(date);
+              const future = date > today;
+              const body = (
+                <View
+                  style={[
+                    styles.day,
+                    on
+                      ? { backgroundColor: accent }
+                      : soft?.has(date)
+                        ? { borderWidth: 1.5, borderColor: alpha(accent, 0.55), borderStyle: 'dashed' }
+                        : date === today
+                          ? { backgroundColor: alpha(colors.text, 0.1) }
+                          : null,
+                  ]}>
+                  {/* The day circle is a fixed 38pt, so its number can't grow with the text size: capped at 1.4x
                   (about 21pt). Without the cap the digits are cut off at the largest setting and a date can't be
                   picked. VoiceOver still reads the full label on the button. */}
-              <T
-                variant="callout"
-                maxFontSizeMultiplier={1.4}
-                color={on ? '#FFFFFF' : future ? colors.textTertiary : colors.text}
-                style={{ fontWeight: on || date === today ? '700' : '400', fontVariant: ['tabular-nums'] }}>
-                {Number(date.slice(8))}
-              </T>
-            </View>
-          );
-          return (
-            <View key={date} style={styles.cell}>
-              {onPress && !future ? (
-                <Press
-                  onPress={() => onPress(date)}
-                  accessibilityLabel={`${monthName(date)} ${Number(date.slice(8))}${on ? ', period day' : ''}`}>
-                  {body}
-                </Press>
-              ) : (
-                body
-              )}
-            </View>
-          );
-        })}
+                  <T
+                    variant="callout"
+                    maxFontSizeMultiplier={1.4}
+                    color={on ? '#FFFFFF' : future ? colors.textTertiary : colors.text}
+                    style={{ fontWeight: on || date === today ? '700' : '400', fontVariant: ['tabular-nums'] }}>
+                    {Number(date.slice(8))}
+                  </T>
+                </View>
+              );
+              return (
+                <View key={date} style={styles.cell}>
+                  {onPress && !future ? (
+                    <Press
+                      onPress={() => onPress(date)}
+                      accessibilityLabel={`${monthName(date)} ${Number(date.slice(8))}${on ? ', period day' : ''}`}>
+                      {body}
+                    </Press>
+                  ) : (
+                    body
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        ))}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', flexWrap: 'wrap' },
-  cell: { width: `${100 / 7}%`, height: 44, alignItems: 'center', justifyContent: 'center' },
+  week: { flexDirection: 'row' },
+  cell: { flex: 1, height: 44, alignItems: 'center', justifyContent: 'center' },
   day: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
 });

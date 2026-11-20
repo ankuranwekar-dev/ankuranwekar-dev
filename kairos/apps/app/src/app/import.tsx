@@ -1,15 +1,8 @@
-import {
-  addDays,
-  diffDays,
-  localToday,
-  type CalendarReading,
-  type ISODate,
-  type PeriodLog,
-} from '@kairos/core';
+import { addDays, diffDays, localToday, type CalendarReading, type ISODate, type PeriodLog } from '@kairos/core';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Linking } from 'react-native';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
@@ -17,6 +10,7 @@ import { haptic } from '@/platform/haptics';
 import { configureNotifications } from '@/platform/notifications';
 import { sampleAvailable, sampleCalendar } from '@/platform/sample';
 import { readPicked, readPixels, type ReadSession } from '@/platform/calendar-reader';
+import { DEV_READ, devPhotoUri } from '@/platform/dev';
 import { photoReaderAvailable } from '@/platform/photo';
 import { CameraDenied, deviceHints, pick, type Picked } from '@/platform/screenshot';
 import { useStore } from '@/state/store';
@@ -45,7 +39,10 @@ const TROUBLE: Record<Trouble, { title: string; hint: string }> = {
     title: 'I couldn’t find a month.',
     hint: 'Fit one month’s dates in the frame, straight on and without glare. A screenshot works too.',
   },
-  other: { title: 'That didn’t look like a calendar.', hint: 'Use a photo or screenshot of the month view, numbers and all.' },
+  other: {
+    title: 'That didn’t look like a calendar.',
+    hint: 'Use a photo or screenshot of the month view, numbers and all.',
+  },
 };
 
 /** Consecutive marked days become one period. A run that reaches today is still going. */
@@ -73,13 +70,13 @@ function toPeriods(marked: ReadonlySet<ISODate>, today: ISODate): PeriodLog[] {
  * result is shown as a calendar that can be corrected with a tap.
  */
 export default function Import() {
-  const params = useLocalSearchParams<{ mode?: Mode; next?: Next }>();
+  const params = useLocalSearchParams<{ mode?: Mode; next?: Next; file?: string; today?: string }>();
   const mode: Mode = params.mode === 'date' ? 'date' : 'screenshot';
   const next: Next = params.next ?? 'back';
   const s = useStore();
   const { colors } = useTheme();
   const him = s.role !== 'her';
-  const today = localToday();
+  const today = (DEV_READ && params.today ? params.today : localToday()) as ISODate;
   const hints = useMemo(deviceHints, []);
 
   const [phase, setPhase] = useState<'intro' | 'reading' | 'review' | 'failed'>(mode === 'date' ? 'review' : 'intro');
@@ -90,7 +87,6 @@ export default function Import() {
   );
   const [weekStart, setWeekStart] = useState<number>(hints.weekStart ?? 0);
   const [last, setLast] = useState<{ session: ReadSession; reading: CalendarReading; picture?: string }>();
-  const [picture, setPicture] = useState<string>();
   const [trouble, setTrouble] = useState<Trouble>('other');
   const [name, setName] = useState(s.playbook.name);
   const [length, setLength] = useState(s.cycle.statedCycleLength ?? 28);
@@ -98,7 +94,7 @@ export default function Import() {
   const periods = toPeriods(marked, today);
   const known = s.cycle.periods.length + periods.length;
 
-  const show = (session: ReadSession, replace: boolean) => {
+  const show = (session: ReadSession, replace: boolean, uri?: string) => {
     const { reading } = session;
     if (reading.status === 'not-found') {
       // Say what went wrong, so the next picture can be better.
@@ -120,17 +116,19 @@ export default function Import() {
     );
     if (reading.weekStart !== undefined) setWeekStart(reading.weekStart);
     if (reading.cycleLength) setLength(reading.cycleLength);
-    setLast({ session, reading, ...(picture ? { picture } : {}) });
+    // A re-read of the same picture keeps it; a new one (another month) replaces it.
+    const shown = uri ?? (replace ? last?.picture : undefined);
+    setLast({ session, reading, ...(shown ? { picture: shown } : {}) });
     setPhase('review');
     if (period.length) haptic.success();
   };
 
-  const read = (run: () => Promise<ReadSession>, replace: boolean) => {
+  const read = (run: () => Promise<ReadSession>, replace: boolean, uri?: string) => {
     setPhase('reading');
     // Let the "reading" state paint before the reader takes the thread for a second or two.
     setTimeout(() => {
       run()
-        .then((session) => show(session, replace))
+        .then((session) => show(session, replace, uri))
         .catch(() => {
           setTrouble('other');
           setPhase('failed');
@@ -147,15 +145,22 @@ export default function Import() {
       setPhase('failed');
       return;
     }
-    if (picked) {
-      setPicture(picked.kind === 'screenshot' ? undefined : picked.uri);
-      read(() => readPicked(picked, { today, ...hints }), false);
-    }
+    if (picked)
+      read(() => readPicked(picked, { today, ...hints }), false, picked.kind === 'screenshot' ? undefined : picked.uri);
   };
 
   const reread = (firstMonth: ISODate) => {
     if (last) read(async () => last.session.reread(firstMonth), true);
   };
+
+  // Developer check only (see platform/dev.ts): open straight onto a photo that is already on the phone.
+  const devFile = DEV_READ ? params.file : undefined;
+  useEffect(() => {
+    if (!devFile) return;
+    const uri = devPhotoUri(devFile);
+    read(() => readPicked({ uri, width: 0, height: 0, kind: 'photo' }, { today, ...hints }), false, uri);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [devFile]);
 
   const toggle = (date: ISODate) => {
     haptic.tap();
@@ -196,7 +201,12 @@ export default function Import() {
             {photoReaderAvailable ? (
               <>
                 <Button label="Take a photo" icon="camera" onPress={() => choose('camera')} />
-                <Button label="Choose a photo or screenshot" icon="photo" kind="secondary" onPress={() => choose('library')} />
+                <Button
+                  label="Choose a photo or screenshot"
+                  icon="photo"
+                  kind="secondary"
+                  onPress={() => choose('library')}
+                />
               </>
             ) : (
               <Button label="Choose a screenshot" icon="photo" onPress={() => choose('library')} />
@@ -249,8 +259,8 @@ export default function Import() {
         </View>
         {photoReaderAvailable ? (
           <T variant="footnote" tone="tertiary" style={{ marginTop: Space.xl }}>
-            For a photo: hold the phone straight on, fill the frame with one month, keep glare off the screen, and wait for
-            it to focus.
+            For a photo: hold the phone straight on, fill the frame with one month, keep glare off the screen, and wait
+            for it to focus.
           </T>
         ) : null}
         {phase === 'failed' && trouble === 'camera' ? (
@@ -319,7 +329,13 @@ export default function Import() {
       footer={
         <>
           <Button label={mode === 'date' ? 'Continue' : 'Looks right'} disabled={found === 0} onPress={finish} />
-          {mode === 'screenshot' ? <Button label="Add another month" kind="ghost" onPress={() => choose(photographed ? 'camera' : 'library')} /> : null}
+          {mode === 'screenshot' ? (
+            <Button
+              label="Add another month"
+              kind="ghost"
+              onPress={() => choose(photographed ? 'camera' : 'library')}
+            />
+          ) : null}
         </>
       }>
       <View style={styles.back}>
@@ -353,7 +369,12 @@ export default function Import() {
 
       {last?.picture ? (
         <View style={styles.photo}>
-          <Image source={{ uri: last.picture }} style={styles.thumb} contentFit="cover" accessibilityLabel="Your photo" />
+          <Image
+            source={{ uri: last.picture }}
+            style={styles.thumb}
+            contentFit="cover"
+            accessibilityLabel="Your photo"
+          />
           <T variant="footnote" tone="tertiary" style={{ flex: 1 }}>
             Your photo, for comparing. Nothing here is saved or sent anywhere.
           </T>
