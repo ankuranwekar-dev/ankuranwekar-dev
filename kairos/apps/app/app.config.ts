@@ -18,7 +18,7 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
 export default ({ config }: ConfigContext): ExpoConfig => {
   const paired = Boolean(process.env.EXPO_PUBLIC_RELAY_URL);
   const domain = paired ? process.env.KAIROS_LINK_DOMAIN : undefined;
-  const bundleId = process.env.KAIROS_BUNDLE_ID ?? config.ios?.bundleIdentifier ?? 'com.9labs.tender';
+  const bundleId = process.env.KAIROS_BUNDLE_ID ?? config.ios?.bundleIdentifier ?? 'com.9labs.tenderapp';
 
   const plugins: NonNullable<ExpoConfig['plugins']> = [...(config.plugins ?? [])];
   if (paired) {
@@ -55,7 +55,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       ...config.android,
-      // Android package segments cannot start with a digit, so this is not the iOS id (com.9labs.tender).
+      // Android package segments cannot start with a digit, so this is not the iOS id (com.9labs.tenderapp).
       package: process.env.KAIROS_BUNDLE_ID ?? config.android?.package ?? 'com.ninelabs.tender',
       ...(paired
         ? {

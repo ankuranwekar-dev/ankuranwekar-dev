@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#0D0A0C",
     "ios": {
-      "bundleIdentifier": "com.9labs.tender",
+      "bundleIdentifier": "com.9labs.tenderapp",
       "buildNumber": "1",
       "supportsTablet": false,
       "infoPlist": {

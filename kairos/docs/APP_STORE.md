@@ -23,7 +23,7 @@ The first native build is where problems usually surface: a config plugin that d
 ## Decisions that are yours
 
 1. **App name.** `Tender`, for both the home-screen name and the store title. A search of the US and UAE App Stores on 20 November 2026 found no app with that exact name, but App Store Connect only settles it when you create the app record. If plain "Tender" is refused, use `Tender: Her Seasons` (change `title` in `store.config.json`). It is a common word, so a trademark search is worth doing before launch.
-2. **Bundle identifier.** `com.9labs.tender`, following your other apps' `com.9labs.*`. It is permanent once the app is created in App Store Connect, so change it (in `app.json` and the default in `app.config.ts`, or set `KAIROS_BUNDLE_ID` in the build environment) before then if you want something else.
+2. **Bundle identifier.** `com.9labs.tenderapp`, following your other apps' `com.9labs.*` (plain `com.9labs.tender` was already claimed by a test registration on your other team, and App IDs are unique across Apple). It is permanent once the app is created in App Store Connect, so change it (in `app.json` and the default in `app.config.ts`, or set `KAIROS_BUNDLE_ID` in the build environment) before then if you want something else.
 3. **Edition.** The default build is the **solo** edition: his phone only, set up from a screenshot or a date, no server. This is the one to ship first: it has nothing to operate and the smallest review surface. The **paired** edition (her app, pairing, signals, Apple Health) switches on when `EXPO_PUBLIC_RELAY_URL` is set, and needs the relay deployed (see the end of this page).
 4. **Price.** The listing assumes free. Subscriptions are not implemented.
 5. **Publisher details.** Done: name, contact email and date are in `site/privacy.html`, `site/support.html` and `apps/app/store.config.json`. Still to do: the review contact phone number in `store.config.json`. Update the "Last updated" date in `site/privacy.html` whenever the policy changes.
@@ -65,7 +65,7 @@ Expo SDK 58 needs a recent Xcode. The project builds on **Xcode 27.2** (Release,
 
 Finishing setup crashed the app on Xcode 26.0 (simulator) until notification setup was moved after the screen transition (a fault in Expo's notification module, not in Tender). It did not crash in six cold runs afterwards, but it was timing-dependent, so check it again on a real iPhone with the Xcode 27.2 build.
 
-Android package names cannot start a segment with a digit, so Android uses `com.ninelabs.tender` while iOS uses `com.9labs.tender`.
+Android package names cannot start a segment with a digit, so Android uses `com.ninelabs.tender` while iOS uses `com.9labs.tenderapp`.
 
 Then archive and upload: open `ios/Tender.xcworkspace` in Xcode, choose your team under *Signing & Capabilities*, select *Any iOS Device*, then *Product → Archive → Distribute App → App Store Connect*.
 
