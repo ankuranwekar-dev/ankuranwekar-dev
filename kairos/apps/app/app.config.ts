@@ -3,8 +3,9 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
 /**
  * Two editions from one codebase, chosen at build time.
  *
- *  - Solo (default): his phone only. He sets up from a screenshot of her
- *    tracker or a date. No server, no camera, no health entitlements.
+ *  - Solo (default): his phone only. He sets up from a photo or screenshot of
+ *    her tracker, or a date. No server, no health entitlements. The camera is
+ *    used only to photograph her calendar and the photo is read on the phone.
  *  - Paired (EXPO_PUBLIC_RELAY_URL set): adds her side: pairing by QR code,
  *    her signals, and import from Apple Health / Health Connect.
  *
@@ -22,11 +23,17 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   const plugins: NonNullable<ExpoConfig['plugins']> = [...(config.plugins ?? [])];
   if (paired) {
+    // Both plugins write the same Info.plist key, so say both things in one sentence.
+    const camera =
+      'Tender uses the camera to photograph her cycle calendar and to scan a pairing code. Photos are read on this phone and never uploaded.';
+    for (const [i, p] of plugins.entries()) {
+      if (Array.isArray(p) && p[0] === 'expo-image-picker') plugins[i] = [p[0], { ...(p[1] as object), cameraPermission: camera }];
+    }
     plugins.push(
       [
         'expo-camera',
         {
-          cameraPermission: 'Tender uses the camera only to scan your partner’s pairing code.',
+          cameraPermission: camera,
           recordAudioAndroid: false,
         },
       ],

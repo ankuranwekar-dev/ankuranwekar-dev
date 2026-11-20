@@ -18,3 +18,4 @@ export * from './calendar/ics';
 export * from './sim/simulate';
 export * from './import/png';
 export * from './import/calendar-image';
+export * from './import/photo';

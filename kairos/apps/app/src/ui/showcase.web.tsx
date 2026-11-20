@@ -92,7 +92,7 @@ const PILLARS: { icon: IconName; title: string; body: string }[] = [
   {
     icon: 'photo',
     title: 'Works with any period app',
-    body: 'A screenshot of her calendar is enough. It is read on the phone and goes nowhere.',
+    body: 'A photo or screenshot of her calendar is enough. It is read on the phone and goes nowhere.',
   },
   {
     icon: 'today',

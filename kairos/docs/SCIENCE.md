@@ -111,7 +111,27 @@ The result is checked for plausibility (a period is two to ten days; starts are 
 | Flagged "check this" overall | 26%, mostly screens that show no period at all |
 | Time per screenshot | about 0.3 s in Node; expect a second or two on a phone |
 
-**What this does not show.** These are calendars drawn for the benchmark, not screenshots of Flo, Clue, Apple Health, Natural Cycles or anything else. Real apps will have layouts, fonts and decorations the benchmark did not anticipate, and the reader has not been run on a single real screenshot. Known gaps: a cycle wheel or week strip (there is no month grid to find); apps that colour every day, such as green and red days for contraception (detected and refused, since red there means "fertile", not "period"); a February of exactly four rows, which looks the same as the first four rows of March (flagged, with the other month offered); and photographs of a screen, which add perspective and moiré the reader was not built for. Testing against real screenshots from the main trackers is the first job before release.
+**What this does not show.** These are calendars drawn for the benchmark, not screenshots of Flo, Clue, Apple Health, Natural Cycles or anything else. Real apps will have layouts, fonts and decorations the benchmark did not anticipate, and the reader has not been run on a single real screenshot. Known gaps: a cycle wheel or week strip (there is no month grid to find); apps that colour every day, such as green and red days for contraception (detected and refused, since red there means "fertile", not "period"); a February of exactly four rows, which looks the same as the first four rows of March (flagged, with the other month offered); and photographs of a screen, which the shape reader cannot read but the text-recognition path below is built for. Testing against real screenshots and real photographs from the main trackers is the first job before release.
+
+### Photographs of a screen
+
+A photograph of a phone is not a screenshot: it is the screenshot seen through a projective transform (tilt, rotation, distance), with glare, moiré from the pixel grid, blur, noise and a colour cast, and usually with a bezel and a table around it. Run on a photo shrunk to its working width, the shape reader above failed on most of them (see the first row below). So photographs, and any picture the picker cannot show to be a flat screenshot, take a different route on iOS:
+
+1. **Apple Vision** (on device, no network) reads every word in the picture with its box (`modules/tender-vision`, Swift).
+2. A numeral's value says which cell of a seven-column month it occupies once the weekday of the 1st is known, so each recognised day number is a known point on a plane. A RANSAC fit over those points (seven hypotheses for the column of the 1st, four numerals per sample, then a joint least-squares fit with one vertical shift per month block) finds the homography that undoes the perspective (`photo-grid.ts`). Greyed days of neighbouring months are recognised as satellites of a block and dropped; the weekday header and month titles are read from the same words.
+3. The photo is warped flat natively and the result is read with the same month inference and period rules as a screenshot (`readFlatCalendar`), but with cell positions from the text recogniser instead of glyph shapes. Numerals the recogniser misses (white on a dark disc is the usual one) are still measured, because their cell is known.
+4. As for screenshots, the result is shown as a calendar to confirm and correct with a tap.
+
+**Measured on simulated photographs.** `tools/photo-sim/sim.py` renders each of the repo's calendar fixtures as a 9-megapixel camera photo at three difficulty levels (easy: near head-on with mild blur; typical: up to 14° tilt, 8° rotation, glare, moiré, blur and noise; hard: up to 26° tilt, heavy glare and defocus, strong colour cast, partly cropped), two photos per level per fixture, 66 in all. "Exact" means every logged period day is right and none is missed.
+
+| Reader | Easy (22) | Typical (22) | Hard (22) | All (66) |
+| --- | --- | --- | --- | --- |
+| Shape reader on the photo shrunk to 720 px (what the app did before) | 7 | 9 | 0 | 16 (24%) |
+| Vision, grid fit, flatten, text-driven reader | 22 | 22 | 17 | 61 (92%) |
+
+On the same 11 clean screenshots the text route also reads every one exactly, so the two readers agree where both apply. Every date in all 66 photographs is assigned to the right day; the misses are marks, almost all a red mark read as a cool colour under a strong cast, at the hard level. Three of the 22 hard photographs came back as "ok" while wrong; the confirm screen is the safety net, and it is always shown.
+
+**What this does not show.** These are simulations of the repo's own calendar styles, not photographs of Flo, Clue or Apple Health on a real phone: real moiré, real reflections, fingers over the screen and real apps' layouts will differ, and the simulator was written by the same people as the reader. Treat 92% as an upper bound until real photographs have been tried. Apple Vision's text recognition is only used with English digits and month names here; calendars in Arabic-Indic numerals or other scripts are not read by the photo route (the month grid still can be, by shape, if it is a screenshot).
 
 ### What a screenshot is worth
 

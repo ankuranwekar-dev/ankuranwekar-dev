@@ -836,6 +836,7 @@ function fitMonths(
   dimBelow: number,
   wsCost: (ws: WeekStart) => number,
   only?: number,
+  hint?: (m: number, i: number) => number,
 ): MonthFit[] {
   const cur = monthIndex(today);
   const out: MonthFit[] = [];
@@ -845,6 +846,7 @@ function fitMonths(
         fitSegment(s, first + i, ws, dimBelow, { above: i > 0, below: i < segs.length - 1 }),
       );
       let cost = fits.reduce((s, f) => s + f.cost, 0) + wsCost(ws);
+      if (hint) for (let i = 0; i < segs.length; i++) cost += hint(first + i, i);
       const last = first + segs.length - 1;
       // Screenshots are nearly always of this month or a recent one.
       if (last < cur) cost += 0.5 * (cur - last);
@@ -1126,23 +1128,68 @@ export function readCalendarImage(pixels: Pixels, options: ReadOptions): Calenda
     k = ideal;
   }
   if (!lat) return NOT_FOUND('no-grid');
+  const grid = lat;
 
-  const segs = segments(lat);
+  const segs = segments(grid);
+  const dateBlobs = new Set(segs.flatMap((s) => s.cells).flatMap((c) => c.token.blobs.map((b) => b.id)));
+  return interpret(
+    {
+      img,
+      lat: grid,
+      segs,
+      // Is the band where a block's next (or previous) row would sit empty page?
+      blank: (y: number): boolean => {
+        const y0 = Math.round(y - grid.h0);
+        const y1 = Math.round(y + grid.h0);
+        if (y0 < 0 || y1 >= img.h) return false;
+        const x0 = Math.max(0, Math.round(grid.x0 - grid.pitch / 2));
+        const x1 = Math.min(img.w - 1, Math.round(grid.x0 + 6.5 * grid.pitch));
+        let n = 0;
+        for (let yy = y0; yy <= y1; yy++) for (let xx = x0; xx <= x1; xx++) if (ink.map[yy * img.w + xx]) n++;
+        return n < 12;
+      },
+      weekStartOf: (rowY) =>
+        headerWeekStart(
+          labelled.blobs,
+          ink,
+          img.w,
+          grid,
+          dateBlobs,
+          options.weekdayInitials?.length === 7 ? options.weekdayInitials : ENGLISH_INITIALS,
+          rowY,
+        ),
+      measure: (cell, bg) => measure(img, labelled.labels, grid, cell, bg),
+      trimHeaderRow: true,
+    },
+    options,
+  );
+}
+
+/** Everything the interpretation needs, whether the grid came from glyph shapes or from a text recogniser. */
+interface Scene {
+  img: Image;
+  lat: Lattice;
+  segs: Segment[];
+  /** True when the page is plainly empty around `y`, false when it is not or is cut off by the image edge. */
+  blank: (y: number) => boolean;
+  /** Week start read off the weekday header above the first row, when it can be read. */
+  weekStartOf: (firstRowY: number) => WeekStart | undefined;
+  measure: (cell: Cell, bg: [number, number, number]) => Mark;
+  /** The weekday header can pass for a row of single-digit dates when numerals are found by shape. */
+  trimHeaderRow: boolean;
+  /** Extra cost for reading block `i` as month `m` (months since year 0), e.g. from a month title. */
+  monthHint?: (m: number, i: number) => number;
+  /** A cell for `slot` of `seg` where the recogniser found no numeral, if that place is inside the image. */
+  synthesize?: (seg: Segment, slot: number) => Cell | undefined;
+}
+
+function interpret(scene: Scene, options: ReadOptions): CalendarReading {
+  const { today } = options;
+  const { img, lat, segs } = scene;
   const cells = segs.flatMap((s) => s.cells);
-  // Is the band where a block's next (or previous) row would sit empty page?
-  const blank = (y: number): boolean => {
-    const y0 = Math.round(y - lat!.h0);
-    const y1 = Math.round(y + lat!.h0);
-    if (y0 < 0 || y1 >= img.h) return false;
-    const x0 = Math.max(0, Math.round(lat!.x0 - lat!.pitch / 2));
-    const x1 = Math.min(img.w - 1, Math.round(lat!.x0 + 6.5 * lat!.pitch));
-    let n = 0;
-    for (let yy = y0; yy <= y1; yy++) for (let xx = x0; xx <= x1; xx++) if (ink.map[yy * img.w + xx]) n++;
-    return n < 12;
-  };
   for (const seg of segs) {
-    seg.blankAbove = blank(seg.cells[0]!.row.y - lat.rowPitch);
-    seg.blankBelow = blank(seg.cells[seg.cells.length - 1]!.row.y + lat.rowPitch);
+    seg.blankAbove = scene.blank(seg.cells[0]!.row.y - lat.rowPitch);
+    seg.blankBelow = scene.blank(seg.cells[seg.cells.length - 1]!.row.y + lat.rowPitch);
   }
   options.trace?.({
     numeralHeight: lat.h0,
@@ -1157,16 +1204,7 @@ export function readCalendarImage(pixels: Pixels, options: ReadOptions): Calenda
   const contrasts = cells.map((c) => c.token.contrast).sort((a, b) => a - b);
   const dimBelow = 0.62 * contrasts[Math.floor(contrasts.length * 0.6)]!;
 
-  const dateBlobs = new Set(cells.flatMap((c) => c.token.blobs.map((b) => b.id)));
-  const fromHeader = headerWeekStart(
-    labelled.blobs,
-    ink,
-    img.w,
-    lat,
-    dateBlobs,
-    options.weekdayInitials?.length === 7 ? options.weekdayInitials : ENGLISH_INITIALS,
-    cells[0]!.row.y,
-  );
+  const fromHeader = scene.weekStartOf(cells[0]!.row.y);
   const hint = options.weekStart;
   const wsCost = (ws: WeekStart) => {
     if (fromHeader !== undefined) return ws === fromHeader ? 0 : 4;
@@ -1175,11 +1213,11 @@ export function readCalendarImage(pixels: Pixels, options: ReadOptions): Calenda
   };
 
   const forced = options.firstMonth ? monthIndex(options.firstMonth) : undefined;
-  let ranked = fitMonths(segs, today, dimBelow, wsCost, forced);
+  let ranked = fitMonths(segs, today, dimBelow, wsCost, forced, scene.monthHint);
   // The weekday header can sit exactly one row above the dates and pass for a row of them. If
   // the grid reads clearly better without its top row, that row was the header.
   const top = segs[0]!;
-  if (top.rows > 2) {
+  if (scene.trimHeaderRow && top.rows > 2) {
     const firstRow = top.cells[0]!.row;
     const trimmed: Segment = {
       ...top,
@@ -1188,7 +1226,7 @@ export function readCalendarImage(pixels: Pixels, options: ReadOptions): Calenda
       blankAbove: false,
     };
     const without = [trimmed, ...segs.slice(1)];
-    const alt = fitMonths(without, today, dimBelow, wsCost, forced);
+    const alt = fitMonths(without, today, dimBelow, wsCost, forced, scene.monthHint);
     if (alt[0] && ranked[0] && alt[0].cost + 3 < ranked[0].cost) {
       segs.splice(0, 1, trimmed);
       ranked = alt;
@@ -1210,6 +1248,22 @@ export function readCalendarImage(pixels: Pixels, options: ReadOptions): Calenda
       if (day >= 0 && day < length) dated.push({ date: addDays(first, day), cell });
     }
   });
+  if (scene.synthesize) {
+    // A numeral the recogniser missed (white on a dark disc is the usual one) is still a day with a place on the grid.
+    segs.forEach((seg, i) => {
+      const first = monthStart(best.first + i);
+      const length = monthLength(best.first + i);
+      const s1 = best.fits[i]!.s1;
+      const have = new Set(seg.cells.map((c) => c.slot));
+      const lastSlot = Math.max(seg.rows * 7 - 1, s1 + length - 1);
+      for (let slot = Math.max(0, s1); slot <= Math.min(lastSlot, seg.rows * 7 + 13); slot++) {
+        const day = slot - s1;
+        if (day < 0 || day >= length || have.has(slot)) continue;
+        const cell = scene.synthesize!(seg, slot);
+        if (cell) dated.push({ date: addDays(first, day), cell });
+      }
+    });
+  }
   dated.sort((a, b) => (a.date < b.date ? -1 : 1));
   const dateOf = (m: MonthFit) => {
     const key: string[] = [];
@@ -1245,7 +1299,7 @@ export function readCalendarImage(pixels: Pixels, options: ReadOptions): Calenda
 
   // Marks.
   const bg = pageColour(img, lat);
-  const marks = dated.map((d) => ({ ...d, mark: measure(img, labelled.labels, lat!, d.cell, bg) }));
+  const marks = dated.map((d) => ({ ...d, mark: scene.measure(d.cell, bg) }));
   const seen = new Set(marks.map((m) => m.date));
   // Days that should be on a visible row but whose numeral was not found.
   const holes = new Set<ISODate>();
@@ -1412,3 +1466,282 @@ export function readCalendarImage(pixels: Pixels, options: ReadOptions): Calenda
   }
   return reading;
 }
+
+// ---------------------------------------------------------------------------
+// From a text recogniser instead of glyph shapes (photographs of a screen)
+// ---------------------------------------------------------------------------
+
+/** A day number the text recogniser found, in the flattened image's pixels. */
+export interface FlatNumeral {
+  value: number;
+  /** Centre of the lattice cell it belongs to. */
+  x: number;
+  y: number;
+  /** Size of the numeral's own box. */
+  w: number;
+  h: number;
+  col: number;
+  /** Row within the lattice (integer), counted from the month's first week. */
+  row: number;
+}
+
+export interface FlatBlock {
+  /** Column of day 1. */
+  first: number;
+  numerals: FlatNumeral[];
+  /** The month's title as read, when one sits just above the block. */
+  heading?: { month: number; year?: number };
+}
+
+export interface FlatWord {
+  text: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** What the text recogniser and the grid fit say about a flattened calendar image. */
+export interface FlatScene {
+  /** Pixels between columns, x of column 0's centre, and pixels between rows. */
+  pitch: number;
+  x0: number;
+  rowPitch: number;
+  /** Month blocks, top to bottom. */
+  blocks: FlatBlock[];
+  /** Every recognised word, for the weekday header and for deciding where the page is empty. */
+  words: FlatWord[];
+}
+
+const WEEKDAY_NAMES = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+/**
+ * A photograph of a screen is dimmer, tinted and hazier than the screenshot it shows. Stretch each channel so
+ * the page's own range fills 0–255 again, which brings pale marks back above the reader's thresholds.
+ */
+function autoLevels(img: Image): void {
+  const n = img.w * img.h;
+  for (let c = 0; c < 3; c++) {
+    const hist = new Uint32Array(256);
+    for (let i = 0; i < n; i += 3) hist[img.rgb[i * 3 + c]!]!++;
+    const total = Math.ceil(n / 3);
+    let acc = 0, lo = 0, hi = 255;
+    for (let v = 0; v < 256; v++) { acc += hist[v]!; if (acc >= 0.004 * total) { lo = v; break; } }
+    acc = 0;
+    for (let v = 255; v >= 0; v--) { acc += hist[v]!; if (acc >= 0.004 * total) { hi = v; break; } }
+    if (hi - lo < 60) continue;
+    const k = 255 / (hi - lo);
+    for (let i = 0; i < n; i++) {
+      const o = i * 3 + c;
+      img.rgb[o] = Math.max(0, Math.min(255, (img.rgb[o]! - lo) * k));
+    }
+  }
+}
+
+function readFlat(px: Pixels, scene: FlatScene, options: ReadOptions): CalendarReading {
+  if (px.width < 200 || px.height < 200) return NOT_FOUND('no-grid');
+  const img = prepare(px);
+  autoLevels(img);
+  const { pitch, x0, rowPitch } = scene;
+  if (scene.blocks.length === 0) return NOT_FOUND('no-grid');
+
+  const typical = (f: (n: FlatNumeral) => number) => {
+    const xs = scene.blocks.flatMap((b) => b.numerals.map(f)).sort((a, b) => a - b);
+    return xs[xs.length >> 1] ?? 0;
+  };
+  const tw = typical((n) => n.w);
+  const th = typical((n) => n.h);
+
+  // Cells for every day between the first and last one read in a block: a numeral the recogniser
+  // missed is still a day, and its colours can be measured wherever the lattice puts it.
+  const rows: Row[] = [];
+  const segs: Segment[] = [];
+  for (const block of scene.blocks) {
+    const byValue = new Map<number, FlatNumeral>();
+    for (const n of block.numerals) if (!byValue.has(n.value)) byValue.set(n.value, n);
+    const values = [...byValue.keys()].sort((a, b) => a - b);
+    if (values.length === 0) continue;
+    const lo = values[0]!;
+    const hi = values[values.length - 1]!;
+    const rowNo = (v: number) => Math.floor((v - 1 + block.first) / 7);
+    const r0 = rowNo(lo);
+    const rowAt = new Map<number, Row>();
+    const cellsOut: Cell[] = [];
+    for (let v = lo; v <= hi; v++) {
+      const r = rowNo(v);
+      const col = (v - 1 + block.first) % 7;
+      const seen = byValue.get(v);
+      // Row centre: any numeral of that row is on it.
+      let y = seen?.y;
+      if (y === undefined) {
+        const mate = [...byValue.values()].find((n) => n.row === r);
+        if (!mate) continue; // a whole row the recogniser missed; leave it to the month fit to notice
+        y = mate.y;
+      }
+      let row = rowAt.get(r);
+      if (!row) {
+        row = { y, cells: new Array(7).fill(undefined), count: 0 };
+        rowAt.set(r, row);
+        rows.push(row);
+      }
+      const w = seen?.w ?? tw;
+      const h = seen?.h ?? th;
+      const cx = x0 + col * pitch;
+      const token: Token = {
+        blobs: [],
+        digits: v >= 10 ? 2 : 1,
+        x0: Math.round(cx - w / 2),
+        x1: Math.round(cx + w / 2),
+        y0: Math.round(y - h / 2),
+        y1: Math.round(y + h / 2),
+        cx,
+        cy: y,
+        contrast: 1,
+      };
+      row.cells[col] = token;
+      row.count++;
+      cellsOut.push({ slot: (r - r0) * 7 + col, token, row, col });
+    }
+    if (cellsOut.length === 0) continue;
+    const rMax = rowNo(hi);
+    segs.push({ cells: cellsOut, rows: rMax - r0 + 1 });
+  }
+  if (segs.length === 0) return NOT_FOUND('no-grid');
+  rows.sort((a, b) => a.y - b.y);
+  const lat: Lattice = { pitch, x0, rowPitch, rows, h0: Math.max(7, Math.round(th)), score: rows.reduce((s, r) => s + r.count, 0) };
+
+  const words = scene.words;
+  const band0 = x0 - pitch / 2;
+  const band1 = x0 + 6.5 * pitch;
+  const blank = (y: number): boolean => {
+    if (y - lat.h0 < 0 || y + lat.h0 >= img.h) return false;
+    return !words.some((w) => w.x >= band0 && w.x <= band1 && Math.abs(w.y - y) <= lat.h0);
+  };
+
+  const initials = options.weekdayInitials?.length === 7 ? options.weekdayInitials : ENGLISH_INITIALS;
+  const weekStartOf = (firstRowY: number): WeekStart | undefined => {
+    const head = new Map<number, string[]>();
+    for (const w of words) {
+      if (w.y >= firstRowY - 0.6 * rowPitch || w.y < firstRowY - 3.4 * rowPitch) continue;
+      const col = Math.round((w.x - x0) / pitch);
+      if (col < 0 || col > 6 || Math.abs(w.x - (x0 + col * pitch)) > 0.4 * pitch) continue;
+      head.set(col, [...(head.get(col) ?? []), w.text.replace(/[.,]/g, '').toLowerCase()]);
+    }
+    if (head.size < 4) return undefined;
+    const score = (ws: WeekStart) => {
+      let hit = 0;
+      for (const [col, texts] of head) {
+        const d = (ws + col) % 7;
+        if (texts.some((t) => t === initials[d]!.toLowerCase() || (t.length >= 2 && t.startsWith(WEEKDAY_NAMES[d]!.slice(0, 2))))) hit++;
+      }
+      return hit;
+    };
+    const ranked = ([0, 1, 6] as WeekStart[]).map((ws) => ({ ws, s: score(ws) })).sort((a, b) => b.s - a.s);
+    return ranked[0]!.s >= 4 && ranked[0]!.s >= ranked[1]!.s + 2 ? ranked[0]!.ws : undefined;
+  };
+
+  // A recognised month title is the strongest evidence of which month a block is.
+  const titles = scene.blocks.map((b) => b.heading);
+  const monthHint = titles.some(Boolean)
+    ? (m: number, i: number) => {
+        const t = titles[i];
+        if (!t) return 0;
+        if (((m % 12) + 12) % 12 + 1 !== t.month) return 5;
+        if (t.year !== undefined && Math.floor(m / 12) !== t.year) return 5;
+        return 0;
+      }
+    : undefined;
+
+  // Colours are judged against the pixels around each cell's numeral rather than one page colour, because a
+  // photograph's lighting is not even.
+  const measureCell = (cell: Cell, bg: [number, number, number]): Mark => {
+    const { token } = cell;
+    const cx = x0 + cell.col * pitch;
+    const hw = 0.46 * pitch;
+    const hh = 0.46 * rowPitch;
+    const xa = Math.max(0, Math.round(cx - hw));
+    const xb = Math.min(img.w - 1, Math.round(cx + hw));
+    const ya = Math.max(0, Math.round(token.cy - hh));
+    const yb = Math.min(img.h - 1, Math.round(token.cy + hh));
+    const counts: Record<Hue, number> = { red: 0, warm: 0, green: 0, cool: 0, purple: 0 };
+    const dist: Record<Hue, number> = { red: 0, warm: 0, green: 0, cool: 0, purple: 0 };
+    let area = 0;
+    for (let y = ya; y <= yb; y++) {
+      for (let x = xa; x <= xb; x++) {
+        if (x >= token.x0 - 2 && x <= token.x1 + 2 && y >= token.y0 - 2 && y <= token.y1 + 2) continue;
+        area++;
+        const o = (y * img.w + x) * 3;
+        const r = img.rgb[o]!;
+        const g = img.rgb[o + 1]!;
+        const b = img.rgb[o + 2]!;
+        const d = Math.max(Math.abs(r - bg[0]), Math.abs(g - bg[1]), Math.abs(b - bg[2]));
+        if (d <= 30) continue;
+        if (Math.max(r, g, b) - Math.min(r, g, b) < 28) continue;
+        const hue = hueClass(r, g, b);
+        counts[hue]++;
+        dist[hue] += d;
+      }
+    }
+    let hue: Hue | undefined;
+    for (const h of HUES) if (counts[h] > (hue ? counts[hue] : 0)) hue = h;
+    const cover = hue && area ? counts[hue] / area : 0;
+    const mark: Mark = { cover, strength: hue ? dist[hue] / counts[hue] : 0 };
+    if (hue && cover >= 0.006) mark.hue = hue;
+    // The numeral's own colour: the pixels in its box that differ most from what the box is mostly made of.
+    const bx0 = Math.max(0, token.x0), bx1 = Math.min(img.w - 1, token.x1);
+    const by0 = Math.max(0, token.y0), by1 = Math.min(img.h - 1, token.y1);
+    const hist = new Map<number, number>();
+    for (let y = by0; y <= by1; y++) {
+      for (let x = bx0; x <= bx1; x++) {
+        const o = (y * img.w + x) * 3;
+        const key = ((img.rgb[o]! >> 4) << 8) | ((img.rgb[o + 1]! >> 4) << 4) | (img.rgb[o + 2]! >> 4);
+        hist.set(key, (hist.get(key) ?? 0) + 1);
+      }
+    }
+    let modal = 0, best = 0;
+    for (const [k, n] of hist) if (n > best) { best = n; modal = k; }
+    const mr = ((modal >> 8) << 4) + 8, mg = (((modal >> 4) & 15) << 4) + 8, mb = ((modal & 15) << 4) + 8;
+    // Blur and haze thin a stroke's colour, so average the farthest-from-the-box pixels, not those past a fixed gap.
+    const far: { d: number; r: number; g: number; b: number }[] = [];
+    let dmax = 0;
+    for (let y = by0; y <= by1; y++) {
+      for (let x = bx0; x <= bx1; x++) {
+        const o = (y * img.w + x) * 3;
+        const r = img.rgb[o]!, g = img.rgb[o + 1]!, b = img.rgb[o + 2]!;
+        const d = Math.max(Math.abs(r - mr), Math.abs(g - mg), Math.abs(b - mb));
+        far.push({ d, r, g, b });
+        if (d > dmax) dmax = d;
+      }
+    }
+    if (dmax >= 45) {
+      let sr = 0, sg = 0, sb = 0, sn = 0;
+      for (const f of far) if (f.d >= 0.65 * dmax) { sr += f.r; sg += f.g; sb += f.b; sn++; }
+      if (sn >= 5) {
+        const r = sr / sn, g = sg / sn, b = sb / sn;
+        if (Math.max(r, g, b) - Math.min(r, g, b) >= 48) mark.glyphHue = hueClass(r, g, b);
+      }
+    }
+    return mark;
+  };
+
+  const synthesize = (seg: Segment, slot: number): Cell | undefined => {
+    const first = seg.cells[0]!;
+    const col = slot % 7;
+    const y = first.row.y + (Math.floor(slot / 7) - Math.floor(first.slot / 7)) * rowPitch;
+    if (y - 0.4 * rowPitch < 0 || y + 0.4 * rowPitch >= img.h) return undefined;
+    const cx = x0 + col * pitch;
+    const row: Row = { y, cells: new Array(7).fill(undefined), count: 0 };
+    const token: Token = {
+      blobs: [], digits: 1, contrast: 1, cx, cy: y,
+      x0: Math.round(cx - tw / 2), x1: Math.round(cx + tw / 2), y0: Math.round(y - th / 2), y1: Math.round(y + th / 2),
+    };
+    return { slot, token, row, col };
+  };
+
+  return interpret(
+    { img, lat, segs, blank, weekStartOf, measure: measureCell, trimHeaderRow: false, synthesize, ...(monthHint ? { monthHint } : {}) },
+    options,
+  );
+}
+
+export { readFlat as readFlatCalendar };

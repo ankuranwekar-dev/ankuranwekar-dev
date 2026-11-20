@@ -110,8 +110,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Tender reads the screenshot you choose on this phone to find period days. It is never uploaded.",
-          "cameraPermission": false,
+          "photosPermission": "Tender reads the photo or screenshot you choose on this phone to find period days. It is never uploaded.",
+          "cameraPermission": "Tender uses the camera to photograph her cycle calendar so it can find the period days. The photo is read on this phone and never uploaded.",
           "microphonePermission": false
         }
       ],

@@ -169,8 +169,8 @@ function HimProfile() {
         <Section label="Her cycle">
           <View style={styles.wrap}>
             <Chip
-              label="New screenshot"
-              icon="photo"
+              label="New photo"
+              icon="camera"
               onPress={() => router.push({ pathname: '/import', params: { mode: 'screenshot', next: 'back' } })}
             />
             <Chip
@@ -318,8 +318,8 @@ function HerProfile() {
       <Section label="Your cycle">
         <View style={styles.wrap}>
           <Chip
-            label="Add a screenshot"
-            icon="photo"
+            label="Add a photo"
+            icon="camera"
             onPress={() => router.push({ pathname: '/import', params: { mode: 'screenshot', next: 'back' } })}
           />
           <Chip

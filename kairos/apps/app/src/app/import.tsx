@@ -2,13 +2,13 @@ import {
   addDays,
   diffDays,
   localToday,
-  readCalendarImage,
   type CalendarReading,
   type ISODate,
   type PeriodLog,
-  type Pixels,
 } from '@kairos/core';
+import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Linking } from 'react-native';
 import { useMemo, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -16,10 +16,12 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { haptic } from '@/platform/haptics';
 import { configureNotifications } from '@/platform/notifications';
 import { sampleAvailable, sampleCalendar } from '@/platform/sample';
-import { deviceHints, pickScreenshot } from '@/platform/screenshot';
+import { readPicked, readPixels, type ReadSession } from '@/platform/calendar-reader';
+import { photoReaderAvailable } from '@/platform/photo';
+import { CameraDenied, deviceHints, pick, type Picked } from '@/platform/screenshot';
 import { useStore } from '@/state/store';
 import { Button, IconButton, Press } from '@/ui/controls';
-import { Icon } from '@/ui/icon';
+import { Icon, type IconName } from '@/ui/icon';
 import { MonthGrid, monthName } from '@/ui/month-grid';
 import { Orb } from '@/ui/orb';
 import { Screen } from '@/ui/screen';
@@ -27,10 +29,24 @@ import { T } from '@/ui/text';
 import { alpha, Radius, seasonColors, Space, useTheme } from '@/ui/theme';
 
 type Mode = 'screenshot' | 'date';
+type Trouble = 'camera' | 'no-text' | 'no-grid' | 'other';
 type Next = 'today' | 'share' | 'back';
 
 const monthFirst = (d: ISODate): ISODate => `${d.slice(0, 8)}01`;
 const accent = seasonColors('winter').glow;
+
+const TROUBLE: Record<Trouble, { title: string; hint: string }> = {
+  camera: { title: 'Tender needs the camera.', hint: 'Allow it in Settings, or choose a photo you already have.' },
+  'no-text': {
+    title: 'I couldn’t read any text.',
+    hint: 'Move closer, hold steady, and make sure the screen is bright. Or take a screenshot instead.',
+  },
+  'no-grid': {
+    title: 'I couldn’t find a month.',
+    hint: 'Fit one month’s dates in the frame, straight on and without glare. A screenshot works too.',
+  },
+  other: { title: 'That didn’t look like a calendar.', hint: 'Use a photo or screenshot of the month view, numbers and all.' },
+};
 
 /** Consecutive marked days become one period. A run that reaches today is still going. */
 function toPeriods(marked: ReadonlySet<ISODate>, today: ISODate): PeriodLog[] {
@@ -73,15 +89,20 @@ export default function Import() {
     mode === 'date' ? [monthFirst(addDays(monthFirst(today), -1)), monthFirst(today)] : [],
   );
   const [weekStart, setWeekStart] = useState<number>(hints.weekStart ?? 0);
-  const [last, setLast] = useState<{ pixels: Pixels; reading: CalendarReading }>();
+  const [last, setLast] = useState<{ session: ReadSession; reading: CalendarReading; picture?: string }>();
+  const [picture, setPicture] = useState<string>();
+  const [trouble, setTrouble] = useState<Trouble>('other');
   const [name, setName] = useState(s.playbook.name);
   const [length, setLength] = useState(s.cycle.statedCycleLength ?? 28);
 
   const periods = toPeriods(marked, today);
   const known = s.cycle.periods.length + periods.length;
 
-  const show = (reading: CalendarReading, pixels: Pixels, replace: boolean) => {
+  const show = (session: ReadSession, replace: boolean) => {
+    const { reading } = session;
     if (reading.status === 'not-found') {
+      // Say what went wrong, so the next picture can be better.
+      setTrouble(session.failure === 'no-text' ? 'no-text' : session.failure === 'no-grid' ? 'no-grid' : 'other');
       setPhase(months.length && !replace ? 'review' : 'failed');
       return;
     }
@@ -99,34 +120,41 @@ export default function Import() {
     );
     if (reading.weekStart !== undefined) setWeekStart(reading.weekStart);
     if (reading.cycleLength) setLength(reading.cycleLength);
-    setLast({ pixels, reading });
+    setLast({ session, reading, ...(picture ? { picture } : {}) });
     setPhase('review');
     if (period.length) haptic.success();
   };
 
-  const read = (pixels: Pixels, firstMonth?: ISODate) => {
+  const read = (run: () => Promise<ReadSession>, replace: boolean) => {
     setPhase('reading');
     // Let the "reading" state paint before the reader takes the thread for a second or two.
     setTimeout(() => {
-      try {
-        show(
-          readCalendarImage(pixels, { today, ...hints, ...(firstMonth ? { firstMonth } : {}) }),
-          pixels,
-          !!firstMonth,
-        );
-      } catch {
-        setPhase('failed');
-      }
+      run()
+        .then((session) => show(session, replace))
+        .catch(() => {
+          setTrouble('other');
+          setPhase('failed');
+        });
     }, 80);
   };
 
-  const choose = async () => {
+  const choose = async (source: 'library' | 'camera') => {
+    let picked: Picked | null;
     try {
-      const pixels = await pickScreenshot();
-      if (pixels) read(pixels);
-    } catch {
+      picked = await pick(source);
+    } catch (e) {
+      setTrouble(e instanceof CameraDenied ? 'camera' : 'other');
       setPhase('failed');
+      return;
     }
+    if (picked) {
+      setPicture(picked.kind === 'screenshot' ? undefined : picked.uri);
+      read(() => readPicked(picked, { today, ...hints }), false);
+    }
+  };
+
+  const reread = (firstMonth: ISODate) => {
+    if (last) read(async () => last.session.reread(firstMonth), true);
   };
 
   const toggle = (date: ISODate) => {
@@ -165,14 +193,21 @@ export default function Import() {
         season="winter"
         footer={
           <>
-            <Button label="Choose a screenshot" icon="photo" onPress={choose} />
+            {photoReaderAvailable ? (
+              <>
+                <Button label="Take a photo" icon="camera" onPress={() => choose('camera')} />
+                <Button label="Choose a photo or screenshot" icon="photo" kind="secondary" onPress={() => choose('library')} />
+              </>
+            ) : (
+              <Button label="Choose a screenshot" icon="photo" onPress={() => choose('library')} />
+            )}
             {sampleAvailable ? (
               <Button
                 label="Try with a sample"
                 kind="ghost"
                 onPress={() => {
                   const pixels = sampleCalendar(today);
-                  if (pixels) read(pixels);
+                  if (pixels) read(async () => readPixels(pixels, { today, ...hints }), false);
                 }}
               />
             ) : null}
@@ -182,20 +217,22 @@ export default function Import() {
           <IconButton icon="back" label="Back" onPress={back} />
         </View>
         <T variant="title" style={styles.title}>
-          {phase === 'failed' ? 'That didn’t look like a calendar.' : `Add ${whose} cycle calendar.`}
+          {phase === 'failed' ? TROUBLE[trouble].title : `Add ${whose} cycle calendar.`}
         </T>
         <T variant="callout" tone="secondary" style={{ marginTop: Space.s }}>
           {phase === 'failed'
-            ? 'Use a screenshot of the month view, numbers and all.'
+            ? TROUBLE[trouble].hint
             : 'Any period app works. It is read on this phone and goes nowhere.'}
         </T>
         <View style={styles.steps}>
           {(
             [
               ['day', `Open the month view in ${him ? 'her' : 'your'} app`],
-              ['photo', 'Take a screenshot'],
-              ['check', 'Choose it here'],
-            ] as const
+              photoReaderAvailable
+                ? ['camera', 'Photograph the screen, or take a screenshot']
+                : ['photo', 'Take a screenshot'],
+              ['check', 'Check what Tender found'],
+            ] satisfies [IconName, string][]
           ).map(([icon, label], i) => (
             <View key={label} style={styles.step}>
               <View style={[styles.stepIcon, { backgroundColor: alpha(accent, 0.16) }]}>
@@ -210,6 +247,22 @@ export default function Import() {
             </View>
           ))}
         </View>
+        {photoReaderAvailable ? (
+          <T variant="footnote" tone="tertiary" style={{ marginTop: Space.xl }}>
+            For a photo: hold the phone straight on, fill the frame with one month, keep glare off the screen, and wait for
+            it to focus.
+          </T>
+        ) : null}
+        {phase === 'failed' && trouble === 'camera' ? (
+          <Press
+            onPress={() => Linking.openSettings().catch(() => {})}
+            style={{ marginTop: Space.xl, alignSelf: 'center' }}
+            accessibilityLabel="Open Settings">
+            <T variant="label" tone="secondary">
+              Open Settings
+            </T>
+          </Press>
+        ) : null}
         {phase === 'failed' ? (
           <Press
             onPress={() => router.replace({ pathname: '/import', params: { mode: 'date', next } })}
@@ -238,6 +291,7 @@ export default function Import() {
   }
 
   const found = periods.length;
+  const photographed = last?.session.via === 'text';
   const alternatives =
     mode === 'screenshot' && months.length === (last?.reading.months.length ?? 0)
       ? last?.reading.alternatives
@@ -252,7 +306,11 @@ export default function Import() {
     mode === 'date'
       ? 'Tap the first day.'
       : found
-        ? 'Tap a day to fix anything.'
+        ? photographed
+          ? last?.session.cropped
+            ? 'Part of the calendar was outside the photo. Check the days at the edges, and tap one to fix it.'
+            : 'Check each day against her screen. Tap one to fix it.'
+          : 'Tap a day to fix anything.'
         : 'Tap the days it happened, or add the month that shows it.';
 
   return (
@@ -261,7 +319,7 @@ export default function Import() {
       footer={
         <>
           <Button label={mode === 'date' ? 'Continue' : 'Looks right'} disabled={found === 0} onPress={finish} />
-          {mode === 'screenshot' ? <Button label="Add another month" kind="ghost" onPress={choose} /> : null}
+          {mode === 'screenshot' ? <Button label="Add another month" kind="ghost" onPress={() => choose(photographed ? 'camera' : 'library')} /> : null}
         </>
       }>
       <View style={styles.back}>
@@ -284,12 +342,21 @@ export default function Import() {
           {alternatives.map((alt) => (
             <Press
               key={alt}
-              onPress={() => last && read(last.pixels, alt)}
+              onPress={() => reread(alt)}
               accessibilityLabel={`It is ${monthName(alt, true)}`}
               style={[styles.alt, { backgroundColor: alpha(colors.text, 0.07) }]}>
               <T variant="label">{monthName(alt, alt.slice(0, 4) !== today.slice(0, 4))}</T>
             </Press>
           ))}
+        </View>
+      ) : null}
+
+      {last?.picture ? (
+        <View style={styles.photo}>
+          <Image source={{ uri: last.picture }} style={styles.thumb} contentFit="cover" accessibilityLabel="Your photo" />
+          <T variant="footnote" tone="tertiary" style={{ flex: 1 }}>
+            Your photo, for comparing. Nothing here is saved or sent anywhere.
+          </T>
         </View>
       ) : null}
 
@@ -347,6 +414,8 @@ const styles = StyleSheet.create({
   step: { flexDirection: 'row', alignItems: 'center', gap: Space.l },
   stepIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   reading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  photo: { flexDirection: 'row', alignItems: 'center', gap: Space.m, marginTop: Space.l },
+  thumb: { width: 64, height: 86, borderRadius: Radius.s },
   alternatives: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: Space.s, marginTop: Space.l },
   alt: { height: 32, paddingHorizontal: 14, borderRadius: Radius.pill, justifyContent: 'center' },
   row: {

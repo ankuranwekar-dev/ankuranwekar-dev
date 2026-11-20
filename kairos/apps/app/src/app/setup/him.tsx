@@ -12,9 +12,9 @@ export default function HimSetup() {
     <SetupFrame title="Sync with her cycle." subtitle="Pick whichever is easiest.">
       <View style={{ gap: Space.m }}>
         <Tile
-          icon="photo"
-          title="Her screenshot"
-          caption="From any period app she uses"
+          icon="camera"
+          title="Her calendar"
+          caption="Photograph her phone, or use a screenshot"
           accent={seasonColors('summer').glow}
           onPress={() => router.push({ pathname: '/import', params: { mode: 'screenshot', next: 'today' } })}
         />

@@ -52,6 +52,7 @@ const ICONS = {
   party: ['party.popper', 'celebration'],
   home: ['house', 'home'],
   photo: ['photo.on.rectangle', 'photo_library'],
+  camera: ['camera', 'photo_camera'],
   day: ['calendar', 'calendar_today'],
   minus: ['minus', 'remove'],
 } as const satisfies Record<string, readonly [SFName, MaterialName]>;

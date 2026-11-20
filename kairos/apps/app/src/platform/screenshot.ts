@@ -2,42 +2,44 @@ import { decodePng, type Pixels } from '@kairos/core';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 
-import { READ_WIDTH } from './screenshot-shared';
+import { fromBase64, kindOf, READ_WIDTH, type Picked } from './screenshot-shared';
 
-export { deviceHints } from './screenshot-shared';
+export { deviceHints, type Picked } from './screenshot-shared';
 
-const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-const LOOKUP = new Uint8Array(128);
-for (let i = 0; i < B64.length; i++) LOOKUP[B64.charCodeAt(i)] = i;
-
-function fromBase64(b64: string): Uint8Array {
-  const clean = b64.replace(/[^A-Za-z0-9+/]/g, '');
-  const out = new Uint8Array(Math.floor((clean.length * 3) / 4));
-  let o = 0;
-  for (let i = 0; i + 1 < clean.length; i += 4) {
-    const a = LOOKUP[clean.charCodeAt(i)]!;
-    const b = LOOKUP[clean.charCodeAt(i + 1)]!;
-    const c = i + 2 < clean.length ? LOOKUP[clean.charCodeAt(i + 2)]! : 0;
-    const d = i + 3 < clean.length ? LOOKUP[clean.charCodeAt(i + 3)]! : 0;
-    out[o++] = (a << 2) | (b >> 4);
-    if (i + 2 < clean.length) out[o++] = ((b & 15) << 4) | (c >> 2);
-    if (i + 3 < clean.length) out[o++] = ((c & 3) << 6) | d;
+export class CameraDenied extends Error {
+  constructor() {
+    super('Camera access is off');
   }
-  return out.subarray(0, o);
 }
 
 /**
- * Lets her (or him) choose a screenshot and returns its pixels. The image is
- * read on the phone and never uploaded; the system photo picker needs no
- * photo-library permission.
+ * Lets her (or him) choose a picture, or take one, and says where it is. Everything is read on the phone and
+ * never uploaded; the system photo picker needs no photo-library permission, and the camera asks once.
  */
-export async function pickScreenshot(): Promise<Pixels | null> {
-  const picked = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 });
+export async function pick(source: 'library' | 'camera'): Promise<Picked | null> {
+  let picked: ImagePicker.ImagePickerResult;
+  if (source === 'camera') {
+    const allowed = await ImagePicker.requestCameraPermissionsAsync();
+    if (!allowed.granted) throw new CameraDenied();
+    picked = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 1, exif: false });
+  } else {
+    picked = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1, exif: true });
+  }
   const asset = picked.canceled ? undefined : picked.assets[0];
   if (!asset) return null;
-  // Shrink natively to the reader's working width and hand it over as PNG, which the engine can decode itself.
-  const context = ImageManipulator.manipulate(asset.uri);
-  if (asset.width > READ_WIDTH * 1.15) context.resize({ width: READ_WIDTH });
+  return {
+    uri: asset.uri,
+    width: asset.width,
+    height: asset.height,
+    kind: source === 'camera' ? 'photo' : kindOf(asset.exif, asset.width, asset.height),
+  };
+}
+
+/** The picture shrunk to the shape reader's working width, as pixels. */
+export async function pixelsOf(p: Picked): Promise<Pixels> {
+  // Shrink natively and hand it over as PNG, which the engine can decode itself.
+  const context = ImageManipulator.manipulate(p.uri);
+  if (p.width > READ_WIDTH * 1.15) context.resize({ width: READ_WIDTH });
   const image = await context.renderAsync();
   const saved = await image.saveAsync({ format: SaveFormat.PNG, base64: true });
   if (!saved.base64) throw new Error('Could not read that image');

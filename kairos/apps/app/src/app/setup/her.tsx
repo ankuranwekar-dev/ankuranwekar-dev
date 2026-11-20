@@ -45,9 +45,9 @@ export default function HerSetup() {
           />
         ) : null}
         <Tile
-          icon="photo"
-          title="A screenshot"
-          caption="From any period app"
+          icon="camera"
+          title="A photo or screenshot"
+          caption="Of any period app's calendar"
           accent={seasonColors('summer').glow}
           onPress={() => router.push({ pathname: '/import', params: { mode: 'screenshot', next: 'share' } })}
         />
