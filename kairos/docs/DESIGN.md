@@ -1,6 +1,6 @@
 # Design
 
-Kairos should feel like weather, not a dashboard: something he glances at and understands, that she trusts on sight, and that never embarrasses either of them in public.
+Tender should feel like weather, not a dashboard: something he glances at and understands, that she trusts on sight, and that never embarrasses either of them in public.
 
 ## Principles
 
@@ -45,9 +45,10 @@ The app icon is the same object: a pearlescent orb holding all four seasons, on 
 
 ## Type
 
-- **Display:** Instrument Serif, regular and italic. Season names are set in italic in the season's color: "Maya's *spring*".
-- **Interface:** the platform system face (SF Pro on Apple platforms, Roboto on Android, the system stack on the web).
-- Scale: display 46/50, title 34/38, title2 26/30, headline 17/22 semibold, body 16/23, callout 15/21, footnote 13/18, caption 11.5 uppercase with 1.3 tracking.
+- **One typeface: Arial** for everything. It ships with iOS, so nothing is bundled; Android has no Arial (and it cannot be redistributed), so it falls back to the system sans there, and the web build asks for Arial then Helvetica.
+- **Display:** Arial bold. Season names are set in bold italic in the season's color: "Maya's *spring*".
+- Scale: display 38/43 bold, title 30/35 bold, title2 23/28 bold, headline 17/22 semibold, body 16/23, callout 15/21, footnote 13/18, caption 11.5 uppercase with 1.3 tracking.
+- Arial is wider than the condensed serif the display sizes were first drawn for, which is why they are smaller than they were (46/34/26); "Maya's late autumn" is the widest title and still fits on one line.
 
 ## Color and theme
 

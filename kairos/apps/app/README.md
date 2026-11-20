@@ -1,4 +1,4 @@
-# Kairos app
+# Tender app
 
 Expo SDK 58 · Expo Router · React Native 0.88 · one codebase for iOS, Android and the web.
 

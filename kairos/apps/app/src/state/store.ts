@@ -63,7 +63,7 @@ interface Data {
   signals: SignalEvent[];
   healthSource: 'apple-health' | 'health-connect' | 'screenshot' | 'manual';
   /**
-   * On his phone without hers ("solo"): he said her period has not started yet, so Kairos stops
+   * On his phone without hers ("solo"): he said her period has not started yet, so Tender stops
    * assuming it has until this day.
    */
   notYetUntil?: ISODate;
@@ -96,7 +96,7 @@ interface Actions {
   importCycle: (data: CycleData, source: Data['healthSource']) => void;
   /** Adds periods read from a screenshot or picked by hand, keeping everything already known. */
   addPeriods: (periods: PeriodLog[], source: Data['healthSource'], cycleLength?: number) => void;
-  /** He confirms the starts Kairos had assumed. */
+  /** He confirms the starts Tender had assumed. */
   confirmPeriods: (starts: ISODate[]) => void;
   notYet: () => void;
   setStatedCycle: (cycleLength: number, lastStart: ISODate) => void;

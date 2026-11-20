@@ -43,7 +43,7 @@ export function Invite({ onPaired }: { onPaired?: () => void }) {
     return () => clearInterval(id);
   }, [pairing, setPairing, onPaired]);
 
-  const link = pairing.invite ?? 'kairos://pair#demo';
+  const link = pairing.invite ?? 'tender://pair#demo';
 
   return (
     <Glass radius={Radius.xl} style={styles.card}>
@@ -72,7 +72,7 @@ export function Invite({ onPaired }: { onPaired?: () => void }) {
             label="Send link"
             kind="secondary"
             compact
-            onPress={() => Share.share({ message: `Join me on Kairos: ${link}` })}
+            onPress={() => Share.share({ message: `Join me on Tender: ${link}` })}
           />
         ) : null}
       </View>

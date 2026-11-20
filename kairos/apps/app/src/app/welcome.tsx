@@ -48,7 +48,7 @@ export default function Welcome() {
       <View style={styles.column}>
         <Animated.View entering={FadeIn.duration(900)}>
           <T variant="caption" tone="tertiary" center style={{ letterSpacing: 3 }}>
-            Kairos
+            Tender
           </T>
         </Animated.View>
 

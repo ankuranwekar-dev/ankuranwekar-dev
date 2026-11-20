@@ -37,7 +37,7 @@ async function findOrCreateCalendar(): Promise<Calendar.ExpoCalendar> {
     title: CALENDAR_TITLE,
     color: COLOR,
     entityType: Calendar.EntityTypes.EVENT,
-    source: { isLocalAccount: true, name: 'Kairos', type: Calendar.SourceType.LOCAL as unknown as string },
+    source: { isLocalAccount: true, name: 'Tender', type: Calendar.SourceType.LOCAL as unknown as string },
     name: 'kairos-seasons',
     ownerAccount: 'kairos',
     accessLevel: Calendar.CalendarAccessLevel.OWNER,

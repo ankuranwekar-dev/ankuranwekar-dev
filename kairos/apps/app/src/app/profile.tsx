@@ -104,7 +104,7 @@ function StartOver() {
   };
   const press = () => {
     if (Platform.OS !== 'web') {
-      Alert.alert('Start over?', 'This erases everything Kairos holds on this phone.', [
+      Alert.alert('Start over?', 'This erases everything Tender holds on this phone.', [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Erase', style: 'destructive', onPress: go },
       ]);

@@ -35,7 +35,7 @@ export function useBackgroundWork(ready: boolean) {
       glyph: k.copy.glyph,
       short: k.copy.codename.split(' ').pop()!,
       line: role === 'her' ? k.copy.herRead : k.copy.read.split('. ').pop()!,
-      meta: k.cycleDay ? `Day ${k.cycleDay}` : 'Kairos',
+      meta: k.cycleDay ? `Day ${k.cycleDay}` : 'Tender',
       ...(detailed && role === 'him' && k.todayNudge ? { idea: k.todayNudge.title } : {}),
       from: pal.from,
       to: pal.to,

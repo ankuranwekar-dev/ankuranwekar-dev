@@ -2,7 +2,7 @@
 
 ## The position in one line
 
-Not another period tracker. She already has one, and she can keep it. **Kairos turns what she tracks into what he does**, starting from a screenshot of whichever app that is.
+Not another period tracker. She already has one, and she can keep it. **Tender turns what she tracks into what he does**, starting from a screenshot of whichever app that is.
 
 ## The market, honestly
 
@@ -10,7 +10,7 @@ Partner sharing is no longer new. Flo launched *Flo for Partners* (the partner g
 
 What none of them do well, as far as the public material shows:
 
-| | Typical partner-sharing app | Kairos |
+| | Typical partner-sharing app | Tender |
 | --- | --- | --- |
 | What he gets | Her calendar, phase names, articles | One specific, timed action a day, with lead time |
 | Personal to her | Generic tips | Her own playbook: what makes her feel loved, her favorites, her "please don't" list, things she mentioned |
@@ -23,16 +23,16 @@ What none of them do well, as far as the public material shows:
 
 The wedge is **action plus trust**. Action is what he lacks; trust is what she requires.
 
-The screenshot path changes the funnel. Every partner-sharing feature on the market sits inside one tracker and needs her to be on it. Kairos does not care which tracker she uses, and does not need her to install anything for him to get his first idea. That removes the two-install barrier that kills most couples' apps, at the price of a weaker product until they pair (see `CONCEPT.md`, section 3).
+The screenshot path changes the funnel. Every partner-sharing feature on the market sits inside one tracker and needs her to be on it. Tender does not care which tracker she uses, and does not need her to install anything for him to get his first idea. That removes the two-install barrier that kills most couples' apps, at the price of a weaker product until they pair (see `CONCEPT.md`, section 3).
 
 ## Who pays
 
 - **Her: free, forever, all features.** She is the gatekeeper. Any paywall on her side slows the only thing that matters early, pairing.
 - **Him: freemium.**
   - *Free:* period heads-up, her signals, three ideas a week.
-  - *Kairos Plus* (pricing hypothesis: $6.99 a month or $49.99 a year, to be tested): daily ideas, full playbook and mentions, lead-time planning, calendar, widget, trying-to-conceive mode.
-- **Gift subscriptions.** "Give him Kairos" for weddings, anniversaries, a first pregnancy attempt. She can buy it for him; he can buy it to ask her to pair, with an invitation that explains the privacy model to her first.
-- **Partnerships (later).** Fertility clinics and employer fertility benefits want partner engagement; Kairos can be offered as a benefit. Clinics get nothing back but anonymous, aggregate, opt-in outcomes, if that.
+  - *Tender Plus* (pricing hypothesis: $6.99 a month or $49.99 a year, to be tested): daily ideas, full playbook and mentions, lead-time planning, calendar, widget, trying-to-conceive mode.
+- **Gift subscriptions.** "Give him Tender" for weddings, anniversaries, a first pregnancy attempt. She can buy it for him; he can buy it to ask her to pair, with an invitation that explains the privacy model to her first.
+- **Partnerships (later).** Fertility clinics and employer fertility benefits want partner engagement; Tender can be offered as a benefit. Clinics get nothing back but anonymous, aggregate, opt-in outcomes, if that.
 - **Commerce (careful, later).** Florist, restaurant and pharmacy shortcuts are plain search links today. Affiliate deals are possible but must never put health or cycle information into a URL, and must clear Apple Guideline 5.1.3. Treat it as small revenue at best.
 
 ### An illustrative model, not a forecast
@@ -70,7 +70,7 @@ The levers are obvious from the table: pairing rate and his conversion dominate.
 
 The honest answer: no app will reverse the global decline in fertility. Its causes are economic and social: education and careers, housing, the cost of children, later marriage and smaller chosen families. Forecasts put global fertility at about 1.8 children per woman by 2050.
 
-What Kairos can do is narrower and worth doing:
+What Tender can do is narrower and worth doing:
 
 - help couples who want children get the timing right without turning their relationship into a schedule;
 - keep both partners engaged and kind through the hardest part, the waiting and the disappointments;
@@ -89,4 +89,4 @@ What Kairos can do is narrower and worth doing:
 
 ## Name
 
-*Kairos* fits the idea (the right moment), works in English and Arabic-speaking markets, and is neutral enough that she is as comfortable with it on her home screen as he is. It is also used by other companies in unrelated fields, so a trademark search in classes 9, 42 and 44 is the first legal task. Fallbacks: *Tend*, *Attune*, *Wavelength*.
+*Tender*, chosen on 20 November 2026. The working title was *Tender*, which already exists as an app in both the US and UAE App Stores. Tender names what the product is for, small and timely tenderness, and echoes a line already in the app ("Tender days. Be her calm."). It is a common English word, so a trademark search in classes 9, 42 and 44 is the first legal task, and App Store Connect may require a longer form such as *Tender: Her Seasons* if the plain name is refused. Names with no exact match in the US and UAE stores on the same date, kept as fallbacks: *Heed*, *Noticed*, *Doting*, *For Her*, *Kindly*.

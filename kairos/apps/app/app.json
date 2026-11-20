@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "Kairos",
-    "slug": "kairos",
+    "name": "Tender",
+    "slug": "tender",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "kairos",
+    "scheme": "tender",
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#0D0A0C",
     "ios": {
-      "bundleIdentifier": "love.kairos.app",
+      "bundleIdentifier": "com.9labs.tender",
       "buildNumber": "1",
       "supportsTablet": false,
       "infoPlist": {
@@ -48,7 +48,7 @@
       }
     },
     "android": {
-      "package": "love.kairos.app",
+      "package": "com.9labs.tender",
       "adaptiveIcon": {
         "backgroundColor": "#0D0A0C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -64,8 +64,8 @@
     "web": {
       "output": "single",
       "favicon": "./assets/images/favicon.png",
-      "name": "Kairos",
-      "shortName": "Kairos",
+      "name": "Tender",
+      "shortName": "Tender",
       "themeColor": "#0D0A0C",
       "backgroundColor": "#0D0A0C",
       "description": "Her rhythm. Your moment. One small idea a day, timed to her cycle."
@@ -103,14 +103,14 @@
       [
         "expo-calendar",
         {
-          "calendarPermission": "Kairos adds a private “Seasons” calendar with all-day, free events. It never reads your other events.",
+          "calendarPermission": "Tender adds a private “Seasons” calendar with all-day, free events. It never reads your other events.",
           "remindersPermission": false
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Kairos reads the screenshot you choose on this phone to find period days. It is never uploaded.",
+          "photosPermission": "Tender reads the screenshot you choose on this phone to find period days. It is never uploaded.",
           "cameraPermission": false,
           "microphonePermission": false
         }

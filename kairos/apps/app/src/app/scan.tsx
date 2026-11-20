@@ -45,7 +45,7 @@ export default function Scan() {
   const camera = Platform.OS !== 'web';
 
   return (
-    <SetupFrame title="Scan her code." subtitle="She’ll find it in Kairos, under her name.">
+    <SetupFrame title="Scan her code." subtitle="She’ll find it in Tender, under her name.">
       <View style={{ gap: Space.l }}>
         {camera ? (
           permission?.granted ? (

@@ -1,4 +1,4 @@
-# Shipping Kairos to the App Store
+# Shipping Tender to the App Store
 
 This is the runbook for the steps that need a Mac and an Apple Developer account. Everything that could be prepared without them is in the repository already.
 
@@ -22,8 +22,8 @@ The first native build is where problems usually surface: a config plugin that d
 
 ## Decisions that are yours
 
-1. **App name.** The home-screen name is `Kairos`. The App Store name must be unique across the store, and plain "Kairos" is almost certainly taken, so the listing uses `Kairos: Her Seasons`. App Store Connect will tell you if that is taken too. A trademark search is worth doing before launch.
-2. **Bundle identifier.** `love.kairos.app` is a placeholder. Use a reverse-domain identifier you control: set `KAIROS_BUNDLE_ID` in the build environment, or edit `app.json`.
+1. **App name.** `Tender`, for both the home-screen name and the store title. A search of the US and UAE App Stores on 20 November 2026 found no app with that exact name, but App Store Connect only settles it when you create the app record. If plain "Tender" is refused, use `Tender: Her Seasons` (change `title` in `store.config.json`). It is a common word, so a trademark search is worth doing before launch.
+2. **Bundle identifier.** `com.9labs.tender`, following your other apps' `com.9labs.*`. It is permanent once the app is created in App Store Connect, so change it (in `app.json` and the default in `app.config.ts`, or set `KAIROS_BUNDLE_ID` in the build environment) before then if you want something else.
 3. **Edition.** The default build is the **solo** edition: his phone only, set up from a screenshot or a date, no server. This is the one to ship first: it has nothing to operate and the smallest review surface. The **paired** edition (her app, pairing, signals, Apple Health) switches on when `EXPO_PUBLIC_RELAY_URL` is set, and needs the relay deployed (see the end of this page).
 4. **Price.** The listing assumes free. Subscriptions are not implemented.
 5. **Publisher details.** Done: name, contact email and date are in `site/privacy.html`, `site/support.html` and `apps/app/store.config.json`. Still to do: the review contact phone number in `store.config.json`. Update the "Last updated" date in `site/privacy.html` whenever the policy changes.
@@ -48,7 +48,7 @@ Walk through it in the simulator:
 - Welcome → **Her screenshot**: drag a screenshot of any tracker's month view onto the simulator first so it is in Photos.
 - **See a demo**, and use the bar at the top to move through a cycle and to switch phones.
 - Tap the orb (Rhythm), her initial (profile), and the idea card (detail).
-- Notifications: finish setup, allow them, then check `Settings → Notifications → Kairos`.
+- Notifications: finish setup, allow them, then check `Settings → Notifications → Tender`.
 - Light and dark appearance; the largest and smallest Dynamic Type sizes.
 
 Capture store screenshots from a 6.9-inch simulator (iPhone 16 Pro Max or newer):
@@ -66,9 +66,9 @@ Expo SDK 58 is built against a newer Swift than Xcode 26.0 ships (Expo's own bui
 - **Do not take the `expo install --fix` bump yet.** `expo-modules-jsi` 58.0.21 and later add code that Xcode 26.0 rejects, so `expo-doctor` stays at 19 of 20 checks (the failing one is the 29 packages a patch version behind).
 - **With a newer Xcode**, delete the patch (`patches/` and the `patchedDependencies` entry in `kairos/package.json`), run `npx expo install --fix`, and rebuild. Try that first if you are updating Xcode anyway.
 
-Finishing setup crashed the app on Xcode 26.0 until notification setup was moved after the screen transition (a fault in Expo's notification module, not in Kairos). It has not crashed in six cold runs since, but it was timing-dependent, so check it again on a real iPhone.
+Finishing setup crashed the app on Xcode 26.0 until notification setup was moved after the screen transition (a fault in Expo's notification module, not in Tender). It has not crashed in six cold runs since, but it was timing-dependent, so check it again on a real iPhone.
 
-Then archive and upload: open `ios/Kairos.xcworkspace` in Xcode, choose your team under *Signing & Capabilities*, select *Any iOS Device*, then *Product → Archive → Distribute App → App Store Connect*.
+Then archive and upload: open `ios/Tender.xcworkspace` in Xcode, choose your team under *Signing & Capabilities*, select *Any iOS Device*, then *Product → Archive → Distribute App → App Store Connect*.
 
 ## Path B: build in the cloud with EAS
 
@@ -96,9 +96,9 @@ If you connect your Mac to the Claude session that built this, the simulator bui
 
 **Export compliance.** The app contains its own implementation of standard encryption (X25519, HKDF-SHA-256, XChaCha20-Poly1305) for pairing. `ITSAppUsesNonExemptEncryption` is deliberately not set, so App Store Connect will ask. Answer that the app uses standard encryption algorithms in addition to those in the operating system, and follow what it tells you from there (France has an extra declaration). This is a legal question; the answer above is a starting point, not advice.
 
-**Age rating.** Apple requires a rating for every app; there is no "unrated" option. Answer the questionnaire honestly: there is no explicit content, but there are romantic themes and references to fertility and wellness topics. The privacy policy says Kairos is intended for adults, and App Store Connect lets you set a higher age rating than the questionnaire computes, so choosing 18+ is possible; check the exact wording in the Age Rating section when you get there.
+**Age rating.** Apple requires a rating for every app; there is no "unrated" option. Answer the questionnaire honestly: there is no explicit content, but there are romantic themes and references to fertility and wellness topics. The privacy policy says Tender is intended for adults, and App Store Connect lets you set a higher age rating than the questionnaire computes, so choosing 18+ is possible; check the exact wording in the Age Rating section when you get there.
 
-**Health claims.** The listing and the app say plainly that Kairos is not a contraceptive and not a medical device. Keep it that way in any screenshots or marketing text you add; reviewers reject fertility apps that imply otherwise.
+**Health claims.** The listing and the app say plainly that Tender is not a contraceptive and not a medical device. Keep it that way in any screenshots or marketing text you add; reviewers reject fertility apps that imply otherwise.
 
 **Review notes** are in `store.config.json`. The demo needs no login.
 

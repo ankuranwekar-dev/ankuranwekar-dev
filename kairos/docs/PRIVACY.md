@@ -9,7 +9,7 @@ This is a design constraint, not a feature. Reproductive health data has become 
 - In August 2025 a federal jury in San Francisco found that Meta violated California's Invasion of Privacy Act by receiving Flo users' health data through SDKs.
 - In 2022, at least one period tracker marketed "end-to-end encryption" while actually using only server-side encryption, and then removed the claim. The lesson: say exactly what the cryptography does, publish the code, and get it audited.
 - Apple's App Store Guideline 5.1.3 forbids using HealthKit data for advertising, marketing or data mining, or sharing it with third parties for those purposes.
-- In the UAE, Federal Law No. 2 of 2019 (the ICT in Health Fields law) restricts processing and storing health data outside the country except under exemptions set by the health authorities. Because Kairos's relay never holds readable health data, it is in a strong position, but counsel should confirm before a UAE launch.
+- In the UAE, Federal Law No. 2 of 2019 (the ICT in Health Fields law) restricts processing and storing health data outside the country except under exemptions set by the health authorities. Because Tender's relay never holds readable health data, it is in a strong position, but counsel should confirm before a UAE launch.
 
 ---
 

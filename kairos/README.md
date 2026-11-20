@@ -1,4 +1,4 @@
-# Kairos
+# Tender
 
 **Her rhythm. Your moment.** A private, cycle-aware companion for couples, for iPhone, Android and the web.
 
@@ -10,7 +10,7 @@ He gets one small, specific idea a day, timed to where she is in her cycle, so h
 
 ## Why it is built this way
 
-The obvious version of this idea (count a week after her period, push him reminders to buy flowers) fails in practice. Calendar counting finds the right ovulation day only about one time in five; gestures that only ever arrive in her fertile week read as a transaction within a few cycles; and an app that needs both partners to install it before either gets anything rarely gets installed at all. Kairos is the version that survives those facts:
+The obvious version of this idea (count a week after her period, push him reminders to buy flowers) fails in practice. Calendar counting finds the right ovulation day only about one time in five; gestures that only ever arrive in her fertile week read as a transaction within a few cycles; and an app that needs both partners to install it before either gets anything rarely gets installed at all. Tender is the version that survives those facts:
 
 - **Works with any tracker.** A screenshot of her calendar is read on the phone, with no server and no OCR model, and shown back as a calendar he can correct with a tap. Or he picks one date.
 - **One screen.** His Today is an orb, a season, a ribbon of the next three weeks and one idea. Everything else is one tap down. No tabs.
@@ -94,4 +94,4 @@ Getting it onto the App Store is covered step by step in [docs/APP_STORE.md](doc
 | + LH tests + mucus | 89% | 95% |
 | Everything | 90% | 98% |
 
-Kairos is a prototype. Fertility estimates support timing; they are not birth control.
+Tender is a prototype. Fertility estimates support timing; they are not birth control.

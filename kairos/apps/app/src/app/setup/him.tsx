@@ -22,7 +22,7 @@ export default function HimSetup() {
           <Tile
             icon="scan"
             title="Scan her code"
-            caption="If she has Kairos too"
+            caption="If she has Tender too"
             accent={seasonColors('autumn').glow}
             onPress={() => router.push('/scan')}
           />

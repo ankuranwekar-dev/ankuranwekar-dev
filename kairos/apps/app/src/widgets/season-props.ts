@@ -6,7 +6,7 @@ export interface SeasonWidgetProps {
   short: string;
   /** One gentle line about the season. */
   line: string;
-  /** e.g. "Day 10 · Kairos" or "Kairos". */
+  /** e.g. "Day 10 · Tender" or "Tender". */
   meta: string;
   /** Today's idea title, only when he opted into detailed notifications. */
   idea?: string;

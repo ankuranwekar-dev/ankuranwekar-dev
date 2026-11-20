@@ -1,4 +1,4 @@
-# The science behind Kairos
+# The science behind Tender
 
 What the product claims, what the evidence says, how confident we are, and how the forecast engine turns it into code. Confidence levels: **high** (replicated, large or hormone-verified studies), **moderate** (sound but limited studies), **low** (plausible, thin evidence).
 
@@ -39,7 +39,7 @@ What the product claims, what the evidence says, how confident we are, and how t
 | People have one "love language" and couples do best when partners speak it | **Not supported.** Impett, Park & Muise, *Curr Dir Psychol Sci* 2024, reviewed the evidence and found little support for Chapman's three central claims; they suggest a "balanced diet" of needs instead | Low for the theory |
 | Sustained heat (hot tubs, saunas) can lower sperm production and motility, reversibly | Small studies (UCSF pilot 2007; sauna studies); recovery after one to two spermatogenic cycles, i.e. months | Moderate (small samples) |
 
-**What this means for the product.** Seasons are tendencies, written as such, and her signals always override them. Kairos weights six "ingredients" (presence, words, service, small gifts, touch, new experiences) by what she says matters to her, as a balanced diet rather than a single language. Romance ideas never ask for an outcome. Novel shared experiences are favoured in spring and summer, when energy tends to be higher, but appear across the cycle.
+**What this means for the product.** Seasons are tendencies, written as such, and her signals always override them. Tender weights six "ingredients" (presence, words, service, small gifts, touch, new experiences) by what she says matters to her, as a balanced diet rather than a single language. Romance ideas never ask for an outcome. Novel shared experiences are favoured in spring and summer, when energy tends to be higher, but appear across the cycle.
 
 ---
 
@@ -115,13 +115,13 @@ The result is checked for plausibility (a period is two to ten days; starts are 
 
 ### What a screenshot is worth
 
-A screenshot yields period dates and nothing else, so the forecast it supports is the "Calendar only" row above: the right ovulation day about one time in seven, within two days about six times in ten. It also goes stale. Kairos assumes an unreported period arrived on schedule and asks him to confirm, which keeps the seasons roughly right for a regular cycle and lets errors build for an irregular one. Pairing with her phone removes both limits.
+A screenshot yields period dates and nothing else, so the forecast it supports is the "Calendar only" row above: the right ovulation day about one time in seven, within two days about six times in ten. It also goes stale. Tender assumes an unreported period arrived on schedule and asks him to confirm, which keeps the seasons roughly right for a regular cycle and lets errors build for an irregular one. Pairing with her phone removes both limits.
 
 ---
 
-## 7. What Kairos is not
+## 7. What Tender is not
 
-- **Not contraception.** Natural Cycles (FDA De Novo, August 2018; ~93% effective with typical use) and Clue Birth Control (FDA 510(k), 2021) went through regulatory clearance to make that claim. Kairos makes no such claim and says so wherever fertility is shown outside "trying".
+- **Not contraception.** Natural Cycles (FDA De Novo, August 2018; ~93% effective with typical use) and Clue Birth Control (FDA 510(k), 2021) went through regulatory clearance to make that claim. Tender makes no such claim and says so wherever fertility is shown outside "trying".
 - **Not a diagnosis.** It nudges couples toward a clinician at 12 months of trying (6 if 35+), and should when cycles are persistently shorter than 21 or longer than 35 days.
 - **Not a mood predictor.** Seasons describe tendencies; signals describe Tuesday.
 

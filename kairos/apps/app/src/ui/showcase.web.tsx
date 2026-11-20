@@ -116,13 +116,13 @@ function Pitch() {
     <View style={{ gap: Space.xxl, maxWidth: 560 }}>
       <View style={{ gap: Space.m }}>
         <T variant="display" style={{ fontSize: 72, lineHeight: 74 }}>
-          Kairos
+          Tender
         </T>
         <T variant="title" italic tone="secondary">
           Her rhythm. Your moment.
         </T>
         <T variant="body" tone="secondary" style={{ fontSize: 18, lineHeight: 27, marginTop: Space.s }}>
-          Kairos turns her cycle into four seasons, and gives him one small thing to do each day so he is there before
+          Tender turns her cycle into four seasons, and gives him one small thing to do each day so he is there before
           she has to ask.
         </T>
       </View>

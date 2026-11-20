@@ -43,7 +43,7 @@ export const relayConfigured = Boolean(RELAY_URL && RELAY_KEY);
  * https://example.com/pair) it opens the app from any messenger; without one the app's own
  * scheme is used. Either way the key rides in the fragment and reaches no server.
  */
-const LINK_BASE = process.env.EXPO_PUBLIC_LINK_BASE ?? 'kairos://pair';
+const LINK_BASE = process.env.EXPO_PUBLIC_LINK_BASE ?? 'tender://pair';
 
 type Role = 'her' | 'him';
 

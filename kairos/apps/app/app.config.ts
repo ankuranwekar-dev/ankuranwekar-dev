@@ -13,12 +13,12 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
  *
  * KAIROS_LINK_DOMAIN (optional, paired only) is a domain you control that
  * serves the apple-app-site-association and assetlinks files, so a pairing
- * link opens the app. Without it, invites use the kairos:// scheme.
+ * link opens the app. Without it, invites use the tender:// scheme.
  */
 export default ({ config }: ConfigContext): ExpoConfig => {
   const paired = Boolean(process.env.EXPO_PUBLIC_RELAY_URL);
   const domain = paired ? process.env.KAIROS_LINK_DOMAIN : undefined;
-  const bundleId = process.env.KAIROS_BUNDLE_ID ?? config.ios?.bundleIdentifier ?? 'love.kairos.app';
+  const bundleId = process.env.KAIROS_BUNDLE_ID ?? config.ios?.bundleIdentifier ?? 'com.9labs.tender';
 
   const plugins: NonNullable<ExpoConfig['plugins']> = [...(config.plugins ?? [])];
   if (paired) {
@@ -26,7 +26,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         'expo-camera',
         {
-          cameraPermission: 'Kairos uses the camera only to scan your partner’s pairing code.',
+          cameraPermission: 'Tender uses the camera only to scan your partner’s pairing code.',
           recordAudioAndroid: false,
         },
       ],
@@ -34,7 +34,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         '@kingstinct/react-native-healthkit',
         {
           NSHealthShareUsageDescription:
-            'Kairos reads your cycle data (periods, ovulation tests, temperature) to forecast your seasons on this iPhone. It is never uploaded unencrypted.',
+            'Tender reads your cycle data (periods, ovulation tests, temperature) to forecast your seasons on this iPhone. It is never uploaded unencrypted.',
           NSHealthUpdateUsageDescription: false,
           background: false,
         },
@@ -45,8 +45,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   return {
     ...config,
-    name: config.name ?? 'Kairos',
-    slug: config.slug ?? 'kairos',
+    name: config.name ?? 'Tender',
+    slug: config.slug ?? 'tender',
     plugins,
     ios: {
       ...config.ios,
@@ -55,7 +55,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       ...config.android,
-      package: process.env.KAIROS_BUNDLE_ID ?? config.android?.package ?? 'love.kairos.app',
+      package: process.env.KAIROS_BUNDLE_ID ?? config.android?.package ?? 'com.9labs.tender',
       ...(paired
         ? {
             permissions: [

@@ -1,9 +1,9 @@
-# Kairos: product concept
+# Tender: product concept
 
 > **Her rhythm. Your moment.**
 > A private companion for couples. He gets one small, specific idea a day, timed to where she is in her cycle, so he can be there before she has to ask. It starts from a screenshot of whatever period app she already uses, and gets better if she joins in.
 
-*Kairos* is the ancient Greek word for the right, opportune moment, as opposed to *chronos*, clock time. The whole product is an argument that good timing is a form of care.
+*Tender* is the product's name. Its working title was *Tender*, the ancient Greek word for the right, opportune moment, as opposed to *chronos*, clock time, and the whole product is still an argument that good timing is a form of care: tenderness, delivered at the right moment.
 
 ---
 
@@ -13,13 +13,13 @@ The brief: women have fertile days, men have no idea when they are, so build an 
 
 **1. "About a week after her period ends" is closer to a coin flip than a schedule.** Only about 13% of real cycles are 28 days long; the average is 29.3, and the follicular phase alone ranges from roughly 10 to 30 days (Bull et al. 2019, 612,613 cycles). In a prospective study, only about 30% of women had their fertile window entirely inside the "textbook" days 10–17 (Wilcox, Dunson & Baird 2000). Calendar-only apps place ovulation on the right day roughly one time in five. Our own engine, on simulated cycles, hits the exact day 14% of the time from the calendar alone. An app that counts days would send him to the wrong week a lot of the time. Forecast quality is the product's moat; it is not a detail.
 
-**2. Gestures concentrated in her fertile week will be decoded as a transaction.** Flowers that only ever arrive in the same week of every month are a pattern she will notice within two or three cycles. After that every gesture reads as a means to an end, and the product has made the relationship worse. Kairos is built around the opposite rule, **never only then**: care runs through her whole cycle, big gestures are capped inside her fertile days and actively encouraged outside them, and the planner enforces it as a hard constraint (see `packages/core/src/nudges/planner.ts`).
+**2. Gestures concentrated in her fertile week will be decoded as a transaction.** Flowers that only ever arrive in the same week of every month are a pattern she will notice within two or three cycles. After that every gesture reads as a means to an end, and the product has made the relationship worse. Tender is built around the opposite rule, **never only then**: care runs through her whole cycle, big gestures are capped inside her fertile days and actively encouraged outside them, and the planner enforces it as a hard constraint (see `packages/core/src/nudges/planner.ts`).
 
-**3. She is the gatekeeper.** The data is hers. A "men's app" that treats her cycle as an input will be deleted the day she sees it. The first version of Kairos took this to its limit and required her to install the app before he could do anything. That was principled and it was a mistake of proportion: asking two people to install something before either gets any value is where most couples' apps die, and she already has a tracker she is happy with. The second version (section 3) lets him start from a screenshot she sends him, and keeps everything that made the product hers, signals, share levels, pause, for couples who both install it.
+**3. She is the gatekeeper.** The data is hers. A "men's app" that treats her cycle as an input will be deleted the day she sees it. The first version of Tender took this to its limit and required her to install the app before he could do anything. That was principled and it was a mistake of proportion: asking two people to install something before either gets any value is where most couples' apps die, and she already has a tracker she is happy with. The second version (section 3) lets him start from a screenshot she sends him, and keeps everything that made the product hers, signals, share levels, pause, for couples who both install it.
 
 **4. If they are not trying for a baby, nudging intimacy toward peak fertility raises the odds of an unplanned pregnancy.** The app therefore asks *why* they are here. "Trying for a baby", "Growing closer" and "Just the basics" lead to different forecasts on his phone, different nudges, and different defaults for what he can see. Fertility estimates help timing; they are not birth control, and the product says so wherever it matters.
 
-**5. Reproductive data is now legally dangerous.** In the US, period-tracking data can be subpoenaed in states that restrict abortion. The FTC has acted against Flo Health (2021) and Premom (2023) over health-data sharing, and in August 2025 a federal jury found that Meta violated California's privacy law by collecting Flo users' data. "We take privacy seriously" is not enough. Kairos is end-to-end encrypted, keeps her raw data on her phone, and runs a relay that stores only ciphertext. See `PRIVACY.md`.
+**5. Reproductive data is now legally dangerous.** In the US, period-tracking data can be subpoenaed in states that restrict abortion. The FTC has acted against Flo Health (2021) and Premom (2023) over health-data sharing, and in August 2025 a federal jury found that Meta violated California's privacy law by collecting Flo users' data. "We take privacy seriously" is not enough. Tender is end-to-end encrypted, keeps her raw data on her phone, and runs a relay that stores only ciphertext. See `PRIVACY.md`.
 
 **6. An app will not reverse falling birth rates.** Global fertility fell from about 4.8 children per woman in 1950 to roughly 2.2 in 2021 and is forecast at 1.83 by 2050 (GBD 2021, *Lancet* 2024). The UAE, where this project starts, was at about 1.2 in 2023. The drivers are structural: education, careers, housing, childcare costs, later marriage and chosen family size. What an app *can* do is narrower and real: help couples who want children time things well, keep trying from draining the romance out of the relationship, and prompt them to see a doctor at 12 months (6 if she is 35 or older) instead of drifting. About one adult in six experiences infertility at some point (WHO 2023), so even that narrow job matters.
 
@@ -29,7 +29,7 @@ The brief: women have fertile days, men have no idea when they are, so build an 
 
 ## 2. The reframe
 
-| The brief said | Kairos does |
+| The brief said | Tender does |
 | --- | --- |
 | Track her fertile days | Forecast her **whole** cycle, with honest uncertainty, from the data she already has |
 | Sync them to his calendar | Put **codenamed seasons** (Winter, Spring, Summer, Autumn) in his calendar, all-day and marked free |
@@ -50,7 +50,7 @@ Seasons describe tendencies, not rules. Prospective studies of mood across the c
 
 | | Solo: his phone only | Paired: both phones |
 | --- | --- | --- |
-| Setup | A screenshot of her tracker's month view, or the date her last period started | She installs Kairos, he scans her code |
+| Setup | A screenshot of her tracker's month view, or the date her last period started | She installs Tender, he scans her code |
 | Time to first idea | Under a minute | A few minutes, two people |
 | Where her data lives | The dates from the screenshot, on his phone | On her phone; he receives only what she chooses, end-to-end encrypted |
 | What keeps it current | He adds a new screenshot now and then, or answers "did her period start?" | Automatic, from her phone |
@@ -58,9 +58,9 @@ Seasons describe tendencies, not rules. Prospective studies of mood across the c
 | Her voice | None in the app | Eight one-tap signals, her playbook, pause |
 | Server | None | A relay that holds ciphertext |
 
-**How the screenshot is read.** Every tracker's month view has the same bones: day numbers on a seven-column grid, with period days marked in a red-to-pink colour. Kairos finds the grid, works out which day is which from where the one-digit days end and the two-digit days begin, identifies the month from the weekday of the 1st, and reads the marks. It runs on the phone in a second or two; the image is not uploaded and is not kept. The result is shown as a calendar he can correct with a tap before anything is saved. Details and measured accuracy are in `SCIENCE.md`.
+**How the screenshot is read.** Every tracker's month view has the same bones: day numbers on a seven-column grid, with period days marked in a red-to-pink colour. Tender finds the grid, works out which day is which from where the one-digit days end and the two-digit days begin, identifies the month from the weekday of the 1st, and reads the marks. It runs on the phone in a second or two; the image is not uploaded and is not kept. The result is shown as a calendar he can correct with a tap before anything is saved. Details and measured accuracy are in `SCIENCE.md`.
 
-**What solo mode cannot know.** On her phone, no logged period means no period yet. On his phone it means nothing: nobody told the app. So when a predicted period is two days past, Kairos assumes it arrived on schedule, keeps the seasons moving, and asks him once: *Did her period start around Wednesday?* Yes, Not yet, or Other day.
+**What solo mode cannot know.** On her phone, no logged period means no period yet. On his phone it means nothing: nobody told the app. So when a predicted period is two days past, Tender assumes it arrived on schedule, keeps the seasons moving, and asks him once: *Did her period start around Wednesday?* Yes, Not yet, or Other day.
 
 **What it costs.** Solo mode is the easier door and the weaker product. The forecast is only as good as period dates allow, it goes stale if he stops updating it, and she has no say inside the app. It also cannot tell a screenshot she sent from a photo of her phone taken without asking. The app says to ask her and is built so that she would be glad he did; it cannot enforce that. Solo is the way in. Paired is the product.
 
@@ -89,18 +89,18 @@ Never shared at any level: temperatures, test results, symptoms, notes, and a pr
 
 ### Her
 
-She wants support without having to manage it, and to be read without having to explain. What Kairos gives her:
+She wants support without having to manage it, and to be read without having to explain. What Tender gives her:
 
 - **A voice without a confrontation.** Eight one-tap signals: *Hold me, Need space, Craving…, Rough day, Cramps, Feeling great, Take me out, Home early.* He gets a specific, kind prompt within seconds; nothing on his lock screen gives it away. "Need space" and "Cramps" also quiet his other ideas for a while.
 - **A partner who gets ahead of things.** Her period kit restocked before it starts, dinner handled on day one, reassurance in late autumn, plans that land on her best days.
 - **Control.** Share level, intent, pause (he sees "paused", nothing else), unpair (erases keys on both phones).
 - **Surprise mode.** She knows he has an idea today; she does not see what it is.
 - **A thank-you button.** "He did something lovely" sends him a heart. It is the strongest learning signal the planner has.
-- **Zero extra tracking.** She keeps using Apple Health, Health Connect, her watch, her ring, her LH kit. Kairos reads them; she logs nothing twice.
+- **Zero extra tracking.** She keeps using Apple Health, Health Connect, her watch, her ring, her LH kit. Tender reads them; she logs nothing twice.
 
 ### Him
 
-He wants to be good at this and does not want a biology lecture. What Kairos gives him:
+He wants to be good at this and does not want a biology lecture. What Tender gives him:
 
 - **Clarity.** "Maya's late autumn. Patience season. Small things can feel big; be her calm." One line, no jargon.
 - **One idea a day, at most.** Specific, doable, timed: *Clear the kitchen before she gets to it. Restock her period kit, quietly. Book a table somewhere neither of you has tried.* With rest days on purpose.
@@ -208,7 +208,7 @@ A cycle-sharing app could be misused by a controlling partner. When both phones 
 - Pregnancy results are never shared. "Late" is never shown.
 - The relay holds ciphertext only, so a subpoena to the company yields nothing readable.
 
-Solo mode has none of these controls, because her phone is not involved. What it has instead is a small footprint: his phone holds a handful of period dates and nothing else, nothing is transmitted, and there is no log of her symptoms, moods or location to browse. A partner intent on monitoring her could already photograph her tracker; Kairos adds a forecast to that, not access. That is a real limit of the solo edition and the reason the paired edition exists.
+Solo mode has none of these controls, because her phone is not involved. What it has instead is a small footprint: his phone holds a handful of period dates and nothing else, nothing is transmitted, and there is no log of her symptoms, moods or location to browse. A partner intent on monitoring her could already photograph her tracker; Tender adds a forecast to that, not access. That is a real limit of the solo edition and the reason the paired edition exists.
 
 ---
 
