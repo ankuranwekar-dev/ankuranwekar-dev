@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "main": "expo-router/entry",
   "dependencies": {
-    "@expo-google-fonts/instrument-serif": "^0.4.1",
     "@expo/ui": "~58.0.21",
     "@kairos/core": "workspace:*",
     "@kingstinct/react-native-healthkit": "^16.2.0",

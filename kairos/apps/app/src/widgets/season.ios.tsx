@@ -58,7 +58,7 @@ export const SeasonWidget = createWidget<SeasonWidgetProps>('SeasonWidget', func
         {props.meta}
       </Text>
       <Spacer />
-      <Text modifiers={[font({ size: 26, design: 'serif' }), foregroundStyle(props.ink)]}>{props.title}</Text>
+      <Text modifiers={[font({ size: 24, family: 'Arial', weight: 'bold' }), foregroundStyle(props.ink)]}>{props.title}</Text>
       <Text modifiers={[font({ size: 12 }), foregroundStyle(props.ink), opacity(0.85)]}>
         {props.idea ?? props.line}
       </Text>

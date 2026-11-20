@@ -78,7 +78,7 @@ export default function Welcome() {
 
         <Animated.View entering={FadeInDown.delay(200).duration(700)} style={{ gap: Space.s }}>
           {/* Capped so "rhythm." still fits on one line at the largest text size; everything else scales fully. */}
-          <T variant="display" center maxFontSizeMultiplier={1.3} style={{ fontSize: 44, lineHeight: 46 }}>
+          <T variant="display" center maxFontSizeMultiplier={1.3} style={{ fontSize: 40, lineHeight: 45 }}>
             Her rhythm.{'\n'}Your moment.
           </T>
           <T variant="callout" tone="secondary" center>

@@ -1,8 +1,3 @@
-import {
-  InstrumentSerif_400Regular,
-  InstrumentSerif_400Regular_Italic,
-  useFonts,
-} from '@expo-google-fonts/instrument-serif';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -20,12 +15,8 @@ import { useTheme } from '@/ui/theme';
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    InstrumentSerif_400Regular,
-    InstrumentSerif_400Regular_Italic,
-  });
-  const hydrated = useHydrated();
-  const ready = fontsLoaded && hydrated;
+  // Arial is a system font, so there is nothing to load: the app is ready as soon as its saved state is.
+  const ready = useHydrated();
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});

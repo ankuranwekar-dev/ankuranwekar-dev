@@ -383,7 +383,7 @@ function HerProfile() {
 }
 
 const styles = StyleSheet.create({
-  name: { fontFamily: Fonts.serif, fontSize: 34, lineHeight: 40, height: 46, padding: 0 },
+  name: { fontFamily: Fonts.sans, fontSize: 30, fontWeight: '700', lineHeight: 36, height: 42, padding: 0 },
   section: { marginTop: Space.xxl, gap: Space.m },
   line: {
     flexDirection: 'row',

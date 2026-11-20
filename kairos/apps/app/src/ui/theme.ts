@@ -42,11 +42,13 @@ const dawn: typeof dusk = {
 
 export type Colors = typeof dusk;
 
+/**
+ * One typeface for the whole app: Arial. It ships with iOS, so nothing is bundled or loaded. Android has no
+ * Arial (and its licence does not allow bundling it), so there it falls back to the system sans; the web build
+ * asks for Arial and then Helvetica.
+ */
 export const Fonts = {
-  serif: 'InstrumentSerif_400Regular',
-  serifItalic: 'InstrumentSerif_400Regular_Italic',
-  sans: Platform.select({ ios: 'System', android: 'sans-serif', default: 'var(--font-display)' })!,
-  rounded: Platform.select({ ios: 'ui-rounded', default: 'var(--font-rounded)' })!,
+  sans: Platform.select({ ios: 'Arial', android: 'sans-serif', default: 'Arial, Helvetica, sans-serif' })!,
 };
 
 export const Space = { xxs: 2, xs: 4, s: 8, m: 12, l: 16, xl: 20, xxl: 28, xxxl: 40 } as const;
