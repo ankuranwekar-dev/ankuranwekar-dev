@@ -18,7 +18,6 @@ import { useStore } from './store';
  */
 export function useBackgroundWork(ready: boolean) {
   const role = useStore((s) => s.role);
-  const demo = useStore((s) => s.demo);
   const onboarded = useStore((s) => s.onboarded);
   const paired = useStore((s) => s.pairing.status === 'paired');
   const k = useKairos();
@@ -47,7 +46,7 @@ export function useBackgroundWork(ready: boolean) {
   // and without this check the system permission prompt appeared on the setup screen, before he had even
   // picked a date (finishing setup asks for it, as the runbook says).
   useEffect(() => {
-    if (!ready || !native || role !== 'him' || demo || !onboarded) return;
+    if (!ready || !native || role !== 'him' || !onboarded) return;
     let cancelled = false;
     // Not at the instant setup finishes. The notification module returns its results from a background
     // thread, and on Xcode 26.0 with Expo SDK 58 that raced with JavaScript running in Hermes: finishing
@@ -70,7 +69,7 @@ export function useBackgroundWork(ready: boolean) {
       clearTimeout(timer);
       if (idle !== undefined) cancelIdleCallback(idle);
     };
-  }, [ready, native, role, demo, onboarded, k.plan]);
+  }, [ready, native, role, onboarded, k.plan]);
 
   useEffect(() => {
     if (!native) return;
@@ -101,7 +100,7 @@ export function useBackgroundWork(ready: boolean) {
   // Her phone publishes; debounce so a burst of edits sends one envelope.
   const lastSent = useRef<string>('');
   useEffect(() => {
-    if (!ready || demo || role !== 'her' || !paired || !relayConfigured || !k.snapshot) return;
+    if (!ready || role !== 'her' || !paired || !relayConfigured || !k.snapshot) return;
     const { generatedAt: _g, ...stable } = k.snapshot;
     const fingerprint = JSON.stringify(stable);
     if (fingerprint === lastSent.current) return;
@@ -112,11 +111,11 @@ export function useBackgroundWork(ready: boolean) {
       });
     }, 1500);
     return () => clearTimeout(id);
-  }, [ready, demo, role, paired, k.snapshot]);
+  }, [ready, role, paired, k.snapshot]);
 
   // His phone collects on launch and whenever it returns to the foreground.
   useEffect(() => {
-    if (!ready || demo || role !== 'him' || !paired || !relayConfigured) return;
+    if (!ready || role !== 'him' || !paired || !relayConfigured) return;
     const pull = async () => {
       const messages = await receive().catch(() => []);
       for (const m of messages) {
@@ -139,5 +138,5 @@ export function useBackgroundWork(ready: boolean) {
       sub.remove();
       clearInterval(id);
     };
-  }, [ready, demo, role, paired, native]);
+  }, [ready, role, paired, native]);
 }

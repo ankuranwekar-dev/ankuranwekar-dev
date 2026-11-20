@@ -1,28 +1,22 @@
-import { addDays, localToday, PHASE_COPY } from '@kairos/core';
-import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 
 import { useKairos } from '@/state/kairos';
-import { useStore } from '@/state/store';
 
-import { Button, Press } from './controls';
 import { FrameContext } from './frame';
 import { Icon, type IconName } from './icon';
 import { T } from './text';
-import { alpha, ink, phaseSeason, Radius, seasonColors, Space, useTheme } from './theme';
+import { alpha, ink, seasonColors, Space, useTheme } from './theme';
 
 const PHONE_W = 393;
 const PHONE_H = 852;
 const BEZEL = 11;
 const FRAME_INSETS = { top: 54, bottom: 26, left: 0, right: 0 };
-const SCRUB_DAYS = 35;
 
 /**
- * The desktop website: the pitch on the left, the real app running in a phone
- * on the right, and controls to flip between his phone and hers and to move
- * through her cycle. Below ~980px wide it steps aside and the app is the page.
+ * The desktop website: the pitch on the left and the real app running in a phone
+ * on the right. Below ~980px wide it steps aside and the app is the page.
  */
 export function Showcase({ children }: { children: ReactNode }) {
   const { width, height } = useWindowDimensions();
@@ -107,9 +101,8 @@ const PILLARS: { icon: IconName; title: string; body: string }[] = [
 ];
 
 function Pitch() {
-  const s = useStore();
   const k = useKairos();
-  const { colors, dark } = useTheme();
+  const { dark } = useTheme();
   const accent = seasonColors(k.season).glow;
 
   return (
@@ -125,50 +118,6 @@ function Pitch() {
           Tender turns her cycle into four seasons, and gives him one small thing to do each day so he is there before
           she has to ask.
         </T>
-      </View>
-
-      <View
-        style={[styles.panel, { backgroundColor: alpha(colors.text, dark ? 0.05 : 0.04), borderColor: colors.border }]}>
-        {s.demo ? (
-          <>
-            <T variant="caption" tone="tertiary">
-              Try it live · a simulated couple, Maya and Alex
-            </T>
-            <View style={{ flexDirection: 'row', gap: Space.s }}>
-              {(['him', 'her'] as const).map((r) => (
-                <Button
-                  key={r}
-                  compact
-                  label={r === 'him' ? 'His phone' : 'Her phone'}
-                  kind={s.role === r ? 'primary' : 'secondary'}
-                  onPress={() => {
-                    s.setRole(r);
-                    router.replace('/today');
-                  }}
-                />
-              ))}
-            </View>
-            <Scrubber />
-          </>
-        ) : (
-          <>
-            <T variant="headline">See both sides of it</T>
-            <T variant="callout" tone="secondary">
-              Open the demo to flip between his phone and hers, and to move through a whole cycle.
-            </T>
-            <View style={{ flexDirection: 'row' }}>
-              <Button
-                label="Open the demo"
-                icon="sparkles"
-                accent={accent}
-                onPress={() => {
-                  s.startDemo('him');
-                  router.replace('/today');
-                }}
-              />
-            </View>
-          </>
-        )}
       </View>
 
       <View style={{ gap: Space.l }}>
@@ -191,67 +140,6 @@ function Pitch() {
         One codebase for iPhone, Android and the web. A working prototype: fertility estimates support timing and are
         not birth control.
       </T>
-    </View>
-  );
-}
-
-/** A strip of her next five weeks, colored by season. Click a day to jump there. */
-function Scrubber() {
-  const s = useStore();
-  const k = useKairos();
-  const { colors } = useTheme();
-  const realToday = localToday();
-  const byDate = new Map((k.forecast?.days ?? []).map((d) => [d.date, d]));
-  const selected = addDays(realToday, s.dayOffset);
-  const phase = byDate.get(selected)?.phase;
-
-  return (
-    <View style={{ gap: Space.s }}>
-      <View style={styles.scrubRow}>
-        {Array.from({ length: SCRUB_DAYS }, (_, i) => {
-          const date = addDays(realToday, i);
-          const d = byDate.get(date);
-          const pal = seasonColors(phaseSeason(d?.phase));
-          const on = i === s.dayOffset;
-          return (
-            <Press
-              key={date}
-              haptics={false}
-              accessibilityLabel={`Jump to ${date}`}
-              onPress={() => s.travel(i)}
-              style={[
-                styles.scrubCell,
-                { backgroundColor: d ? pal.from : alpha(colors.text, 0.1) },
-                on ? { transform: [{ scaleY: 1.5 }], borderColor: colors.text, borderWidth: 1.5 } : null,
-              ]}>
-              {d?.peak ? <View style={styles.peak} /> : null}
-            </Press>
-          );
-        })}
-      </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <T variant="footnote" tone="secondary">
-          {s.dayOffset === 0
-            ? 'Today'
-            : new Date(`${selected}T12:00:00`).toLocaleDateString(undefined, {
-                weekday: 'long',
-                month: 'short',
-                day: 'numeric',
-              })}
-          {phase ? ` · ${PHASE_COPY[phase].name}` : ''}
-        </T>
-        {s.dayOffset !== 0 ? (
-          <Press onPress={() => s.travel(0)} accessibilityLabel="Back to today">
-            <T variant="label" tone="secondary">
-              Back to today
-            </T>
-          </Press>
-        ) : (
-          <T variant="footnote" tone="tertiary">
-            Click a day
-          </T>
-        )}
-      </View>
     </View>
   );
 }
@@ -298,10 +186,6 @@ const styles = StyleSheet.create({
     opacity: 0.85,
     zIndex: 100,
   },
-  panel: { borderRadius: Radius.xl, borderWidth: 1, padding: Space.xl, gap: Space.l },
   pillar: { flexDirection: 'row', gap: Space.l, alignItems: 'flex-start' },
   pillarIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  scrubRow: { flexDirection: 'row', gap: 3, alignItems: 'center', height: 30 },
-  scrubCell: { flex: 1, height: 20, borderRadius: 4, alignItems: 'center', justifyContent: 'center' },
-  peak: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#FFFFFF' },
 });

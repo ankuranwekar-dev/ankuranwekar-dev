@@ -1,5 +1,4 @@
 import {
-  addDays,
   buildSnapshot,
   diffDays,
   forecast as runForecast,
@@ -23,7 +22,6 @@ import {
 } from '@kairos/core';
 import { createContext, createElement, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
-import { visibleUntil } from './demo';
 import { useStore, type Heart, type Logged } from './store';
 
 export interface ActiveSignal {
@@ -59,7 +57,7 @@ export interface Kairos {
 const SIGNAL_TTL_HOURS = 14;
 
 /** Re-render at local midnight so "today" rolls over without a relaunch. */
-function useToday(offset: number): ISODate {
+function useToday(): ISODate {
   const [base, setBase] = useState(localToday());
   useEffect(() => {
     const now = new Date();
@@ -67,27 +65,27 @@ function useToday(offset: number): ISODate {
     const id = setTimeout(() => setBase(localToday()), midnight.getTime() - now.getTime());
     return () => clearTimeout(id);
   }, [base]);
-  return addDays(base, offset);
+  return base;
 }
 
 function useKairosCompute(): Kairos {
   const s = useStore();
-  const today = useToday(s.demo ? s.dayOffset : 0);
+  const today = useToday();
 
-  const solo = s.role === 'him' && !s.demo && s.pairing.status !== 'paired' && s.cycle.periods.length > 0;
+  const solo = s.role === 'him' && s.pairing.status !== 'paired' && s.cycle.periods.length > 0;
 
-  // The forecast runs wherever the cycle data lives: her phone, the demo, or his phone when he
-  // set up alone from a screenshot or a date.
+  // The forecast runs wherever the cycle data lives: her phone, or his phone when he set up alone from a
+  // photo, a screenshot or a date.
   const source = useMemo(() => {
     if (solo) return withAssumedPeriods(s.cycle, today, s.notYetUntil);
-    return { data: s.demo ? visibleUntil(s.cycle, today) : s.cycle, assumed: [] as ISODate[] };
-  }, [solo, s.demo, s.cycle, today, s.notYetUntil]);
+    return { data: s.cycle, assumed: [] as ISODate[] };
+  }, [solo, s.cycle, today, s.notYetUntil]);
 
   const forecast = useMemo(() => {
-    if (s.role !== 'her' && !s.demo && !solo) return undefined;
+    if (s.role !== 'her' && !solo) return undefined;
     if (source.data.periods.length === 0) return undefined;
     return runForecast(source.data, { asOf: today, seed: s.pairing.pairId ?? 'kairos', lookback: 45, horizon: 90 });
-  }, [s.role, s.demo, solo, source, today, s.pairing.pairId]);
+  }, [s.role, solo, source, today, s.pairing.pairId]);
 
   const snapshot = useMemo<PartnerSnapshot | undefined>(() => {
     if (forecast) {

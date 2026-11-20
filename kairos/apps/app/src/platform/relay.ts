@@ -30,7 +30,7 @@ import { secureDelete, secureGet, secureSet } from './secure';
  * The relay is a mailbox: it stores envelopes it cannot read and hands them
  * to whoever presents the mailbox token. Configure it with
  * EXPO_PUBLIC_RELAY_URL and EXPO_PUBLIC_RELAY_ANON_KEY; without them the app
- * runs in demo mode only.
+ * is the solo edition: no pairing, nothing sent anywhere.
  */
 
 const RELAY_URL = process.env.EXPO_PUBLIC_RELAY_URL;

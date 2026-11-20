@@ -22,8 +22,6 @@ import { useEffect, useState } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 
-import { DEMO_PLAYBOOK, demoCycleData, demoMentions } from './demo';
-
 export type Role = 'him' | 'her';
 
 /** A history entry that remembers what he actually saw, so "done" cards survive a re-plan. */
@@ -49,9 +47,6 @@ export interface Pairing {
 
 interface Data {
   role?: Role;
-  demo: boolean;
-  /** Demo-only time travel, in days from the real today. */
-  dayOffset: number;
   onboarded: boolean;
 
   // Her phone
@@ -83,11 +78,9 @@ interface Data {
 }
 
 interface Actions {
-  startDemo: (role: Role) => void;
   setRole: (role: Role) => void;
   finishOnboarding: () => void;
   reset: () => void;
-  travel: (days: number) => void;
 
   logPeriodStart: (date: ISODate) => void;
   logPeriodEnd: (date: ISODate) => void;
@@ -122,8 +115,6 @@ interface Actions {
 export type Store = Data & Actions;
 
 const INITIAL: Data = {
-  demo: false,
-  dayOffset: 0,
   onboarded: false,
   cycle: { periods: [] },
   intent: 'closer',
@@ -177,35 +168,9 @@ export const useStore = create<Store>()(
     (set, get) => ({
       ...INITIAL,
 
-      startDemo: (role) => {
-        const today = localToday();
-        set({
-          ...INITIAL,
-          demo: true,
-          role,
-          onboarded: true,
-          cycle: demoCycleData(today),
-          intent: 'trying',
-          share: 'fertility',
-          playbook: DEMO_PLAYBOOK,
-          healthSource: 'apple-health',
-          hisName: 'Alex',
-          pairing: {
-            status: 'paired',
-            partnerName: role === 'him' ? 'Maya' : 'Alex',
-            safety: ['🌸', '🦊', '🍋', '🌙'],
-            pairedAt: nowIso(),
-            pairId: 'demo',
-          },
-          mentions: demoMentions(today),
-          prefs: { cadence: 'steady', budget: 3, notifyAt: '08:30' },
-          calendar: { synced: false },
-        });
-      },
       setRole: (role) => set({ role }),
       finishOnboarding: () => set({ onboarded: true }),
       reset: () => set({ ...INITIAL }),
-      travel: (days) => set({ dayOffset: days }),
 
       logPeriodStart: (date) =>
         set((s) => ({
@@ -298,9 +263,15 @@ export const useStore = create<Store>()(
     }),
     {
       name: 'kairos-v1',
-      version: 2,
-      // v2 added screenshot import and solo mode; every v1 field is unchanged.
-      migrate: (state) => state as Store,
+      version: 3,
+      // v2 added screenshot import and solo mode; every v1 field is unchanged. v3 removed the demo: a phone that was
+      // showing the simulated couple starts clean rather than keeping Maya's cycle as if it were real.
+      migrate: (state) => {
+        const old = state as Partial<Store> & { demo?: boolean; dayOffset?: number };
+        if (old.demo) return { ...INITIAL } as Store;
+        const { demo: _demo, dayOffset: _offset, ...rest } = old;
+        return rest as Store;
+      },
       storage: createJSONStorage(() => safeStorage),
     },
   ),

@@ -85,7 +85,7 @@ One orchestrated motion per moment: the orb breathes; cards fade up; the Done ba
 | Home and lock-screen widget (iOS) | Codename, glyph, today's idea if opted in | Her season | Built (compiled, not yet run on a device) |
 | Apple Watch complication, Control Center control, Siri / App Intents | Today's idea | One-tap signals | Roadmap |
 | Android Glance widget | | | Roadmap |
-| Desktop website | Pitch with the live app in a phone frame, his/her switch and a cycle scrubber | | Built |
+| Desktop website | Pitch with the live app in a phone frame | | Built |
 
 The sheets are native form sheets on iOS (Liquid Glass on iOS 26), and full pages with a close button on Android and the web.
 

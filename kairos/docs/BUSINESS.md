@@ -81,7 +81,7 @@ What Tender can do is narrower and worth doing:
 
 | Phase | Weeks | Team | Output |
 | --- | --- | --- | --- |
-| 0. Prototype | Done | — | This repository: engine, app, relay, docs, live demo |
+| 0. Prototype | Done | — | This repository: engine, app, relay, docs, web build |
 | 0.5 First release | 1–4 | Founder plus one engineer with a Mac | The solo edition on the App Store: native build, simulator and device testing, the reader checked against real screenshots from the main trackers (`docs/APP_STORE.md`) |
 | 1. Private beta | 1–12 | 2 React Native engineers, 1 product designer, founder/PM, fractional security engineer, clinical advisor (OB-GYN or reproductive endocrinologist) | Real pairing on TestFlight and Play internal testing, push-to-wake, Siri and widget signals, Arabic, 50 couples |
 | 2. Launch | 13–24 | + growth lead, + support | App Store and Play launch in the UAE and English-speaking markets, security audit published, subscriptions live |

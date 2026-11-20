@@ -34,7 +34,7 @@
       "email": "ankuranwekar.dev@gmail.com",
       "phone": "+1 000 000 0000",
       "demoRequired": false,
-      "notes": "No account or sign-in is needed. On the first screen, tap \"See a demo\" for a fully populated example (a simulated couple). To test setup: tap \"I'm her partner\", then \"Pick a date\" and choose any past day; or \"Her calendar\", then \"Choose a photo or screenshot\" and pick a screenshot or photo of any period-tracking app's month calendar (or \"Take a photo\" to photograph one; the camera is used only for this). The picture is analysed on the device and is not uploaded or saved. This edition of the app sends no data to any server; a few ideas offer a button that opens Maps or Messages. Cycle estimates are informational only; the app makes no contraceptive or medical claims."
+      "notes": "No account or sign-in is needed. To test setup: tap \"I'm her partner\", then \"Pick a date\" and choose any past day; or \"Her calendar\", then \"Choose a photo or screenshot\" and pick a screenshot or photo of any period-tracking app's month calendar (or \"Take a photo\" to photograph one; the camera is used only for this). The picture is analysed on the device and is not uploaded or saved. This edition of the app sends no data to any server; a few ideas offer a button that opens Maps or Messages. Cycle estimates are informational only; the app makes no contraceptive or medical claims."
     }
   }
 }

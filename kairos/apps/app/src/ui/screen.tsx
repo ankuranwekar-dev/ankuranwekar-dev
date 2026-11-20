@@ -4,10 +4,6 @@ import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useStore } from '@/state/store';
-
-import { DEMO_BAR_HEIGHT } from './demo-bar';
-import { useInShowcase } from './frame';
 import { alpha, MaxWidth, seasonColors, Space, useTheme } from './theme';
 
 /** A full screen: warm background, a wash of the season's colour at the top, one centred column. */
@@ -25,15 +21,13 @@ export function Screen({
 }) {
   const { colors, dark } = useTheme();
   const insets = useSafeAreaInsets();
-  const inShowcase = useInShowcase();
-  const demo = useStore((s) => s.demo) && !inShowcase;
   const glow = season ? seasonColors(season).glow : '#B79BEB';
   const content = (
     <View
       style={[
         styles.content,
         {
-          paddingTop: insets.top + Space.m + (demo ? DEMO_BAR_HEIGHT : 0),
+          paddingTop: insets.top + Space.m,
           paddingBottom: footer ? Space.l : insets.bottom + Space.xxl,
         },
       ]}>

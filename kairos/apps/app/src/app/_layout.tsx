@@ -8,7 +8,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useBackgroundWork } from '@/state/effects';
 import { KairosProvider } from '@/state/kairos';
 import { useHydrated } from '@/state/store';
-import { DemoBar } from '@/ui/demo-bar';
 import { Showcase } from '@/ui/showcase';
 import { useTheme } from '@/ui/theme';
 
@@ -113,7 +112,6 @@ function App() {
                 }}
               />
             </Stack>
-            <DemoBar />
           </Showcase>
         </ThemeProvider>
       </SafeAreaProvider>

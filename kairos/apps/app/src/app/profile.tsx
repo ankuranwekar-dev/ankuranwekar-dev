@@ -144,7 +144,7 @@ function HimProfile() {
 
   return (
     <Sheet>
-      {paired || s.demo ? (
+      {paired ? (
         <T variant="title">{playbook.name || 'Her'}</T>
       ) : (
         <TextInput
@@ -165,7 +165,7 @@ function HimProfile() {
             : 'No cycle yet'}
       </T>
 
-      {!paired && !s.demo ? (
+      {!paired ? (
         <Section label="Her cycle">
           <View style={styles.wrap}>
             <Chip
@@ -212,7 +212,7 @@ function HimProfile() {
       </Section>
 
       <Section label="She loves">
-        <Favourites playbook={playbook} {...(paired || s.demo ? {} : { onChange: s.updatePlaybook })} />
+        <Favourites playbook={playbook} {...(paired ? {} : { onChange: s.updatePlaybook })} />
       </Section>
 
       <Section label="She mentioned">
@@ -364,7 +364,7 @@ function HerProfile() {
       </Section>
 
       <View style={styles.reset}>
-        {paired && !s.demo ? (
+        {paired ? (
           <Press
             onPress={async () => {
               await unpair().catch(() => {});

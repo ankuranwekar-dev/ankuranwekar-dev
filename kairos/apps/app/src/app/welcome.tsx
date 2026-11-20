@@ -7,9 +7,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { relayConfigured } from '@/platform/relay';
 import { useStore } from '@/state/store';
-import { Button, Press } from '@/ui/controls';
+import { Button } from '@/ui/controls';
 import { useScreenSize } from '@/ui/frame';
-import { Icon } from '@/ui/icon';
 import { Orb } from '@/ui/orb';
 import { T } from '@/ui/text';
 import { ink, MaxWidth, seasonColors, Space, useTheme } from '@/ui/theme';
@@ -21,7 +20,6 @@ export default function Welcome() {
   const insets = useSafeAreaInsets();
   const { colors, dark } = useTheme();
   const { height } = useScreenSize();
-  const startDemo = useStore((s) => s.startDemo);
   const setRole = useStore((s) => s.setRole);
   const [i, setI] = useState(0);
   const season = CYCLE[i]!;
@@ -104,18 +102,6 @@ export default function Welcome() {
               }}
             />
           ) : null}
-          <Press
-            onPress={() => {
-              startDemo('him');
-              router.replace('/today');
-            }}
-            style={styles.demo}
-            accessibilityLabel="See a demo">
-            <Icon name="sparkles" size={14} color={colors.textSecondary} />
-            <T variant="label" tone="secondary">
-              See a demo
-            </T>
-          </Press>
         </Animated.View>
       </View>
     </ScrollView>
@@ -127,5 +113,4 @@ const styles = StyleSheet.create({
   column: { flexGrow: 1, width: '100%', maxWidth: MaxWidth, paddingHorizontal: Space.xl },
   hero: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', minHeight: 240 },
   actions: { gap: Space.s, paddingTop: Space.xxl },
-  demo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 44, paddingVertical: Space.s },
 });

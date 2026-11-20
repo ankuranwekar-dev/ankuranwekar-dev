@@ -47,7 +47,7 @@ pnpm web                                         # the app in a browser
 pnpm app                                         # Expo dev server; press i / a for simulators
 ```
 
-In the browser, tap **I'm her partner → Her screenshot → Try with a sample** to watch the reader work without a screenshot to hand, or **See a demo** for a simulated couple, Maya and Alex, with a bar to switch phones and move through her cycle. On a wide screen the web app becomes the website, with the live app in a phone frame.
+In the browser, tap **I'm her partner → Her calendar → Try with a sample** to watch the reader work without a screenshot to hand. On a wide screen the web app becomes the website, with the live app in a phone frame.
 
 Native builds use Expo's continuous native generation (no `ios/` or `android/` folders are committed). HealthKit, Health Connect, the widget and the camera scanner need a development build:
 
@@ -75,7 +75,7 @@ Getting it onto the App Store is covered step by step in [docs/APP_STORE.md](doc
 | Engine, reader, crypto and relay protocol tests | 100 passing (`pnpm test`) |
 | TypeScript, engine and app | Clean |
 | Screenshot reader | 530 of 540 rendered look-alike calendars read exactly; 9 of the rest flagged for checking, 1 not. **Not yet run on real screenshots from real apps** |
-| Web build | Builds; setup from a date, from a sample screenshot and from an image file, the demo, both sides and every sheet exercised in Chromium at phone and desktop sizes, light and dark |
+| Web build | Builds; setup from a date, from a sample screenshot and from an image file, both sides and every sheet exercised in Chromium at phone and desktop sizes, light and dark |
 | iOS and Android JavaScript bundles | Build to Hermes bytecode (`expo export --platform ios --platform android`); HealthKit code is only in the iOS bundle and Health Connect only in Android |
 | App configuration | Resolves for both editions (`expo config`); the solo edition carries no camera or health capabilities |
 | Relay schema | Migration run on Postgres (PGlite): constraints, pruning, retention, cascade delete and `anon` denial verified |

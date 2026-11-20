@@ -47,7 +47,6 @@ Walk through it in the simulator:
 
 - Welcome → **I'm her partner** → **Pick a date** → Today.
 - Welcome → **Her calendar** → **Take a photo** (on a device; point it at another phone's month view), or **Choose a photo or screenshot** (in the simulator, drag a screenshot of any tracker's month view in first so it is in Photos).
-- **See a demo**, and use the bar at the top to move through a cycle and to switch phones.
 - Tap the orb (Rhythm), her initial (profile), and the idea card (detail).
 - Notifications: finish setup, allow them, then check `Settings → Notifications → Tender`.
 - Light and dark appearance; the largest and smallest Dynamic Type sizes.
@@ -58,7 +57,7 @@ Capture store screenshots from a 6.9-inch simulator (iPhone 16 Pro Max or newer)
 xcrun simctl io booted screenshot today.png
 ```
 
-The nine screens in `docs/store-screenshots/` avoid the demo's fertile-window wording on purpose (see "Health claims" below). If you retake them, step the demo forward to autumn or winter instead of using day 0, and answer the notification prompt before capturing.
+The seven screens in `docs/store-screenshots/` (taken before photo reading and before the demo was removed, so the setup and import screens are out of date) avoid fertile-window wording on purpose (see "Health claims" below). When you retake them, answer the notification prompt before capturing, and pick a date that puts her in autumn or winter.
 
 ### Xcode version
 
@@ -100,7 +99,7 @@ If you connect your Mac to the Claude session that built this, the simulator bui
 
 **Health claims.** The listing and the app say plainly that Tender is not a contraceptive and not a medical device. Keep it that way in any screenshots or marketing text you add; reviewers reject fertility apps that imply otherwise.
 
-**Review notes** are in `store.config.json`. The demo needs no login.
+**Review notes** are in `store.config.json`. There is no login and no demo mode: App Review sets the app up from a date, or from a photo or screenshot of any calendar.
 
 **URLs.** The `site/` folder is published with GitHub Pages from the `gh-pages` branch of this repository:
 
