@@ -48,7 +48,7 @@
       }
     },
     "android": {
-      "package": "com.9labs.tender",
+      "package": "com.ninelabs.tender",
       "adaptiveIcon": {
         "backgroundColor": "#0D0A0C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

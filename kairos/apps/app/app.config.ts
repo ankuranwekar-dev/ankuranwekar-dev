@@ -55,7 +55,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       ...config.android,
-      package: process.env.KAIROS_BUNDLE_ID ?? config.android?.package ?? 'com.9labs.tender',
+      // Android package segments cannot start with a digit, so this is not the iOS id (com.9labs.tender).
+      package: process.env.KAIROS_BUNDLE_ID ?? config.android?.package ?? 'com.ninelabs.tender',
       ...(paired
         ? {
             permissions: [
