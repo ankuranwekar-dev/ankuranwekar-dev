@@ -5,8 +5,8 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { createBackupApi, memoryBackupStore, accountHash } from '../../../supabase/functions/backup/handler';
-import { createAppleVerifier, type AppleJwk } from '../../../supabase/functions/backup/verify';
+import { createBackupApi, memoryBackupStore, accountHash } from '../../../supabase/functions/tender-backup/handler';
+import { createAppleVerifier, type AppleJwk } from '../../../supabase/functions/tender-backup/verify';
 import {
   BackupError,
   fromRecoveryCode,

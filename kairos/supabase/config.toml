@@ -6,6 +6,6 @@ project_id = "kairos"
 [functions.relay]
 verify_jwt = false
 
-# The backup authenticates every call with a Sign in with Apple identity token (see functions/backup/verify.ts).
-[functions.backup]
+# The backup authenticates every call with a Sign in with Apple identity token (see functions/tender-backup/verify.ts).
+[functions.tender-backup]
 verify_jwt = false

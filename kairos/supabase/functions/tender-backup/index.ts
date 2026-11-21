@@ -1,5 +1,5 @@
 // Supabase Edge Function entry point (Deno). Deploy with:
-//   supabase functions deploy backup --no-verify-jwt
+//   supabase functions deploy tender-backup --no-verify-jwt
 // Optional secrets: APPLE_CLIENT_ID (the app's bundle id, default com.9labs.tenderapp) and BACKUP_PEPPER (otherwise the
 // pepper from Supabase Vault, made by the migration). SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set automatically.
 
@@ -19,7 +19,7 @@ const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SE
 async function loadPepper(): Promise<string> {
   const fromEnv = Deno.env.get('BACKUP_PEPPER');
   if (fromEnv && fromEnv.length >= 32) return fromEnv;
-  const { data, error } = await db.rpc('backup_pepper');
+  const { data, error } = await db.rpc('tender_backup_pepper');
   if (error || typeof data !== 'string' || data.length < 32) throw new Error('No backup pepper: run the migration');
   return data;
 }
@@ -33,7 +33,7 @@ const toRow = (r: { blob: string; version: number; updated_at: string }): Backup
 
 const store: BackupStore = {
   async get(user) {
-    const { data, error } = await db.from('backups').select('blob, version, updated_at').eq('user_hash', user).maybeSingle();
+    const { data, error } = await db.from('tender_backups').select('blob, version, updated_at').eq('user_hash', user).maybeSingle();
     if (error) throw error;
     return data ? toRow(data) : null;
   },
@@ -41,15 +41,17 @@ const store: BackupStore = {
     const now = new Date().toISOString();
     if (expected === 0) {
       const { data, error } = await db
-        .from('backups')
+        .from('tender_backups')
         .insert({ user_hash: user, blob, version: 1, updated_at: now })
         .select('blob, version, updated_at')
         .maybeSingle();
-      if (error) return null; // already exists: the version has moved on
+      // A unique violation means the account already has a backup: the version has moved on. Anything else is a real fault.
+      if (error?.code === '23505') return null;
+      if (error) throw error;
       return data ? toRow(data) : null;
     }
     const { data, error } = await db
-      .from('backups')
+      .from('tender_backups')
       .update({ blob, version: expected + 1, updated_at: now })
       .eq('user_hash', user)
       .eq('version', expected)
@@ -59,7 +61,7 @@ const store: BackupStore = {
     return data ? toRow(data) : null;
   },
   async delete(user) {
-    const { error } = await db.from('backups').delete().eq('user_hash', user);
+    const { error } = await db.from('tender_backups').delete().eq('user_hash', user);
     if (error) throw error;
   },
 };

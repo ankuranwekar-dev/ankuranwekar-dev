@@ -4,8 +4,8 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { accountHash, createBackupApi, memoryBackupStore } from '../../../supabase/functions/backup/handler';
-import { createAppleVerifier, type AppleJwk } from '../../../supabase/functions/backup/verify';
+import { accountHash, createBackupApi, memoryBackupStore } from '../../../supabase/functions/tender-backup/handler';
+import { createAppleVerifier, type AppleJwk } from '../../../supabase/functions/tender-backup/verify';
 import {
   BackupError,
   ConflictError,

@@ -88,7 +88,12 @@ export function createAppleVerifier(opts: VerifierOptions): (token: string) => P
 export function appleKeysFromNetwork(fetcher: typeof fetch = fetch, ttlMs = 3_600_000): VerifierOptions['keys'] {
   let cached: { at: number; keys: AppleJwk[] } | undefined;
   return async (refresh) => {
-    if (!refresh && cached && Date.now() - cached.at < ttlMs) return cached.keys;
+    if (cached) {
+      const age = Date.now() - cached.at;
+      // A token naming an unknown key triggers a refresh, but never more than once a minute: nobody can make this
+      // function hammer Apple by sending it junk.
+      if (age < (refresh ? 60_000 : ttlMs)) return cached.keys;
+    }
     const res = await fetcher('https://appleid.apple.com/auth/keys');
     if (!res.ok) throw new TokenError('keys unavailable');
     const body = (await res.json()) as { keys: AppleJwk[] };

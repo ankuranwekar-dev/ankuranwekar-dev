@@ -1,6 +1,7 @@
 /**
- * Client for the sealed-backup server (supabase/functions/backup). Configure it with EXPO_PUBLIC_BACKUP_URL (and
- * EXPO_PUBLIC_BACKUP_ANON_KEY if the project wants one on the gateway); without a URL the app has no account feature.
+ * Client for the sealed-backup server (supabase/functions/tender-backup). Configure it with EXPO_PUBLIC_BACKUP_URL, the
+ * function's full address (https://<project>.supabase.co/functions/v1/tender-backup), and EXPO_PUBLIC_BACKUP_ANON_KEY if
+ * the project wants one on the gateway; without a URL the app has no account feature.
  */
 const URL = process.env.EXPO_PUBLIC_BACKUP_URL;
 const KEY = process.env.EXPO_PUBLIC_BACKUP_ANON_KEY;
@@ -21,7 +22,7 @@ async function call<T>(op: string, token: string, extra: Record<string, unknown>
   if (!URL) throw new Error('Backup is not set up in this build');
   let res: Response;
   try {
-    res = await fetch(`${URL}/functions/v1/backup`, {
+    res = await fetch(URL, {
       method: 'POST',
       headers: { 'content-type': 'application/json', ...(KEY ? { apikey: KEY, authorization: `Bearer ${KEY}` } : {}) },
       body: JSON.stringify({ op, token, ...extra }),
