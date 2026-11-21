@@ -189,7 +189,8 @@ export const useStore = create<Store>()(
       setAccount: (account) => set({ account }),
       patchAccount: (patch) => set((s) => (s.account ? { account: { ...s.account, ...patch } } : {})),
       restore: (data) => set({ ...data }),
-      reset: () => set({ ...INITIAL }),
+      // `account` is not in INITIAL, so it has to be cleared by name: Start over signs out as well as erasing.
+      reset: () => set({ ...INITIAL, account: undefined }),
 
       logPeriodStart: (date) =>
         set((s) => ({

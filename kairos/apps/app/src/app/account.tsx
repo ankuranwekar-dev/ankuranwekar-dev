@@ -1,7 +1,7 @@
 import { BackupError } from '@kairos/core';
 import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import { AppleCancelled } from '@/platform/apple';
@@ -19,7 +19,7 @@ import {
   signOut,
   type Settled,
 } from '@/state/account';
-import type { Summary } from '@/state/backup-data';
+import { hasLocalData, type Summary } from '@/state/backup-data';
 import { useStore } from '@/state/store';
 import { AppleButton } from '@/ui/apple-button';
 import { Button, Press } from '@/ui/controls';
@@ -108,6 +108,8 @@ export default function Account() {
       else setPhase({ kind: 'idle' });
     } catch (e) {
       if (e instanceof AppleCancelled) return setPhase({ kind: 'idle' });
+      // Apple wants a fresh sign-in: sign out here, so the Apple button is there to press.
+      if (e instanceof AccountError && e.reason === 'sign-in') signOut();
       setError(problem(e));
       setPhase(was.kind === 'need-code' ? { kind: 'need-code' } : { kind: 'idle' });
     }
@@ -131,6 +133,17 @@ export default function Account() {
       },
       (r) => (r ? land(r) : setPhase({ kind: 'idle' })),
     );
+
+  // "I've used Tender before" on a phone that is already signed in but holds nothing (for instance right after Start
+  // over): go and get the backup, rather than showing a screen about a backup that is not here.
+  const emptyHere = !hasLocalData(useStore.getState());
+  const started = useRef(false);
+  useEffect(() => {
+    if (!restoring || !account || !emptyHere || started.current || !backupConfigured) return;
+    started.current = true;
+    run('Restoring…', review, land);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restoring, account, emptyHere]);
 
   if (!backupConfigured) {
     return (

@@ -212,6 +212,19 @@ describe('a second phone', () => {
     expect(d.state.data).toEqual(mine);
   });
 
+  it('brings everything back after Start over on a phone that kept its keychain', async () => {
+    const w = await world();
+    const a = phone(w, 'apple-1', structuredClone(richa));
+    await a.signIn();
+
+    // Start over: the phone's data is erased; the secret in the keychain and the account on the server are not.
+    a.state.data = empty();
+    a.state.version = undefined;
+    expect(await a.session.review()).toEqual({ kind: 'ready', restored: true, firstTime: false });
+    expect(a.state.data).toEqual(richa);
+    expect(a.state.version).toBe(1);
+  });
+
   it('does not ask when both already say the same thing', async () => {
     const w = await world();
     const icloud: { secret?: Uint8Array } = {};
