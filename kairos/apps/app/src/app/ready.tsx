@@ -44,18 +44,18 @@ export default function Ready() {
       icon: 'sun',
       title: k.copy ? `Right now: ${possessive} ${k.copy.name.toLowerCase()}` : `${possessive} cycle is in`,
       body: k.copy
-        ? `${k.copy.brief} The four seasons are Tender’s gentle names for where she is in her cycle.`
-        : 'Tender works out where she is in her cycle, and shows it as a season.',
+        ? `${k.copy.brief} Seasons are Tender’s names for her cycle.`
+        : 'Seasons are Tender’s names for her cycle.',
     },
     {
       icon: 'bell',
       title: `An idea most mornings, at ${time}`,
-      body: 'About five a week, each one small and doable that day. The quiet days are on purpose. Nothing on your lock screen says anything about her cycle.',
+      body: 'Small and doable. Nothing on your lock screen mentions her cycle.',
     },
     {
       icon: 'check',
       title: 'Do it, then tap “I did it”',
-      body: 'That is the whole app. Tender uses it to pick tomorrow’s, and you can close it.',
+      body: 'That’s all. You can close the app.',
     },
   ];
 

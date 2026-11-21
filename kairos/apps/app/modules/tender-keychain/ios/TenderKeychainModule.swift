@@ -44,7 +44,7 @@ public class TenderKeychainModule: Module {
         kSecValueData as String: Data(value.utf8),
       ]
       let status = SecItemAdd(add as CFDictionary, nil)
-      if status != errSecSuccess { throw KeychainException(status) }
+      if status != errSecSuccess { throw KeychainException() }
     }
 
     AsyncFunction("remove") { () in
@@ -54,14 +54,5 @@ public class TenderKeychainModule: Module {
 }
 
 final class KeychainException: Exception, @unchecked Sendable {
-  private let status: OSStatus
-  init(_ status: OSStatus) {
-    self.status = status
-    super.init()
-  }
-  required init(file: String = #fileID, line: UInt = #line, function: String = #function) {
-    self.status = errSecParam
-    super.init(file: file, line: line, function: function)
-  }
-  override var reason: String { "The keychain refused the backup secret (\(status))" }
+  override var reason: String { "The keychain refused the backup secret" }
 }
