@@ -45,8 +45,20 @@ export interface Pairing {
   pairedAt?: string;
 }
 
-interface Data {
+/** A signed-in person: Apple's identifier for them, and where their backup stands. */
+export interface Account {
+  user: string;
+  since: string;
+  lastBackupAt?: string;
+  /** The server's version of the backup this phone last wrote or restored, for the next write to build on. */
+  version?: number;
+  /** Another phone has backed up since; automatic backups wait until the person chooses which to keep. */
+  conflict?: boolean;
+}
+
+export interface Data {
   role?: Role;
+  account?: Account;
   onboarded: boolean;
 
   // Her phone
@@ -80,6 +92,10 @@ interface Data {
 interface Actions {
   setRole: (role: Role) => void;
   finishOnboarding: () => void;
+  setAccount: (account: Account | undefined) => void;
+  patchAccount: (patch: Partial<Account>) => void;
+  /** Replace what a backup carries (see state/backup-data.ts) with what it held. */
+  restore: (data: Partial<Data>) => void;
   reset: () => void;
 
   logPeriodStart: (date: ISODate) => void;
@@ -170,6 +186,9 @@ export const useStore = create<Store>()(
 
       setRole: (role) => set({ role }),
       finishOnboarding: () => set({ onboarded: true }),
+      setAccount: (account) => set({ account }),
+      patchAccount: (patch) => set((s) => (s.account ? { account: { ...s.account, ...patch } } : {})),
+      restore: (data) => set({ ...data }),
       reset: () => set({ ...INITIAL }),
 
       logPeriodStart: (date) =>

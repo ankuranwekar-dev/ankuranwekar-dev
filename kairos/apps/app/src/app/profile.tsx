@@ -4,6 +4,7 @@ import { useState, type ReactNode } from 'react';
 import { Alert, Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import { haptic } from '@/platform/haptics';
+import { backupConfigured } from '@/platform/backup-api';
 import { relayConfigured, unpair } from '@/platform/relay';
 import { useKairos } from '@/state/kairos';
 import { useStore } from '@/state/store';
@@ -242,6 +243,19 @@ function HimProfile() {
             </Press>
           </View>
         ))}
+      </Section>
+
+      <Section label="History and backup">
+        <View style={styles.wrap}>
+          <Chip label="History" icon="timer" onPress={() => router.push('/history')} />
+          {backupConfigured ? (
+            <Chip
+              label={s.account ? 'Backup on' : 'Back up with Apple'}
+              icon="lock"
+              onPress={() => router.push('/account')}
+            />
+          ) : null}
+        </View>
       </Section>
 
       <View style={styles.reset}>

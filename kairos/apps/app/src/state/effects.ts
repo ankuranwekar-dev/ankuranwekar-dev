@@ -6,6 +6,7 @@ import { configureNotifications, onNudgeResponse, presentSignal, scheduleNudges 
 import { receive, relayConfigured, send } from '@/platform/relay';
 import { updateSeasonWidget } from '@/widgets/season';
 
+import { useAutoBackup } from './account';
 import { useKairos } from './kairos';
 import { useStore } from './store';
 
@@ -17,6 +18,7 @@ import { useStore } from './store';
  *  - his phone collects new snapshots and signals when it comes to the foreground.
  */
 export function useBackgroundWork(ready: boolean) {
+  useAutoBackup(ready);
   const role = useStore((s) => s.role);
   const onboarded = useStore((s) => s.onboarded);
   const paired = useStore((s) => s.pairing.status === 'paired');

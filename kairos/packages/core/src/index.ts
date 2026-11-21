@@ -19,3 +19,5 @@ export * from './sim/simulate';
 export * from './import/png';
 export * from './import/calendar-image';
 export * from './import/photo';
+export * from './crypto/backup';
+export * from './crypto/backup-session';

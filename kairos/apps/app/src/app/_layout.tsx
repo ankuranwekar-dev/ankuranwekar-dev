@@ -102,6 +102,28 @@ function App() {
                 }}
               />
               <Stack.Screen
+                name="account"
+                options={{
+                  presentation: 'formSheet',
+                  sheetAllowedDetents: [0.95],
+                  sheetGrabberVisible: true,
+                  sheetCornerRadius: 32,
+                  contentStyle: { backgroundColor: colors.bgRaised },
+                  animation: 'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen
+                name="history"
+                options={{
+                  presentation: 'formSheet',
+                  sheetAllowedDetents: [0.95],
+                  sheetGrabberVisible: true,
+                  sheetCornerRadius: 32,
+                  contentStyle: { backgroundColor: colors.bgRaised },
+                  animation: 'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen
                 name="invite"
                 options={{
                   presentation: 'formSheet',

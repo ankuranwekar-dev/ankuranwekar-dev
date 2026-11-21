@@ -1,10 +1,11 @@
 import type { Season } from '@kairos/core';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeOut } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { backupConfigured } from '@/platform/backup-api';
 import { relayConfigured } from '@/platform/relay';
 import { useStore } from '@/state/store';
 import { Button } from '@/ui/controls';
@@ -100,6 +101,13 @@ export default function Welcome() {
                 setRole('her');
                 router.push('/setup/her');
               }}
+            />
+          ) : null}
+          {backupConfigured && Platform.OS === 'ios' ? (
+            <Button
+              label="I’ve used Tender before"
+              kind="ghost"
+              onPress={() => router.push({ pathname: '/account', params: { restore: '1' } })}
             />
           ) : null}
         </Animated.View>
