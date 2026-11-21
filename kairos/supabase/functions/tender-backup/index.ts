@@ -38,25 +38,8 @@ const store: BackupStore = {
     return data ? toRow(data) : null;
   },
   async put(user, blob, expected) {
-    const now = new Date().toISOString();
-    if (expected === 0) {
-      const { data, error } = await db
-        .from('tender_backups')
-        .insert({ user_hash: user, blob, version: 1, updated_at: now })
-        .select('blob, version, updated_at')
-        .maybeSingle();
-      // A unique violation means the account already has a backup: the version has moved on. Anything else is a real fault.
-      if (error?.code === '23505') return null;
-      if (error) throw error;
-      return data ? toRow(data) : null;
-    }
-    const { data, error } = await db
-      .from('tender_backups')
-      .update({ blob, version: expected + 1, updated_at: now })
-      .eq('user_hash', user)
-      .eq('version', expected)
-      .select('blob, version, updated_at')
-      .maybeSingle();
+    // One function does the version check and keeps the backup it replaces (see the migration).
+    const { data, error } = await db.rpc('tender_backup_put', { p_user: user, p_blob: blob, p_expected: expected });
     if (error) throw error;
     return data ? toRow(data) : null;
   },

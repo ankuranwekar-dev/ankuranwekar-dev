@@ -246,6 +246,26 @@ describe('keeping it up to date', () => {
     expect([...w.store.rows.values()][0]!.version).toBe(2);
   });
 
+  it('never replaces a backup with an empty phone', async () => {
+    const w = await world();
+    const a = phone(w, 'apple-1', structuredClone(richa));
+    await a.signIn();
+    const before = [...w.store.rows.values()][0]!;
+
+    // The phone was reset but is still signed in (an old build, or a timer that fires after Start over).
+    a.state.data = empty();
+    w.tick(60_000);
+    await a.session.backupNow();
+
+    const after = [...w.store.rows.values()][0]!;
+    expect(after.version).toBe(before.version);
+    expect(after.blob).toBe(before.blob);
+    // ...and the backup still brings everything back.
+    a.state.version = undefined;
+    expect(await a.session.review()).toEqual({ kind: 'ready', restored: true, firstTime: false });
+    expect(a.state.data).toEqual(richa);
+  });
+
   it('never overwrites a newer backup from another phone, and lets the person choose', async () => {
     const w = await world();
     const icloud: { secret?: Uint8Array } = {};

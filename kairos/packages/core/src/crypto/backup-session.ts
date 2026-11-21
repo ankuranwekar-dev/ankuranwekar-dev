@@ -80,9 +80,15 @@ export function createBackupSession<D>(deps: SessionDeps<D>) {
   /** Held between "a backup was found" and "the person chose". */
   let pending: { data: D; savedAt: string; version: number } | undefined;
 
-  async function upload(token: string, secret: Uint8Array, base: number): Promise<void> {
+  /**
+   * Replace the account's backup with this phone's data. An empty phone never does: a phone that was just reset (or one
+   * that is still signed in after a reset) must not wipe the one copy that can bring everything back.
+   */
+  async function upload(token: string, secret: Uint8Array, base: number): Promise<boolean> {
+    if (!local.hasData()) return false;
     const r = await api.put(token, sealBackup(secret, local.read()), base);
     local.note({ version: r.version, lastBackupAt: r.updatedAt, conflict: false });
+    return true;
   }
 
   function take(data: D, version: number, updatedAt: string) {
@@ -157,6 +163,7 @@ export function createBackupSession<D>(deps: SessionDeps<D>) {
     async backupNow(): Promise<void> {
       const secret = await keys.load();
       if (!secret) throw new BackupError('wrong-key', 'This phone has no backup secret');
+      if (!local.hasData()) return; // nothing to save, and an empty phone must never replace a backup
       try {
         await upload(await deps.freshToken(), secret, local.baseVersion() ?? 0);
       } catch (e) {
