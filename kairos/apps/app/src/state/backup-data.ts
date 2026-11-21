@@ -28,6 +28,24 @@ export function pickBackup(s: Store): BackupData {
   return out as BackupData;
 }
 
+/**
+ * A short fingerprint of what a backup would carry (cyrb53). Kept on the account after each backup or restore, so the
+ * app can tell on its own, even after being closed, whether the backup still matches this phone.
+ */
+export function fingerprint(d: BackupData): string {
+  const s = JSON.stringify(d);
+  let h1 = 0xdeadbeef;
+  let h2 = 0x41c6ce57;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    h1 = Math.imul(h1 ^ c, 2654435761);
+    h2 = Math.imul(h2 ^ c, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+
 /** Is there anything on this phone worth losing? */
 export function hasLocalData(s: Store): boolean {
   return s.onboarded || s.cycle.periods.length > 0 || s.history.length > 0;

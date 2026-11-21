@@ -6,6 +6,7 @@ import {
   type Settled as CoreSettled,
 } from '@kairos/core';
 import { useEffect } from 'react';
+import { AppState } from 'react-native';
 
 import { appleCredentialState, freshAppleToken, onAppleRevoked, signInWithApple } from '@/platform/apple';
 import {
@@ -18,7 +19,15 @@ import {
 } from '@/platform/backup-api';
 import { forgetBackupSecret, loadBackupSecret, saveBackupSecret } from '@/platform/backup-key';
 
-import { hasLocalData, pickBackup, sameData, summarise, type BackupData, type Summary } from './backup-data';
+import {
+  fingerprint,
+  hasLocalData,
+  pickBackup,
+  sameData,
+  summarise,
+  type BackupData,
+  type Summary,
+} from './backup-data';
 import { useStore } from './store';
 
 /**
@@ -98,7 +107,12 @@ const session = createBackupSession<BackupData>({
     apply: (data) => state().restore(data),
     baseVersion: () => state().account?.version,
     note: ({ version, lastBackupAt, conflict }) =>
-      state().patchAccount({ ...(conflict ? {} : { version, ...(lastBackupAt ? { lastBackupAt } : {}) }), conflict }),
+      state().patchAccount({
+        ...(conflict
+          ? {}
+          : { version, backedUp: fingerprint(pickBackup(state())), ...(lastBackupAt ? { lastBackupAt } : {}) }),
+        conflict,
+      }),
   },
 });
 
@@ -173,9 +187,32 @@ export async function checkAppleStandsGood(): Promise<void> {
   if (s === 'revoked' || s === 'not-found') signOut();
 }
 
+/** Does the backup lack something this phone has? True after a change the app was closed before it could save. */
+function backupIsDue(): boolean {
+  const s = state();
+  return Boolean(s.account) && hasLocalData(s) && fingerprint(pickBackup(s)) !== s.account?.backedUp;
+}
+
 /**
- * Backs up quietly while signed in: a little after the data last changed, at most once a minute, and not at all
- * after a conflict (the person chooses first) or without a connection (the next change tries again).
+ * Before Start over: make sure the account holds what this phone holds, so Start over never loses anything. False when
+ * that could not be done (no connection, signed out of Apple, another phone ahead); the person decides what then.
+ */
+export async function saveBeforeErasing(): Promise<boolean> {
+  const s = state();
+  if (!s.account || !backupConfigured || !hasLocalData(s)) return true;
+  if (!backupIsDue()) return true;
+  try {
+    await backupNow();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Backs up quietly while signed in: soon after the app opens if the backup is behind, a little after the data changes,
+ * straight away when the app is left, and not at all after a conflict (the person chooses first) or without a
+ * connection (the next change, or the next time the app opens, tries again).
  */
 export function useAutoBackup(ready: boolean): void {
   const signedIn = useStore((s) => Boolean(s.account) && !s.account?.conflict);
@@ -188,17 +225,33 @@ export function useAutoBackup(ready: boolean): void {
   useEffect(() => {
     if (!ready || !signedIn || !backupConfigured) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    const run = () => {
+      timer = undefined;
+      if (backupIsDue()) backupNow().catch(() => {});
+    };
+    const later = (ms: number) => {
+      clearTimeout(timer);
+      timer = setTimeout(run, ms);
+    };
+    if (backupIsDue()) later(3_000);
+
     let last = JSON.stringify(pickBackup(state()));
     const unsub = useStore.subscribe((s) => {
       const now = JSON.stringify(pickBackup(s));
       if (now === last) return;
       last = now;
-      clearTimeout(timer);
-      timer = setTimeout(() => backupNow().catch(() => {}), 20_000);
+      later(20_000);
+    });
+    const app = AppState.addEventListener('change', (next) => {
+      if (next !== 'active' && timer) {
+        clearTimeout(timer);
+        run();
+      }
     });
     return () => {
       clearTimeout(timer);
       unsub();
+      app.remove();
     };
   }, [ready, signedIn]);
 }

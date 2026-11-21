@@ -1,11 +1,12 @@
 import type { Cadence, Playbook, ShareLevel } from '@kairos/core';
 import { router } from 'expo-router';
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { Alert, Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import { haptic } from '@/platform/haptics';
 import { backupConfigured } from '@/platform/backup-api';
 import { relayConfigured, unpair } from '@/platform/relay';
+import { saveBeforeErasing } from '@/state/account';
 import { useKairos } from '@/state/kairos';
 import { useStore } from '@/state/store';
 import { Button, Chip, Press, Segmented, Toggle } from '@/ui/controls';
@@ -207,21 +208,42 @@ function Favourites({ playbook, onChange }: { playbook: Playbook; onChange?: (pa
  */
 function StartOver() {
   const reset = useStore((s) => s.reset);
+  const signedIn = useStore((s) => Boolean(s.account));
   const { colors } = useTheme();
   const [armed, setArmed] = useState(false);
+  const busy = useRef(false);
   const go = () => {
     reset();
     router.dismissTo('/welcome');
   };
+  // Signed in: the backup is brought up to date first, so "I've used Tender before" can bring everything back.
+  const erase = async () => {
+    if (busy.current) return;
+    busy.current = true;
+    try {
+      if (await saveBeforeErasing()) return go();
+      if (Platform.OS === 'web') return go();
+      Alert.alert('Couldn’t save a backup first', 'If you erase now, this can’t be brought back.', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Erase anyway', style: 'destructive', onPress: go },
+      ]);
+    } finally {
+      busy.current = false;
+    }
+  };
   const press = () => {
     if (Platform.OS !== 'web') {
-      Alert.alert('Start over?', 'This erases everything Tender holds on this phone.', [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Erase', style: 'destructive', onPress: go },
-      ]);
+      Alert.alert(
+        'Start over?',
+        signedIn ? 'Your backup is saved first, so you can bring it all back.' : 'This erases everything Tender holds on this phone.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Erase', style: 'destructive', onPress: erase },
+        ],
+      );
       return;
     }
-    if (armed) go();
+    if (armed) erase();
     else {
       setArmed(true);
       setTimeout(() => setArmed(false), 4000);

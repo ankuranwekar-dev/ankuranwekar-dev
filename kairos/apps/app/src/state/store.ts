@@ -52,6 +52,8 @@ export interface Account {
   lastBackupAt?: string;
   /** The server's version of the backup this phone last wrote or restored, for the next write to build on. */
   version?: number;
+  /** Fingerprint of the data the backup holds (see `fingerprint`): when it differs from the phone's, a backup is due. */
+  backedUp?: string;
   /** Another phone has backed up since; automatic backups wait until the person chooses which to keep. */
   conflict?: boolean;
 }
