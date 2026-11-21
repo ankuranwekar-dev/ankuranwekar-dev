@@ -14,12 +14,16 @@ import { Sheet } from '@/ui/sheet';
 import { T } from '@/ui/text';
 import { alpha, Fonts, Radius, seasonColors, Space, useTheme } from '@/ui/theme';
 
-type FavKey = 'flowers' | 'treat' | 'drink' | 'cuisine';
-const FAVOURITES: { key: FavKey; label: string }[] = [
-  { key: 'flowers', label: 'Flowers' },
-  { key: 'treat', label: 'Treat' },
-  { key: 'drink', label: 'Coffee' },
-  { key: 'cuisine', label: 'Dinner out' },
+type LoveKey = 'flowers' | 'treat' | 'drink' | 'cuisine' | 'scent' | 'comfortFood' | 'place' | 'music';
+const LOVES: { key: LoveKey; label: string; hint: string }[] = [
+  { key: 'flowers', label: 'Flowers', hint: 'Peonies' },
+  { key: 'treat', label: 'Treat', hint: 'Dark chocolate' },
+  { key: 'drink', label: 'Drink', hint: 'Flat white' },
+  { key: 'cuisine', label: 'Dinner out', hint: 'Thai' },
+  { key: 'scent', label: 'Scent', hint: 'Jasmine' },
+  { key: 'comfortFood', label: 'Comfort food', hint: 'Mac and cheese' },
+  { key: 'place', label: 'Place', hint: 'The beach' },
+  { key: 'music', label: 'Music', hint: 'Jazz' },
 ];
 const NEVER: { tag: string; label: string }[] = [
   { tag: 'public', label: 'Public gestures' },
@@ -61,31 +65,137 @@ function Line({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
+/**
+ * What she loves: only what has been added, and one Add button. Add offers a few ideas to start from and "Something
+ * else" for anything of his own. Without `onChange` (her phone's choices on his) it is a plain list.
+ */
 function Favourites({ playbook, onChange }: { playbook: Playbook; onChange?: (patch: Partial<Playbook>) => void }) {
   const { colors } = useTheme();
-  return (
-    <View>
-      {FAVOURITES.map((f) => (
-        <View key={f.key} style={[styles.line, { borderColor: colors.hairline }]}>
-          <T variant="callout" tone="secondary" style={{ width: 96 }}>
-            {f.label}
-          </T>
-          {onChange ? (
-            <TextInput
-              value={playbook[f.key] ?? ''}
-              onChangeText={(t) => onChange({ [f.key]: t })}
-              placeholder="Add"
-              placeholderTextColor={colors.textTertiary}
-              returnKeyType="done"
-              style={[styles.input, { color: colors.text }]}
-            />
-          ) : (
-            <T variant="callout" style={{ flex: 1, textAlign: 'right' }}>
-              {playbook[f.key] || '—'}
+  type Editing = { kind: LoveKey } | { kind: 'custom'; index?: number };
+  const [mode, setMode] = useState<'idle' | 'pick' | { edit: Editing; text: string }>('idle');
+
+  const known = LOVES.filter((l) => playbook[l.key]);
+  const notes = playbook.notes ?? [];
+  const free = LOVES.filter((l) => !playbook[l.key]);
+  const close = () => setMode('idle');
+
+  const save = (edit: Editing, raw: string) => {
+    const text = raw.trim();
+    if (edit.kind === 'custom') {
+      const next = [...notes];
+      if (edit.index === undefined) {
+        if (text) next.push(text);
+      } else if (text) next[edit.index] = text;
+      else next.splice(edit.index, 1);
+      onChange?.({ notes: next });
+    } else {
+      onChange?.({ [edit.kind]: text || undefined });
+    }
+    close();
+  };
+
+  const remove = (edit: Editing) => save(edit, '');
+
+  if (!onChange) {
+    return (
+      <View>
+        {known.map((l) => (
+          <View key={l.key} style={[styles.line, { borderColor: colors.hairline }]}>
+            <T variant="callout" tone="secondary" style={{ width: 110 }}>
+              {l.label}
             </T>
-          )}
+            <T variant="callout" style={{ flex: 1, textAlign: 'right' }}>
+              {playbook[l.key]}
+            </T>
+          </View>
+        ))}
+        {notes.map((n, i) => (
+          <View key={`${i}-${n}`} style={[styles.line, { borderColor: colors.hairline }]}>
+            <T variant="callout" style={{ flex: 1 }}>
+              {n}
+            </T>
+          </View>
+        ))}
+        {known.length + notes.length === 0 ? (
+          <T variant="callout" tone="tertiary">
+            Nothing yet.
+          </T>
+        ) : null}
+      </View>
+    );
+  }
+
+  if (typeof mode === 'object') {
+    const { edit, text } = mode;
+    const meta = edit.kind === 'custom' ? undefined : LOVES.find((l) => l.key === edit.kind)!;
+    const existing = edit.kind === 'custom' ? edit.index !== undefined : Boolean(playbook[edit.kind]);
+    return (
+      <View style={{ gap: Space.m }}>
+        <T variant="headline">{meta?.label ?? 'Something else'}</T>
+        <TextInput
+          autoFocus
+          value={text}
+          onChangeText={(t) => setMode({ edit, text: t })}
+          onSubmitEditing={() => save(edit, text)}
+          placeholder={meta?.hint ?? 'Rainy-day films'}
+          placeholderTextColor={colors.textTertiary}
+          returnKeyType="done"
+          style={[styles.field, { color: colors.text, backgroundColor: alpha(colors.text, 0.06) }]}
+        />
+        <View style={styles.wrap}>
+          <Button label="Save" compact disabled={!text.trim()} onPress={() => save(edit, text)} />
+          <Button label="Cancel" compact kind="ghost" onPress={close} />
+          {existing ? <Button label="Remove" compact kind="ghost" onPress={() => remove(edit)} /> : null}
         </View>
-      ))}
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ gap: Space.m }}>
+      {known.length + notes.length > 0 ? (
+        <View>
+          {known.map((l) => (
+            <Press
+              key={l.key}
+              onPress={() => setMode({ edit: { kind: l.key }, text: playbook[l.key] ?? '' })}
+              accessibilityLabel={`${l.label}: ${playbook[l.key]}. Edit`}
+              style={[styles.line, { borderColor: colors.hairline }]}>
+              <T variant="callout" tone="secondary" style={{ width: 110 }}>
+                {l.label}
+              </T>
+              <T variant="callout" style={{ flex: 1, textAlign: 'right' }}>
+                {playbook[l.key]}
+              </T>
+            </Press>
+          ))}
+          {notes.map((n, i) => (
+            <Press
+              key={`${i}-${n}`}
+              onPress={() => setMode({ edit: { kind: 'custom', index: i }, text: n })}
+              accessibilityLabel={`${n}. Edit`}
+              style={[styles.line, { borderColor: colors.hairline }]}>
+              <T variant="callout" style={{ flex: 1 }}>
+                {n}
+              </T>
+            </Press>
+          ))}
+        </View>
+      ) : null}
+
+      {mode === 'pick' ? (
+        <View style={styles.wrap}>
+          {free.map((l) => (
+            <Chip key={l.key} label={l.label} onPress={() => setMode({ edit: { kind: l.key }, text: '' })} />
+          ))}
+          <Chip label="Something else" icon="plus" onPress={() => setMode({ edit: { kind: 'custom' }, text: '' })} />
+          <Chip label="Cancel" onPress={close} />
+        </View>
+      ) : (
+        <View style={styles.wrap}>
+          <Chip label="Add" icon="plus" onPress={() => setMode('pick')} />
+        </View>
+      )}
     </View>
   );
 }
@@ -407,6 +517,7 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   input: { flex: 1, fontSize: 16, height: 46, textAlign: 'right' },
+  field: { borderRadius: Radius.m, paddingHorizontal: Space.l, height: 50, fontSize: 17 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: Space.s },
   capture: { borderRadius: Radius.m, paddingHorizontal: Space.m, height: 48, justifyContent: 'center' },
   mention: { fontSize: 16, height: 48 },
