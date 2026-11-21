@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { useDevNav } from '@/platform/dev';
 import { useBackgroundWork } from '@/state/effects';
 import { KairosProvider } from '@/state/kairos';
 import { useHydrated } from '@/state/store';
@@ -34,6 +35,7 @@ export default function RootLayout() {
 function App() {
   const { dark, colors } = useTheme();
   useBackgroundWork(true);
+  useDevNav();
 
   const navTheme = dark
     ? {

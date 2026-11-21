@@ -15,7 +15,7 @@ This is the runbook for the steps that need a Mac and an Apple Developer account
 | Native iOS build (Xcode / CocoaPods) | Done: Release for iOS devices builds on Xcode 27.2 (see "Xcode version"), signs with team UMD9S65GU8 and installs on an iPhone 17 running iOS 27.2 |
 | Simulator testing | Done on an iPhone 17 Pro Max simulator, light and dark, smallest and largest text sizes (before photo reading was added) |
 | **Photo of her calendar** | Built: Apple Vision text recognition plus a perspective fit (`docs/SCIENCE.md`). 61 of 66 simulated camera photos read exactly, 16 of 18 of them through the real app on an iPhone. **Never tried on a real photograph of a real app**; do that before launch (see "Review risks") |
-| Screenshots from a real simulator | Captured from the Release build: `docs/store-screenshots/` (6.9-inch, 1320 x 2868; light in the folder, dark in `dark/`) |
+| Screenshots from a real simulator | Nine screens, retaken 21 Nov 2026 after photo reading, Sign in with Apple and the She loves change: `docs/store-screenshots/` (iPhone 18 Pro Max simulator, 1320 x 2868, RGB; light in the folder, dark in `dark/`). The person shown is "Maya", not a real one |
 | **Widget and notifications on a device** | **Not run.** The widget has never been seen on a Home or Lock Screen, and no notification has been seen to fire |
 | **Upload and submission** | **Not done.** Needs your Apple Developer account |
 
@@ -51,13 +51,19 @@ Walk through it in the simulator:
 - Notifications: finish setup, allow them, then check `Settings → Notifications → Tender`.
 - Light and dark appearance; the largest and smallest Dynamic Type sizes.
 
-Capture store screenshots from a 6.9-inch simulator (iPhone 16 Pro Max or newer):
+Capture store screenshots from a 6.9-inch simulator (iPhone 16 Pro Max or newer), from a build made with `EXPO_PUBLIC_DEV_READ=1` (its data lives under its own storage key and never mixes with a real install):
 
 ```bash
-xcrun simctl io booted screenshot today.png
+EXPO_PUBLIC_DEV_READ=1 xcodebuild -workspace Tender.xcworkspace -scheme Tender -configuration Release \
+  -sdk iphonesimulator -destination 'platform=iOS Simulator,id=<UDID>' ONLY_ACTIVE_ARCH=YES ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build
+xcrun simctl status_bar <UDID> override --time 9:41 --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3
+xcrun simctl ui <UDID> appearance dark   # or light
+xcrun simctl io <UDID> screenshot today.png
 ```
 
-The seven screens in `docs/store-screenshots/` (taken before photo reading and before the demo was removed, so the setup and import screens are out of date) avoid fertile-window wording on purpose (see "Health claims" below). When you retake them, answer the notification prompt before capturing, and pick a date that puts her in autumn or winter.
+In the simulator a link (`simctl openurl`) raises an "Open in Tender?" dialog that nothing can press without a person, so the dev build also watches `Documents/dev-nav.txt` (`useDevNav` in `src/platform/dev.ts`): write a route into it and the app goes there within a second (`/today`, `/import?mode=date&pick=2026-10-26&name=Maya&today=2026-11-21`; a leading `push:` opens it over the current screen, which is how the Rhythm, Profile, idea and Backup sheets are meant to be seen). Find the file with `xcrun simctl get_app_container <UDID> com.9labs.tenderapp data`. Two quirks: the simulator draws the Dynamic Island only on some frames (retake until it is there, or paint it on with the measured 284 x 110 stadium at x 518, y 42), and a sheet must be opened over Today, not jumped to.
+
+The nine screens in `docs/store-screenshots/` avoid fertile-window wording on purpose (see "Health claims" below). When you retake them, pick a date that puts her in autumn or winter, and use a made-up name.
 
 ### Xcode version
 
