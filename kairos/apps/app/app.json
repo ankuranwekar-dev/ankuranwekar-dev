@@ -2,7 +2,7 @@
   "expo": {
     "name": "Tender",
     "slug": "tender",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tender",
@@ -10,7 +10,7 @@
     "backgroundColor": "#0D0A0C",
     "ios": {
       "bundleIdentifier": "com.9labs.tenderapp",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "supportsTablet": false,
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true,

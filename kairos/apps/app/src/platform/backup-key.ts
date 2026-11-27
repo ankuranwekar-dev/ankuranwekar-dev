@@ -48,3 +48,31 @@ export async function forgetBackupSecret(): Promise<void> {
 
 /** Whether another phone could get the secret without a recovery code. Best effort: the module cannot see iCloud's setting. */
 export const secretCanSync = synced != null;
+
+const SESSION = 'tender.backup.session.v1';
+
+export interface BackupSessionToken {
+  token: string;
+  expiresAt: string;
+}
+
+/**
+ * The Tender session for the backup server. Apple's identity tokens last ten minutes and a new one means showing Apple's
+ * sign-in sheet, so the app keeps this instead: months long, renewed quietly, in this phone's keychain only.
+ */
+export async function loadBackupSession(): Promise<BackupSessionToken | null> {
+  try {
+    const text = await secureGet(SESSION);
+    return text ? (JSON.parse(text) as BackupSessionToken) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveBackupSession(s: BackupSessionToken): Promise<void> {
+  await secureSet(SESSION, JSON.stringify(s)).catch(() => {});
+}
+
+export async function forgetBackupSession(): Promise<void> {
+  await secureDelete(SESSION).catch(() => {});
+}

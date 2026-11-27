@@ -291,3 +291,60 @@ describe('the backup server', () => {
     expect((await t.call({ op: 'put', token: tok, blob, base: 1 })).status).toBe(200);
   });
 });
+
+describe('sessions (so backups never show Apple\'s sign-in sheet)', () => {
+  const DAY = 86_400_000;
+
+  it('trades one Apple token for a session that works for months, with no Apple token after', async () => {
+    const t = await setup();
+    const res = await t.call({ op: 'session', token: await t.token('apple-user-1') });
+    expect(res.status).toBe(200);
+    const session: string = res.body.session;
+    expect(session.startsWith('s1.')).toBe(true);
+    expect(Date.parse(res.body.expiresAt)).toBe(1_800_000_000_000 + 180 * DAY);
+
+    // Apple's token is long expired; the session still backs up, months later.
+    t.tick(90 * DAY);
+    const blob = sealBackup(newBackupSecret(), sample);
+    expect((await t.call({ op: 'put', token: session, blob, base: 0 })).status).toBe(200);
+    expect((await t.call({ op: 'head', token: session })).body.version).toBe(1);
+
+    // It is the same account as the Apple identity: a fresh Apple token sees the same backup.
+    expect((await t.call({ op: 'head', token: await t.token('apple-user-1') })).body.version).toBe(1);
+  });
+
+  it('renews itself without Apple, and stops working once expired', async () => {
+    const t = await setup();
+    const first = (await t.call({ op: 'session', token: await t.token('apple-user-1') })).body.session;
+    t.tick(170 * DAY);
+    const renewed = await t.call({ op: 'session', token: first });
+    expect(renewed.status).toBe(200);
+    expect(Date.parse(renewed.body.expiresAt)).toBe(1_800_000_000_000 + 350 * DAY);
+
+    t.tick(11 * DAY); // the first session is now past its 180 days
+    expect((await t.call({ op: 'head', token: first })).status).toBe(401);
+    expect((await t.call({ op: 'session', token: first })).status).toBe(401);
+    expect((await t.call({ op: 'head', token: renewed.body.session })).status).toBe(404); // valid, just no backup yet
+  });
+
+  it('cannot be forged, altered or moved to another account', async () => {
+    const t = await setup();
+    const a = (await t.call({ op: 'session', token: await t.token('apple-user-1') })).body.session as string;
+    await t.call({ op: 'put', token: a, blob: sealBackup(newBackupSecret(), sample), base: 0 });
+
+    const [, payload, sig] = a.split('.');
+    const other = toBase64Url(new TextEncoder().encode(JSON.stringify({ u: 'someone-else', e: 9_999_999_999 })));
+    for (const bad of [`s1.${other}.${sig}`, `s1.${payload}.${sig!.slice(0, -2)}AA`, `s1.${payload}`, 's1.', 's1.x.y']) {
+      expect((await t.call({ op: 'head', token: bad })).status).toBe(401);
+    }
+
+    // A server with a different pepper does not accept this one's sessions.
+    const elsewhere = createBackupApi({ store: t.store, verify: async () => ({ sub: 'x' }), pepper: 'q'.repeat(48) });
+    const res = await elsewhere(new Request('https://x.test', { method: 'POST', body: JSON.stringify({ op: 'head', token: a }) }));
+    expect(res.status).toBe(401);
+
+    // Another person's session does not see this backup.
+    const b = (await t.call({ op: 'session', token: await t.token('apple-user-2') })).body.session;
+    expect((await t.call({ op: 'head', token: b })).status).toBe(404);
+  });
+});

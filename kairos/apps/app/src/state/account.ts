@@ -16,8 +16,16 @@ import {
   remoteGet,
   remoteHead,
   remotePut,
+  remoteSession,
 } from '@/platform/backup-api';
-import { forgetBackupSecret, loadBackupSecret, saveBackupSecret } from '@/platform/backup-key';
+import {
+  forgetBackupSecret,
+  forgetBackupSession,
+  loadBackupSecret,
+  loadBackupSession,
+  saveBackupSecret,
+  saveBackupSession,
+} from '@/platform/backup-key';
 
 import {
   fingerprint,
@@ -58,14 +66,62 @@ export class AccountError extends Error {
 const nowIso = () => new Date().toISOString();
 const state = () => useStore.getState();
 
+const DAY = 86_400_000;
+
+/**
+ * Whether getting a token may show Apple's sign-in sheet. Only for something the person just tapped; automatic backups
+ * run with this off, so the app never interrupts anyone with Apple's sheet on its own.
+ */
+let mayAskApple = true;
+
+/** Runs a job that must never show Apple's sign-in sheet. */
+export async function quietly<T>(job: () => Promise<T>): Promise<T> {
+  const before = mayAskApple;
+  mayAskApple = false;
+  try {
+    return await job();
+  } finally {
+    mayAskApple = before;
+  }
+}
+
+/** Trade a token (Apple's, or a session about to lapse) for a fresh session and keep it. */
+async function startSession(token: string): Promise<string | null> {
+  try {
+    const s = await remoteSession(token);
+    await saveBackupSession({ token: s.session, expiresAt: s.expiresAt });
+    return s.session;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * A token for the backup server. Normally the stored Tender session (renewed quietly when it has under a month left).
+ * Only when there is none, and only for something the person just tapped, does this ask Apple, which shows its sheet.
+ */
 async function freshToken(): Promise<string> {
   const user = state().account?.user;
   if (!user) throw new AccountError('sign-in', 'Not signed in');
+
+  const stored = await loadBackupSession();
+  const left = stored ? Date.parse(stored.expiresAt) - Date.now() : 0;
+  if (stored && left > DAY) {
+    if (left < 30 * DAY) return (await startSession(stored.token)) ?? stored.token;
+    return stored.token;
+  }
+  if (!mayAskApple) {
+    state().patchAccount({ needsSignIn: true });
+    throw new AccountError('sign-in', 'Sign in with Apple again');
+  }
+  let apple: string;
   try {
-    return await freshAppleToken(user);
+    apple = await freshAppleToken(user);
   } catch {
     throw new AccountError('sign-in', 'Sign in with Apple again');
   }
+  state().patchAccount({ needsSignIn: false });
+  return (await startSession(apple)) ?? apple;
 }
 
 /** Network and server failures, as the few things a person can act on. BackupErrors pass through for the code screen. */
@@ -139,8 +195,11 @@ export async function signIn(): Promise<Settled> {
   if (!backupConfigured) throw new AccountError('server', 'Backup is not set up in this build');
   const cred = await signInWithApple();
   // Signed in with Apple even if the backup cannot be reached right now: "Back up now" can try again.
+  await forgetBackupSession(); // never let an older session (perhaps another Apple ID's) stand in for this one
   state().setAccount({ user: cred.user, since: nowIso() });
-  return guarded(async () => present(await session.settle(cred.token)));
+  // One Apple token, traded at once for a session: from here on nothing shows Apple's sheet again.
+  const token = (await startSession(cred.token)) ?? cred.token;
+  return guarded(async () => present(await session.settle(token)));
 }
 
 /** The person chose the backup over what is on this phone. */
@@ -168,6 +227,7 @@ export const currentRecoveryCode = () => session.recoveryCode();
 export function signOut(): void {
   state().setAccount(undefined);
   session.forgetPending();
+  forgetBackupSession().catch(() => {});
 }
 
 /**
@@ -202,7 +262,7 @@ export async function saveBeforeErasing(): Promise<boolean> {
   if (!s.account || !backupConfigured || !hasLocalData(s)) return true;
   if (!backupIsDue()) return true;
   try {
-    await backupNow();
+    await quietly(backupNow);
     return true;
   } catch {
     return false;
@@ -227,7 +287,7 @@ export function useAutoBackup(ready: boolean): void {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const run = () => {
       timer = undefined;
-      if (backupIsDue()) backupNow().catch(() => {});
+      if (backupIsDue()) quietly(backupNow).catch(() => {});
     };
     const later = (ms: number) => {
       clearTimeout(timer);

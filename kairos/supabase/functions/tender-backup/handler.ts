@@ -9,6 +9,12 @@
  *   get     -> { blob, version, updatedAt }              the sealed blob
  *   put     { blob, base } -> { version, updatedAt }     replace it; `base` is the version being replaced (0 for none)
  *   delete  -> { ok: true }                              erase the account's backup for good
+ *   session -> { session, expiresAt }                    a Tender session token for this account
+ *
+ * `token` is either an Apple identity token or a Tender session token (`s1.…`). Apple's tokens last ten minutes and a
+ * new one can only be had by showing the person Apple's sign-in sheet, so the app trades one for a session once, at
+ * sign-in, and uses the session for everything after: backups never interrupt anyone. A session is the account hash
+ * and an expiry, signed with a key derived from the pepper; `session` called with a live session renews it.
  *
  * What it can see: that an account exists, how large its blob is and when it last changed. What it cannot see: anything
  * inside the blob. The account is stored as a keyed hash of Apple's identifier, so a copy of the table does not name
@@ -40,7 +46,11 @@ export interface BackupOptions {
   maxChars?: number;
   /** Fewest milliseconds between two writes by one account. */
   minIntervalMs?: number;
+  /** How long a session lasts, in days. */
+  sessionDays?: number;
 }
+
+const SESSION_PREFIX = 's1.';
 
 const BLOB_RE = /^[A-Za-z0-9_-]+$/;
 
@@ -58,6 +68,50 @@ function toBase64Url(bytes: Uint8Array): string {
   let bin = '';
   for (const b of bytes) bin += String.fromCharCode(b);
   return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function hmac(keyBytes: Uint8Array, data: string): Promise<Uint8Array> {
+  const key = await crypto.subtle.importKey('raw', keyBytes, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(data)));
+}
+
+function fromBase64Url(s: string): Uint8Array {
+  const bin = atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (s.length % 4)) % 4));
+  return Uint8Array.from(bin, (c) => c.charCodeAt(0));
+}
+
+function sameBytes(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i]! ^ b[i]!;
+  return diff === 0;
+}
+
+/** Signs and checks Tender session tokens: `s1.<payload>.<signature>`, payload `{"u": account hash, "e": expiry s}`. */
+export function sessionTokens(pepper: string) {
+  const key = hmac(new TextEncoder().encode(pepper), 'tender-session-v1');
+  return {
+    async issue(user: string, expiresAt: number): Promise<string> {
+      const payload = toBase64Url(new TextEncoder().encode(JSON.stringify({ u: user, e: expiresAt })));
+      const sig = toBase64Url(await hmac(await key, SESSION_PREFIX + payload));
+      return `${SESSION_PREFIX}${payload}.${sig}`;
+    },
+    /** The account hash and expiry, or null if the token is not a genuine session. Expiry is the caller's to check. */
+    async read(token: string): Promise<{ user: string; expiresAt: number } | null> {
+      if (!token.startsWith(SESSION_PREFIX) || token.length > 512) return null;
+      const [payload, sig] = token.slice(SESSION_PREFIX.length).split('.');
+      if (!payload || !sig) return null;
+      try {
+        const want = await hmac(await key, SESSION_PREFIX + payload);
+        if (!sameBytes(want, fromBase64Url(sig))) return null;
+        const body = JSON.parse(new TextDecoder().decode(fromBase64Url(payload))) as { u?: unknown; e?: unknown };
+        if (typeof body.u !== 'string' || typeof body.e !== 'number') return null;
+        return { user: body.u, expiresAt: body.e };
+      } catch {
+        return null;
+      }
+    },
+  };
 }
 
 /** Keyed hash of the Apple identifier: 43 characters. */
@@ -82,6 +136,8 @@ export function createBackupApi(opts: BackupOptions): (req: Request) => Promise<
   const now = opts.now ?? (() => Date.now());
   const maxChars = opts.maxChars ?? 262_144;
   const minInterval = opts.minIntervalMs ?? 2000;
+  const sessionSeconds = Math.round((opts.sessionDays ?? 180) * 86_400);
+  const sessions = sessionTokens(opts.pepper);
 
   return async (req) => {
     try {
@@ -94,13 +150,20 @@ export function createBackupApi(opts: BackupOptions): (req: Request) => Promise<
       }
       if (typeof body.op !== 'string' || typeof body.token !== 'string') throw new HttpError(400, 'op and token are required');
 
-      let sub: string;
-      try {
-        sub = (await opts.verify(body.token)).sub;
-      } catch {
-        throw new HttpError(401, 'Sign in again');
+      let user: string;
+      if (body.token.startsWith(SESSION_PREFIX)) {
+        const s = await sessions.read(body.token);
+        if (!s || s.expiresAt * 1000 <= now()) throw new HttpError(401, 'Sign in again');
+        user = s.user;
+      } else {
+        let sub: string;
+        try {
+          sub = (await opts.verify(body.token)).sub;
+        } catch {
+          throw new HttpError(401, 'Sign in again');
+        }
+        user = await accountHash(sub, opts.pepper);
       }
-      const user = await accountHash(sub, opts.pepper);
 
       switch (body.op) {
         case 'head': {
@@ -129,6 +192,10 @@ export function createBackupApi(opts: BackupOptions): (req: Request) => Promise<
             });
           }
           return reply(200, { version: row.version, updatedAt: row.updatedAt });
+        }
+        case 'session': {
+          const expiresAt = Math.floor(now() / 1000) + sessionSeconds;
+          return reply(200, { session: await sessions.issue(user, expiresAt), expiresAt: new Date(expiresAt * 1000).toISOString() });
         }
         case 'delete': {
           await opts.store.delete(user);

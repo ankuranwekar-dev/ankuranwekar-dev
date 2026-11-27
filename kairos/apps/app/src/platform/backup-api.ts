@@ -60,3 +60,6 @@ export const remoteGet = (token: string) => call<RemoteBackup>('get', token);
 export const remotePut = (token: string, blob: string, base: number) =>
   call<{ version: number; updatedAt: string }>('put', token, { blob, base });
 export const remoteDelete = (token: string) => call<{ ok: true }>('delete', token);
+
+/** Trades an Apple identity token (or a live session) for a Tender session: `{ session, expiresAt }`. */
+export const remoteSession = (token: string) => call<{ session: string; expiresAt: string }>('session', token);

@@ -6,7 +6,7 @@ import { Alert, Platform, StyleSheet, TextInput, View } from 'react-native';
 import { haptic } from '@/platform/haptics';
 import { backupConfigured } from '@/platform/backup-api';
 import { relayConfigured, unpair } from '@/platform/relay';
-import { saveBeforeErasing } from '@/state/account';
+import { saveBeforeErasing, signOut } from '@/state/account';
 import { useKairos } from '@/state/kairos';
 import { useStore } from '@/state/store';
 import { Button, Chip, Press, Segmented, Toggle } from '@/ui/controls';
@@ -213,6 +213,7 @@ function StartOver() {
   const [armed, setArmed] = useState(false);
   const busy = useRef(false);
   const go = () => {
+    signOut();
     reset();
     router.dismissTo('/welcome');
   };

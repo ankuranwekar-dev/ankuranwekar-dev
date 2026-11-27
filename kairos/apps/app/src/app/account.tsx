@@ -310,12 +310,20 @@ export default function Account() {
   return (
     <Sheet title="Backup">
       <T variant="title2" style={{ marginTop: Space.m }}>
-        {account.conflict ? 'Another phone backed up.' : account.lastBackupAt ? 'Backed up.' : 'Not backed up yet.'}
+        {account.conflict
+          ? 'Another phone backed up.'
+          : account.needsSignIn
+            ? 'Backups paused.'
+            : account.lastBackupAt
+              ? 'Backed up.'
+              : 'Not backed up yet.'}
       </T>
       <T variant="callout" tone="secondary" style={{ marginTop: Space.s }}>
         {account.conflict
           ? 'Choose which to keep.'
-          : account.lastBackupAt
+          : account.needsSignIn
+            ? 'Tap Back up now to turn them back on.'
+            : account.lastBackupAt
             ? `Last: ${when(account.lastBackupAt)}`
             : 'Tap Back up now.'}
       </T>

@@ -54,6 +54,8 @@ export interface Account {
   version?: number;
   /** Fingerprint of the data the backup holds (see `fingerprint`): when it differs from the phone's, a backup is due. */
   backedUp?: string;
+  /** Automatic backups stopped because the Tender session lapsed; "Back up now" signs in again (once). */
+  needsSignIn?: boolean;
   /** Another phone has backed up since; automatic backups wait until the person chooses which to keep. */
   conflict?: boolean;
 }
